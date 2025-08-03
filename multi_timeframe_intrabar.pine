@@ -239,7 +239,8 @@ getLabelStyle(styleString) =>
         "Label Center" => label.style_label_center
         "Triangle Up" => label.style_triangleup
         "Triangle Down" => label.style_triangledown
-     
+        "Triangle Left" => label.style_triangleleft
+        "Triangle Right" => label.style_triangleright
         "Flag" => label.style_flag
         "Circle" => label.style_circle
         "Square" => label.style_square
