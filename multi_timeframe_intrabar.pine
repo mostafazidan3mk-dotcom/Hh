@@ -142,11 +142,16 @@ process_tf(tf) =>
         touchBear = (use_wick_touch and (tfHigh > rangeHigh and tfClose < rangeHigh and tfLow > rangeLow)) or
                     (use_body_touch and (tfOpen > rangeHigh and tfClose < rangeHigh))
 
-        // --- Rejection Wick Detection ---
-        // Bullish rejection: wick makes lower low than body & candle closes bullish & touched low
-        bullishRejection = (tfLow < math.min(tfOpen, tfClose)) and (tfClose > tfOpen) and (tfLow <= rangeLow)
-        // Bearish rejection: wick makes higher high than body & candle closes bearish & touched high
-        bearishRejection = (tfHigh > math.max(tfOpen, tfClose)) and (tfClose < tfOpen) and (tfHigh >= rangeHigh)
+        // --- Identify swept candle levels (previous candle) ---
+        prevLow  = tfLow[1]
+        prevHigh = tfHigh[1]
+
+        // --- Rejection Wick with sweep confirmation ---
+        // Bullish rejection: current low sweeps previous candle's low & closes bullish
+        bullishRejection = (tfLow < prevLow) and (tfClose > tfOpen) and (tfClose > tfLow[1])
+        
+        // Bearish rejection: current high sweeps previous candle's high & closes bearish
+        bearishRejection = (tfHigh > prevHigh) and (tfClose < tfOpen) and (tfClose < tfHigh[1])
 
         // --- Combine both methods ---
         bullishTouch := touchBull or bullishRejection
