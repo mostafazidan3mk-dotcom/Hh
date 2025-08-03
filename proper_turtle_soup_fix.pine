@@ -67,10 +67,8 @@ maxbars         = input.int(250, "Maximum Bars", group = g_OPT)
 hllinewidth     = input.int(2, "High/Low Line Width", group = g_OPT)
 midlinewidth    = input.int(1, "Mid Line Width", group = g_OPT)
 
-// TURTLE SOUP INPUTS - Fixed for each timeframe
+// TURTLE SOUP INPUTS - Using your range breakout logic
 turtle_soup_enable = input.bool(true, "Enable Turtle Soup", group = g_OPT)
-turtle_lookback = input.int(10, "Turtle Soup Lookback", minval = 5, maxval = 50, group = g_OPT)
-turtle_wick_sweep = input.bool(true, "Detect Wick Sweeps", group = g_OPT)
 
 var g_LABEL = "Label Options"
 bullishLabelStyle = input.string("Label Up", "Bullish Label Style", options=[  "None", "Label Up", "Label Down", "Label Left", "Label Right", "Label Center",   "Triangle Up", "Triangle Down", "Triangle Left", "Triangle Right",   "Flag", "Circle", "Square", "Diamond", "Cross", "X-Cross", "Arrow Up", "Arrow Down" ], group=g_LABEL)
@@ -97,58 +95,7 @@ var g_TOUCH = "Touch Options"
 use_wick_touch = input.bool(true, "Use Wick Touch", group=g_TOUCH)
 use_body_touch = input.bool(true, "Use Body Touch", group=g_TOUCH)
 
-// TURTLE SOUP DETECTION for each timeframe's own data
-turtle_soup_detection(tfHigh, tfLow, tfClose, tfOpen) =>
-    var bool turtleSoupBull = false
-    var bool turtleSoupBear = false
-    
-    if turtle_soup_enable
-        // Get recent support/resistance levels from THIS timeframe
-        recentHigh = ta.highest(tfHigh, turtle_lookback)
-        recentLow = ta.lowest(tfLow, turtle_lookback)
-        
-        // Current candle analysis
-        currentHigh = tfHigh
-        currentLow = tfLow  
-        currentClose = tfClose
-        currentOpen = tfOpen
-        
-        // Previous candle analysis
-        prevHigh = tfHigh[1]
-        prevLow = tfLow[1]
-        prevClose = tfClose[1]
-        
-        // BULLISH TURTLE SOUP: Swept low then rallied
-        // 1. Current candle made new low (swept below recent support)
-        // 2. But closed back above the recent support level
-        sweptLowThisCandle = currentLow < recentLow[1]
-        closedAboveSupport = currentClose > recentLow[1]
-        
-        if turtle_wick_sweep
-            // Include wick sweeps: low swept but close recovered
-            turtleSoupBull := sweptLowThisCandle and closedAboveSupport
-        else
-            // Body sweep: open was below support but closed above
-            openedBelowSupport = currentOpen < recentLow[1]
-            turtleSoupBull := openedBelowSupport and closedAboveSupport
-        
-        // BEARISH TURTLE SOUP: Swept high then failed
-        // 1. Current candle made new high (swept above recent resistance)  
-        // 2. But closed back below the recent resistance level
-        sweptHighThisCandle = currentHigh > recentHigh[1]
-        closedBelowResistance = currentClose < recentHigh[1]
-        
-        if turtle_wick_sweep
-            // Include wick sweeps: high swept but close failed
-            turtleSoupBear := sweptHighThisCandle and closedBelowResistance
-        else
-            // Body sweep: open was above resistance but closed below
-            openedAboveResistance = currentOpen > recentHigh[1]
-            turtleSoupBear := openedAboveResistance and closedBelowResistance
-    
-    [turtleSoupBull, turtleSoupBear]
-
-// Modified process_tf function with proper turtle soup for EACH timeframe
+// Modified process_tf function with turtle soup using YOUR range breakout logic
 process_tf(tf) =>
     var float rangeHigh = na
     var float rangeLow = na
@@ -157,6 +104,12 @@ process_tf(tf) =>
     var bool inConsolidation = true
     var bool bullishTouch = false
     var bool bearishTouch = false
+    
+    // TURTLE SOUP tracking - using YOUR range logic
+    var bool brokeAbove = false
+    var bool brokeBelow = false
+    var bool turtleSoupBull = false
+    var bool turtleSoupBear = false
     
     [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_on)
     
@@ -167,12 +120,19 @@ process_tf(tf) =>
     tfChildUp = tfOpen > tfClose ? tfOpen : tfClose
     tfChildDown = tfOpen > tfClose ? tfClose : tfOpen
     
-    // TURTLE SOUP detection using THIS timeframe's data
-    [turtleSoupBull, turtleSoupBear] = request.security(syminfo.tickerid, tf, turtle_soup_detection(high, low, close, open), barmerge.gaps_off, barmerge.lookahead_off)
-    
     if newBar
         upControl = tfChildUp > rangeHigh and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
         downControl = tfChildDown < rangeLow and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
+        
+        // TURTLE SOUP: Track breakouts using YOUR exact logic
+        if turtle_soup_enable and not na(rangeHigh) and not na(rangeLow)
+            // Detect breakout ABOVE your range
+            if upControl
+                brokeAbove := true
+                
+            // Detect breakout BELOW your range  
+            if downControl
+                brokeBelow := true
         
         if (upControl or downControl)
             inConsolidation := false
@@ -184,6 +144,9 @@ process_tf(tf) =>
             rangeLow := tfLow
             rangeStart := bar_index
             inConsolidation := true
+            // Reset turtle soup when new range starts
+            brokeAbove := false
+            brokeBelow := false
         
         if not inConsolidation and (bar_index - rangeStart > maxbars or bar_index - rangeStart < minbars)
             inConsolidation := true
@@ -191,6 +154,8 @@ process_tf(tf) =>
         rangeMid := (rangeHigh + rangeLow) / 2
         bullishTouch := false
         bearishTouch := false
+        turtleSoupBull := false
+        turtleSoupBear := false
     
     if inConsolidation
         bullishWickTouch = low < rangeLow and close > rangeLow and high < rangeHigh
@@ -200,6 +165,18 @@ process_tf(tf) =>
         
         bullishTouch := (use_wick_touch and bullishWickTouch) or (use_body_touch and bullishBodyTouch)
         bearishTouch := (use_wick_touch and bearishWickTouch) or (use_body_touch and bearishBodyTouch)
+        
+        // TURTLE SOUP: Broke out but now BACK in range (using YOUR logic)
+        if turtle_soup_enable
+            // Bullish turtle soup: broke below but now back in range
+            if brokeBelow and tfChildDown >= rangeLow and tfChildUp <= rangeHigh
+                turtleSoupBull := true
+                brokeBelow := false
+                
+            // Bearish turtle soup: broke above but now back in range  
+            if brokeAbove and tfChildUp <= rangeHigh and tfChildDown >= rangeLow
+                turtleSoupBear := true
+                brokeAbove := false
     
     [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch, turtleSoupBull, turtleSoupBear]
 
