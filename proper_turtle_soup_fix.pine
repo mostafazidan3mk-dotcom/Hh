@@ -106,8 +106,6 @@ process_tf(tf) =>
     var bool bearishTouch = false
     
     // TURTLE SOUP tracking - using YOUR range logic
-    var bool brokeAbove = false
-    var bool brokeBelow = false
     var bool turtleSoupBull = false
     var bool turtleSoupBear = false
     
@@ -124,15 +122,27 @@ process_tf(tf) =>
         upControl = tfChildUp > rangeHigh and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
         downControl = tfChildDown < rangeLow and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
         
-        // TURTLE SOUP: Track breakouts using YOUR exact logic
+        // TURTLE SOUP: Detect on THIS candle - swept and recovered
         if turtle_soup_enable and not na(rangeHigh) and not na(rangeLow)
-            // Detect breakout ABOVE your range
-            if upControl
-                brokeAbove := true
+            // Bullish turtle soup: Low swept below range BUT close is back above range low
+            // This catches your 4H pattern: "swept the low and continue"
+            sweptLow = tfLow < rangeLow
+            recoveredAboveLow = tfClose >= rangeLow
+            if sweptLow and recoveredAboveLow
+                turtleSoupBull := true
+            else
+                turtleSoupBull := false
                 
-            // Detect breakout BELOW your range  
-            if downControl
-                brokeBelow := true
+            // Bearish turtle soup: High swept above range BUT close is back below range high  
+            sweptHigh = tfHigh > rangeHigh
+            recoveredBelowHigh = tfClose <= rangeHigh
+            if sweptHigh and recoveredBelowHigh
+                turtleSoupBear := true
+            else
+                turtleSoupBear := false
+        else
+            turtleSoupBull := false
+            turtleSoupBear := false
         
         if (upControl or downControl)
             inConsolidation := false
@@ -144,9 +154,6 @@ process_tf(tf) =>
             rangeLow := tfLow
             rangeStart := bar_index
             inConsolidation := true
-            // Reset turtle soup when new range starts
-            brokeAbove := false
-            brokeBelow := false
         
         if not inConsolidation and (bar_index - rangeStart > maxbars or bar_index - rangeStart < minbars)
             inConsolidation := true
@@ -154,8 +161,6 @@ process_tf(tf) =>
         rangeMid := (rangeHigh + rangeLow) / 2
         bullishTouch := false
         bearishTouch := false
-        turtleSoupBull := false
-        turtleSoupBear := false
     
     if inConsolidation
         bullishWickTouch = low < rangeLow and close > rangeLow and high < rangeHigh
@@ -165,18 +170,6 @@ process_tf(tf) =>
         
         bullishTouch := (use_wick_touch and bullishWickTouch) or (use_body_touch and bullishBodyTouch)
         bearishTouch := (use_wick_touch and bearishWickTouch) or (use_body_touch and bearishBodyTouch)
-        
-        // TURTLE SOUP: Broke out but now BACK in range (using YOUR logic)
-        if turtle_soup_enable
-            // Bullish turtle soup: broke below but now back in range
-            if brokeBelow and tfChildDown >= rangeLow and tfChildUp <= rangeHigh
-                turtleSoupBull := true
-                brokeBelow := false
-                
-            // Bearish turtle soup: broke above but now back in range  
-            if brokeAbove and tfChildUp <= rangeHigh and tfChildDown >= rangeLow
-                turtleSoupBear := true
-                brokeAbove := false
     
     [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch, turtleSoupBull, turtleSoupBear]
 
