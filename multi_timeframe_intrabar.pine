@@ -106,8 +106,8 @@ process_tf(tf) =>
     var bool inConsolidation = true
     var bool bullishTouch = false
     var bool bearishTouch = false
-    var int lastBullishSweep = 0
-    var int lastBearishSweep = 0
+    var int lastBullIndex = na
+    var int lastBearIndex = na
     
     [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_on)
     
@@ -157,26 +157,32 @@ process_tf(tf) =>
 
         // --- Rejection Wick with sweep confirmation (with anti-spam filters) ---
         // Bullish rejection: current low sweeps previous candle's low & closes bullish
-        bullishRejection = use_sweep_rejection and 
-                          (tfLow < prevLow) and 
-                          (tfClose > tfOpen) and 
-                          (tfClose > tfLow[1]) and
-                          (bullishSweepSize >= sweep_min_size) and
-                          (bar_index - lastBullishSweep >= sweep_cooldown)
+        bullRejection = use_sweep_rejection and 
+                       (tfLow < prevLow) and 
+                       (tfClose > tfOpen) and 
+                       (tfClose > tfLow[1]) and
+                       (bullishSweepSize >= sweep_min_size)
         
         // Bearish rejection: current high sweeps previous candle's high & closes bearish
-        bearishRejection = use_sweep_rejection and
-                          (tfHigh > prevHigh) and 
-                          (tfClose < tfOpen) and 
-                          (tfClose < tfHigh[1]) and
-                          (bearishSweepSize >= sweep_min_size) and
-                          (bar_index - lastBearishSweep >= sweep_cooldown)
+        bearRejection = use_sweep_rejection and
+                       (tfHigh > prevHigh) and 
+                       (tfClose < tfOpen) and 
+                       (tfClose < tfHigh[1]) and
+                       (bearishSweepSize >= sweep_min_size)
 
-        // --- Update sweep timestamps ---
-        if bullishRejection
-            lastBullishSweep := bar_index
-        if bearishRejection
-            lastBearishSweep := bar_index
+        // --- Apply cooldown filter ---
+        isValidBull = bullRejection and (na(lastBullIndex) or bar_index - lastBullIndex > sweep_cooldown)
+        isValidBear = bearRejection and (na(lastBearIndex) or bar_index - lastBearIndex > sweep_cooldown)
+
+        // --- Update timestamps ---
+        if isValidBull
+            lastBullIndex := bar_index
+        if isValidBear
+            lastBearIndex := bar_index
+
+        // --- Final touch signals ---
+        bullishRejection := isValidBull
+        bearishRejection := isValidBear
 
         // --- Combine both methods ---
         bullishTouch := touchBull or bullishRejection
