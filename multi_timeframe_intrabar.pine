@@ -93,6 +93,9 @@ eol_label_offset = input.int(5, "End-of-Line Label Offset", minval=1, maxval=50,
 var g_TOUCH = "Touch Options"
 use_wick_touch = input.bool(true, "Use Wick Touch", group=g_TOUCH)
 use_body_touch = input.bool(true, "Use Body Touch", group=g_TOUCH)
+use_sweep_rejection = input.bool(true, "Use Sweep Rejection", group=g_TOUCH)
+sweep_min_size = input.float(0.5, "Min Sweep Size (%)", minval=0.1, maxval=5.0, step=0.1, group=g_TOUCH)
+sweep_cooldown = input.int(3, "Sweep Cooldown (bars)", minval=1, maxval=20, group=g_TOUCH)
 
 // Modified process_tf function with enhanced touch detection
 process_tf(tf) =>
@@ -103,6 +106,8 @@ process_tf(tf) =>
     var bool inConsolidation = true
     var bool bullishTouch = false
     var bool bearishTouch = false
+    var int lastBullishSweep = 0
+    var int lastBearishSweep = 0
     
     [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_on)
     
@@ -146,12 +151,32 @@ process_tf(tf) =>
         prevLow  = tfLow[1]
         prevHigh = tfHigh[1]
 
-        // --- Rejection Wick with sweep confirmation ---
+        // --- Calculate sweep sizes ---
+        bullishSweepSize = (prevLow - tfLow) / prevLow * 100
+        bearishSweepSize = (tfHigh - prevHigh) / prevHigh * 100
+
+        // --- Rejection Wick with sweep confirmation (with anti-spam filters) ---
         // Bullish rejection: current low sweeps previous candle's low & closes bullish
-        bullishRejection = (tfLow < prevLow) and (tfClose > tfOpen) and (tfClose > tfLow[1])
+        bullishRejection = use_sweep_rejection and 
+                          (tfLow < prevLow) and 
+                          (tfClose > tfOpen) and 
+                          (tfClose > tfLow[1]) and
+                          (bullishSweepSize >= sweep_min_size) and
+                          (bar_index - lastBullishSweep >= sweep_cooldown)
         
         // Bearish rejection: current high sweeps previous candle's high & closes bearish
-        bearishRejection = (tfHigh > prevHigh) and (tfClose < tfOpen) and (tfClose < tfHigh[1])
+        bearishRejection = use_sweep_rejection and
+                          (tfHigh > prevHigh) and 
+                          (tfClose < tfOpen) and 
+                          (tfClose < tfHigh[1]) and
+                          (bearishSweepSize >= sweep_min_size) and
+                          (bar_index - lastBearishSweep >= sweep_cooldown)
+
+        // --- Update sweep timestamps ---
+        if bullishRejection
+            lastBullishSweep := bar_index
+        if bearishRejection
+            lastBearishSweep := bar_index
 
         // --- Combine both methods ---
         bullishTouch := touchBull or bullishRejection
