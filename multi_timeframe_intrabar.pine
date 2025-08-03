@@ -180,13 +180,9 @@ process_tf(tf) =>
         if isValidBear
             lastBearIndex := bar_index
 
-        // --- Final touch signals ---
-        bullishRejection := isValidBull
-        bearishRejection := isValidBear
-
         // --- Combine both methods ---
-        bullishTouch := touchBull or bullishRejection
-        bearishTouch := touchBear or bearishRejection
+        bullishTouch := touchBull or isValidBull
+        bearishTouch := touchBear or isValidBear
     
     [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch]
 
