@@ -95,22 +95,6 @@ use_sweep_rejection = input.bool(true, "Use Sweep Rejection", group=g_TOUCH)
 sweep_min_size = input.float(0.5, "Min Sweep Size (%)", minval=0.1, maxval=5.0, step=0.1, group=g_TOUCH)
 sweep_cooldown = input.int(3, "Sweep Cooldown Bars", minval=1)
 
-// --- Best wick rejection tracking variables for each timeframe ---
-var float bestBullishLow1 = na, bestBearishHigh1 = na
-var bool bullishSet1 = false, bearishSet1 = false
-var float bestBullishLow2 = na, bestBearishHigh2 = na
-var bool bullishSet2 = false, bearishSet2 = false
-var float bestBullishLow3 = na, bestBearishHigh3 = na
-var bool bullishSet3 = false, bearishSet3 = false
-var float bestBullishLow4 = na, bestBearishHigh4 = na
-var bool bullishSet4 = false, bearishSet4 = false
-var float bestBullishLow5 = na, bestBearishHigh5 = na
-var bool bullishSet5 = false, bearishSet5 = false
-var float bestBullishLow6 = na, bestBearishHigh6 = na
-var bool bullishSet6 = false, bearishSet6 = false
-var float bestBullishLow7 = na, bestBearishHigh7 = na
-var bool bullishSet7 = false, bearishSet7 = false
-
 // --- Best sweep tracking variables for each timeframe ---
 var float bestBullishLow1 = na
 var int bestBullishBar1 = na
@@ -205,112 +189,7 @@ process_tf(tf) =>
 [high6, low6, mid6, start6, inRange6, newBar6, bullishTouch6, bearishTouch6, tfTime6] = process_tf(tf6)
 [high7, low7, mid7, start7, inRange7, newBar7, bullishTouch7, bearishTouch7, tfTime7] = process_tf(tf7)
 
-// --- Best wick rejection logic for each timeframe ---
-// M30
-if newBar1
-    bestBullishLow1 := na, bestBearishHigh1 := na, bullishSet1 := false, bearishSet1 := false
-if inRange1
-    if low < low1 and close > open and close > low1
-        if na(bestBullishLow1) or low < bestBullishLow1
-            bestBullishLow1 := low
-            bullishSet1 := true
-    if high > high1 and close < open and close < high1
-        if na(bestBearishHigh1) or high > bestBearishHigh1
-            bestBearishHigh1 := high
-            bearishSet1 := true
-if newBar1
-    bullishTouch1 := bullishSet1
-    bearishTouch1 := bearishSet1
-// H1
-if newBar2
-    bestBullishLow2 := na, bestBearishHigh2 := na, bullishSet2 := false, bearishSet2 := false
-if inRange2
-    if low < low2 and close > open and close > low2
-        if na(bestBullishLow2) or low < bestBullishLow2
-            bestBullishLow2 := low
-            bullishSet2 := true
-    if high > high2 and close < open and close < high2
-        if na(bestBearishHigh2) or high > bestBearishHigh2
-            bestBearishHigh2 := high
-            bearishSet2 := true
-if newBar2
-    bullishTouch2 := bullishSet2
-    bearishTouch2 := bearishSet2
-// H2
-if newBar3
-    bestBullishLow3 := na, bestBearishHigh3 := na, bullishSet3 := false, bearishSet3 := false
-if inRange3
-    if low < low3 and close > open and close > low3
-        if na(bestBullishLow3) or low < bestBullishLow3
-            bestBullishLow3 := low
-            bullishSet3 := true
-    if high > high3 and close < open and close < high3
-        if na(bestBearishHigh3) or high > bestBearishHigh3
-            bestBearishHigh3 := high
-            bearishSet3 := true
-if newBar3
-    bullishTouch3 := bullishSet3
-    bearishTouch3 := bearishSet3
-// H4
-if newBar4
-    bestBullishLow4 := na, bestBearishHigh4 := na, bullishSet4 := false, bearishSet4 := false
-if inRange4
-    if low < low4 and close > open and close > low4
-        if na(bestBullishLow4) or low < bestBullishLow4
-            bestBullishLow4 := low
-            bullishSet4 := true
-    if high > high4 and close < open and close < high4
-        if na(bestBearishHigh4) or high > bestBearishHigh4
-            bestBearishHigh4 := high
-            bearishSet4 := true
-if newBar4
-    bullishTouch4 := bullishSet4
-    bearishTouch4 := bearishSet4
-// D
-if newBar5
-    bestBullishLow5 := na, bestBearishHigh5 := na, bullishSet5 := false, bearishSet5 := false
-if inRange5
-    if low < low5 and close > open and close > low5
-        if na(bestBullishLow5) or low < bestBullishLow5
-            bestBullishLow5 := low
-            bullishSet5 := true
-    if high > high5 and close < open and close < high5
-        if na(bestBearishHigh5) or high > bestBearishHigh5
-            bestBearishHigh5 := high
-            bearishSet5 := true
-if newBar5
-    bullishTouch5 := bullishSet5
-    bearishTouch5 := bearishSet5
-// W
-if newBar6
-    bestBullishLow6 := na, bestBearishHigh6 := na, bullishSet6 := false, bearishSet6 := false
-if inRange6
-    if low < low6 and close > open and close > low6
-        if na(bestBullishLow6) or low < bestBullishLow6
-            bestBullishLow6 := low
-            bullishSet6 := true
-    if high > high6 and close < open and close < high6
-        if na(bestBearishHigh6) or high > bestBearishHigh6
-            bestBearishHigh6 := high
-            bearishSet6 := true
-if newBar6
-    bullishTouch6 := bullishSet6
-    bearishTouch6 := bearishSet6
-// M
-if newBar7
-    bestBullishLow7 := na, bestBearishHigh7 := na, bullishSet7 := false, bearishSet7 := false
-if inRange7
-    if low < low7 and close > open and close > low7
-        if na(bestBullishLow7) or low < bestBullishLow7
-            bestBullishLow7 := low
-            bullishSet7 := true
-    if high > high7 and close < open and close < high7
-        if na(bestBearishHigh7) or high > bestBearishHigh7
-            bestBearishHigh7 := high
-            bearishSet7 := true
-if newBar7
-    bullishTouch7 := bullishSet7
-    bearishTouch7 := bearishSet7
+
 
 // --- Best sweep detection for each timeframe ---
 // M30
