@@ -95,7 +95,7 @@ use_wick_touch = input.bool(true, "Use Wick Touch", group=g_TOUCH)
 use_body_touch = input.bool(true, "Use Body Touch", group=g_TOUCH)
 use_sweep_rejection = input.bool(true, "Use Sweep Rejection", group=g_TOUCH)
 sweep_min_size = input.float(0.5, "Min Sweep Size (%)", minval=0.1, maxval=5.0, step=0.1, group=g_TOUCH)
-sweep_cooldown = input.int(3, "Sweep Cooldown (bars)", minval=1, maxval=20, group=g_TOUCH)
+sweep_cooldown = input.int(3, "Sweep Cooldown Bars", minval=1)
 
 // Modified process_tf function with enhanced touch detection
 process_tf(tf) =>
@@ -194,6 +194,87 @@ process_tf(tf) =>
 [high5, low5, mid5, start5, inRange5, newBar5, bullishTouch5, bearishTouch5] = process_tf(tf5)
 [high6, low6, mid6, start6, inRange6, newBar6, bullishTouch6, bearishTouch6] = process_tf(tf6)
 [high7, low7, mid7, start7, inRange7, newBar7, bullishTouch7, bearishTouch7] = process_tf(tf7)
+
+// Memory variables for each timeframe
+var int lastBullishTFBarIndex1 = na
+var int lastBearishTFBarIndex1 = na
+var int lastBullishSignal1 = na
+var int lastBearishSignal1 = na
+
+var int lastBullishTFBarIndex2 = na
+var int lastBearishTFBarIndex2 = na
+var int lastBullishSignal2 = na
+var int lastBearishSignal2 = na
+
+var int lastBullishTFBarIndex3 = na
+var int lastBearishTFBarIndex3 = na
+var int lastBullishSignal3 = na
+var int lastBearishSignal3 = na
+
+var int lastBullishTFBarIndex4 = na
+var int lastBearishTFBarIndex4 = na
+var int lastBullishSignal4 = na
+var int lastBearishSignal4 = na
+
+var int lastBullishTFBarIndex5 = na
+var int lastBearishTFBarIndex5 = na
+var int lastBullishSignal5 = na
+var int lastBearishSignal5 = na
+
+var int lastBullishTFBarIndex6 = na
+var int lastBearishTFBarIndex6 = na
+var int lastBullishSignal6 = na
+var int lastBearishSignal6 = na
+
+var int lastBullishTFBarIndex7 = na
+var int lastBearishTFBarIndex7 = na
+var int lastBullishSignal7 = na
+var int lastBearishSignal7 = na
+
+// Helper function for per-timeframe rejection/cooldown logic
+rejection_with_cooldown(tfTime, inConsolidation, low, high, close, open, rangeLow, rangeHigh, lastBullishTFBarIndex, lastBearishTFBarIndex, lastBullishSignal, lastBearishSignal) =>
+    bullishRejection = false
+    bearishRejection = false
+    validBullish = false
+    validBearish = false
+    if inConsolidation
+        wickBull = low < rangeLow and close > rangeLow and close > open
+        wickBear = high > rangeHigh and close < rangeHigh and close < open
+        if wickBull and (lastBullishTFBarIndex != tfTime)
+            bullishRejection := true
+            lastBullishTFBarIndex := tfTime
+        if wickBear and (lastBearishTFBarIndex != tfTime)
+            bearishRejection := true
+            lastBearishTFBarIndex := tfTime
+    validBullish := bullishRejection and (na(lastBullishSignal) or bar_index - lastBullishSignal >= sweep_cooldown)
+    validBearish := bearishRejection and (na(lastBearishSignal) or bar_index - lastBearishSignal >= sweep_cooldown)
+    if validBullish
+        lastBullishSignal := bar_index
+        // Place your bullish label/alert code here
+    if validBearish
+        lastBearishSignal := bar_index
+        // Place your bearish label/alert code here
+    [validBullish, validBearish, lastBullishTFBarIndex, lastBearishTFBarIndex, lastBullishSignal, lastBearishSignal]
+
+// Apply to each timeframe
+global_vars = [
+    [tf1, inRange1, low, high, close, open, high1, low1, lastBullishTFBarIndex1, lastBearishTFBarIndex1, lastBullishSignal1, lastBearishSignal1],
+    [tf2, inRange2, low, high, close, open, high2, low2, lastBullishTFBarIndex2, lastBearishTFBarIndex2, lastBullishSignal2, lastBearishSignal2],
+    [tf3, inRange3, low, high, close, open, high3, low3, lastBullishTFBarIndex3, lastBearishTFBarIndex3, lastBullishSignal3, lastBearishSignal3],
+    [tf4, inRange4, low, high, close, open, high4, low4, lastBullishTFBarIndex4, lastBearishTFBarIndex4, lastBullishSignal4, lastBearishSignal4],
+    [tf5, inRange5, low, high, close, open, high5, low5, lastBullishTFBarIndex5, lastBearishTFBarIndex5, lastBullishSignal5, lastBearishSignal5],
+    [tf6, inRange6, low, high, close, open, high6, low6, lastBullishTFBarIndex6, lastBearishTFBarIndex6, lastBullishSignal6, lastBearishSignal6],
+    [tf7, inRange7, low, high, close, open, high7, low7, lastBullishTFBarIndex7, lastBearishTFBarIndex7, lastBullishSignal7, lastBearishSignal7]
+]
+
+// For each timeframe, call the helper and update the variables
+[validBullish1, validBearish1, lastBullishTFBarIndex1, lastBearishTFBarIndex1, lastBullishSignal1, lastBearishSignal1] = rejection_with_cooldown(tf1, inRange1, low, high, close, open, low1, high1, lastBullishTFBarIndex1, lastBearishTFBarIndex1, lastBullishSignal1, lastBearishSignal1)
+[validBullish2, validBearish2, lastBullishTFBarIndex2, lastBearishTFBarIndex2, lastBullishSignal2, lastBearishSignal2] = rejection_with_cooldown(tf2, inRange2, low, high, close, open, low2, high2, lastBullishTFBarIndex2, lastBearishTFBarIndex2, lastBullishSignal2, lastBearishSignal2)
+[validBullish3, validBearish3, lastBullishTFBarIndex3, lastBearishTFBarIndex3, lastBullishSignal3, lastBearishSignal3] = rejection_with_cooldown(tf3, inRange3, low, high, close, open, low3, high3, lastBullishTFBarIndex3, lastBearishTFBarIndex3, lastBullishSignal3, lastBearishSignal3)
+[validBullish4, validBearish4, lastBullishTFBarIndex4, lastBearishTFBarIndex4, lastBullishSignal4, lastBearishSignal4] = rejection_with_cooldown(tf4, inRange4, low, high, close, open, low4, high4, lastBullishTFBarIndex4, lastBearishTFBarIndex4, lastBullishSignal4, lastBearishSignal4)
+[validBullish5, validBearish5, lastBullishTFBarIndex5, lastBearishTFBarIndex5, lastBullishSignal5, lastBearishSignal5] = rejection_with_cooldown(tf5, inRange5, low, high, close, open, low5, high5, lastBullishTFBarIndex5, lastBearishTFBarIndex5, lastBullishSignal5, lastBearishSignal5)
+[validBullish6, validBearish6, lastBullishTFBarIndex6, lastBearishTFBarIndex6, lastBullishSignal6, lastBearishSignal6] = rejection_with_cooldown(tf6, inRange6, low, high, close, open, low6, high6, lastBullishTFBarIndex6, lastBearishTFBarIndex6, lastBullishSignal6, lastBearishSignal6)
+[validBullish7, validBearish7, lastBullishTFBarIndex7, lastBearishTFBarIndex7, lastBullishSignal7, lastBearishSignal7] = rejection_with_cooldown(tf7, inRange7, low, high, close, open, low7, high7, lastBullishTFBarIndex7, lastBearishTFBarIndex7, lastBullishSignal7, lastBearishSignal7)
 
 // Modified plot_lines function
 plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, bullishTouch, bearishTouch, tfName) =>
