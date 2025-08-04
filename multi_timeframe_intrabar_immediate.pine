@@ -199,14 +199,14 @@ if newBar1
     hasBullishSweep1 := false
     hasBearishSweep1 := false
 if inRange1
-    // Bullish sweep: low sweeps previous low and closes bullish (reversal signal)
-    if tfLow1 < tfLow1[1] and tfClose1 > tfOpen1
+    // Faster bullish sweep detection: just sweep the low
+    if tfLow1 < tfLow1[1]
         if na(bestBullishLow1) or tfLow1 < bestBullishLow1
             bestBullishLow1 := tfLow1
             bestBullishBar1 := bar_index
             hasBullishSweep1 := true
-    // Bearish sweep: high sweeps previous high and closes bearish (reversal signal)
-    if tfHigh1 > tfHigh1[1] and tfClose1 < tfOpen1
+    // Faster bearish sweep detection: just sweep the high
+    if tfHigh1 > tfHigh1[1]
         if na(bestBearishHigh1) or tfHigh1 > bestBearishHigh1
             bestBearishHigh1 := tfHigh1
             bestBearishBar1 := bar_index
@@ -225,12 +225,12 @@ if newBar2
     bestBearishHigh2 := na
     bestBearishBar2 := na
 if inRange2
-    if tfLow2 < tfLow2[1] and tfClose2 > tfOpen2
+    if tfLow2 < tfLow2[1]
         if na(bestBullishLow2) or tfLow2 < bestBullishLow2
             bestBullishLow2 := tfLow2
             bestBullishBar2 := bar_index
             label.new(bar_index, tfLow2, "Best Bull Sweep 1D", color=color.green, style=label.style_label_up, textcolor=color.white)
-    if tfHigh2 > tfHigh2[1] and tfClose2 < tfOpen2
+    if tfHigh2 > tfHigh2[1]
         if na(bestBearishHigh2) or tfHigh2 > bestBearishHigh2
             bestBearishHigh2 := tfHigh2
             bestBearishBar2 := bar_index
