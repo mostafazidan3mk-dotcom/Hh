@@ -95,7 +95,23 @@ use_sweep_rejection = input.bool(true, "Use Sweep Rejection", group=g_TOUCH)
 sweep_min_size = input.float(0.5, "Min Sweep Size (%)", minval=0.1, maxval=5.0, step=0.1, group=g_TOUCH)
 sweep_cooldown = input.int(3, "Sweep Cooldown Bars", minval=1)
 
-// Modified process_tf function with enhanced touch detection
+// --- Best wick rejection tracking variables for each timeframe ---
+var float bestBullishLow1 = na, bestBearishHigh1 = na
+var bool bullishSet1 = false, bearishSet1 = false
+var float bestBullishLow2 = na, bestBearishHigh2 = na
+var bool bullishSet2 = false, bearishSet2 = false
+var float bestBullishLow3 = na, bestBearishHigh3 = na
+var bool bullishSet3 = false, bearishSet3 = false
+var float bestBullishLow4 = na, bestBearishHigh4 = na
+var bool bullishSet4 = false, bearishSet4 = false
+var float bestBullishLow5 = na, bestBearishHigh5 = na
+var bool bullishSet5 = false, bearishSet5 = false
+var float bestBullishLow6 = na, bestBearishHigh6 = na
+var bool bullishSet6 = false, bearishSet6 = false
+var float bestBullishLow7 = na, bestBearishHigh7 = na
+var bool bullishSet7 = false, bearishSet7 = false
+
+// --- Process function for each timeframe ---
 process_tf(tf) =>
     var float rangeHigh = na
     var float rangeLow = na
@@ -104,23 +120,17 @@ process_tf(tf) =>
     var bool inConsolidation = true
     var bool bullishTouch = false
     var bool bearishTouch = false
-    
     [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
-    
     newBar = ta.change(tfTime) != 0
-    
     tfUp = tfHigh
     tfDown = tfLow
     tfChildUp = tfOpen > tfClose ? tfOpen : tfClose
     tfChildDown = tfOpen > tfClose ? tfClose : tfOpen
-    
     if newBar
         upControl = tfChildUp > rangeHigh and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
         downControl = tfChildDown < rangeLow and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
-        
         if (upControl or downControl)
             inConsolidation := false
-        
         if (inConsolidation and tfChildDown <= rangeHigh and tfChildDown >= rangeLow and tfChildUp <= rangeHigh and tfChildUp >= rangeLow and bar_index > 1)
             rangeStart := rangeStart
         else
@@ -128,101 +138,41 @@ process_tf(tf) =>
             rangeLow := tfLow
             rangeStart := bar_index
             inConsolidation := true
-        
         if not inConsolidation and (bar_index - rangeStart > maxbars or bar_index - rangeStart < minbars)
             inConsolidation := true
-        
         rangeMid := (rangeHigh + rangeLow) / 2
         bullishTouch := false
         bearishTouch := false
-    
     if inConsolidation
         // --- Original Touch Detection ---
-        touchBull = (use_wick_touch and (tfLow < rangeLow and tfClose > rangeLow and tfHigh < rangeHigh)) or
-                    (use_body_touch and (tfOpen < rangeLow and tfClose > rangeLow))
-        touchBear = (use_wick_touch and (tfHigh > rangeHigh and tfClose < rangeHigh and tfLow > rangeLow)) or
-                    (use_body_touch and (tfOpen > rangeHigh and tfClose < rangeHigh))
-
+        touchBull = (use_wick_touch and (tfLow < rangeLow and tfClose > rangeLow and tfHigh < rangeHigh)) or (use_body_touch and (tfOpen < rangeLow and tfClose > rangeLow))
+        touchBear = (use_wick_touch and (tfHigh > rangeHigh and tfClose < rangeHigh and tfLow > rangeLow)) or (use_body_touch and (tfOpen > rangeHigh and tfClose < rangeHigh))
         // --- Identify swept candle levels (previous candle) ---
         prevLow  = tfLow[1]
         prevHigh = tfHigh[1]
-
         // --- Calculate sweep sizes ---
         bullishSweepSize = (prevLow - tfLow) / prevLow * 100
         bearishSweepSize = (tfHigh - prevHigh) / prevHigh * 100
-
         // --- Rejection Wick with sweep confirmation ---
-        // Bullish rejection: current low sweeps previous candle's low & closes bullish
-        bullishRejection = use_sweep_rejection and 
-                          (tfLow < prevLow) and 
-                          (tfClose > tfOpen) and 
-                          (tfClose > tfLow[1]) and
-                          (bullishSweepSize >= sweep_min_size)
-        
-        // Bearish rejection: current high sweeps previous candle's high & closes bearish
-        bearishRejection = use_sweep_rejection and
-                          (tfHigh > prevHigh) and 
-                          (tfClose < tfOpen) and 
-                          (tfClose < tfHigh[1]) and
-                          (bearishSweepSize >= sweep_min_size)
-
-        // --- Combine both methods ---
+        bullishRejection = use_sweep_rejection and (tfLow < prevLow) and (tfClose > tfOpen) and (tfClose > tfLow[1]) and (bullishSweepSize >= sweep_min_size)
+        bearishRejection = use_sweep_rejection and (tfHigh > prevHigh) and (tfClose < tfOpen) and (tfClose < tfHigh[1]) and (bearishSweepSize >= sweep_min_size)
         bullishTouch := touchBull or bullishRejection
         bearishTouch := touchBear or bearishRejection
-    
-    [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch]
+    [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch, tfTime]
 
-// Process data for each timeframe
-[high1, low1, mid1, start1, inRange1, newBar1, bullishTouch1, bearishTouch1] = process_tf(tf1)
-[high2, low2, mid2, start2, inRange2, newBar2, bullishTouch2, bearishTouch2] = process_tf(tf2)
-[high3, low3, mid3, start3, inRange3, newBar3, bullishTouch3, bearishTouch3] = process_tf(tf3)
-[high4, low4, mid4, start4, inRange4, newBar4, bullishTouch4, bearishTouch4] = process_tf(tf4)
-[high5, low5, mid5, start5, inRange5, newBar5, bullishTouch5, bearishTouch5] = process_tf(tf5)
-[high6, low6, mid6, start6, inRange6, newBar6, bullishTouch6, bearishTouch6] = process_tf(tf6)
-[high7, low7, mid7, start7, inRange7, newBar7, bullishTouch7, bearishTouch7] = process_tf(tf7)
+// --- Process data for each timeframe ---
+[high1, low1, mid1, start1, inRange1, newBar1, bullishTouch1, bearishTouch1, tfTime1] = process_tf(tf1)
+[high2, low2, mid2, start2, inRange2, newBar2, bullishTouch2, bearishTouch2, tfTime2] = process_tf(tf2)
+[high3, low3, mid3, start3, inRange3, newBar3, bullishTouch3, bearishTouch3, tfTime3] = process_tf(tf3)
+[high4, low4, mid4, start4, inRange4, newBar4, bullishTouch4, bearishTouch4, tfTime4] = process_tf(tf4)
+[high5, low5, mid5, start5, inRange5, newBar5, bullishTouch5, bearishTouch5, tfTime5] = process_tf(tf5)
+[high6, low6, mid6, start6, inRange6, newBar6, bullishTouch6, bearishTouch6, tfTime6] = process_tf(tf6)
+[high7, low7, mid7, start7, inRange7, newBar7, bullishTouch7, bearishTouch7, tfTime7] = process_tf(tf7)
 
-// Best wick rejection tracking variables for each timeframe
-var float bestBullishLow1 = na
-var float bestBearishHigh1 = na
-var bool bullishSet1 = false
-var bool bearishSet1 = false
-
-var float bestBullishLow2 = na
-var float bestBearishHigh2 = na
-var bool bullishSet2 = false
-var bool bearishSet2 = false
-
-var float bestBullishLow3 = na
-var float bestBearishHigh3 = na
-var bool bullishSet3 = false
-var bool bearishSet3 = false
-
-var float bestBullishLow4 = na
-var float bestBearishHigh4 = na
-var bool bullishSet4 = false
-var bool bearishSet4 = false
-
-var float bestBullishLow5 = na
-var float bestBearishHigh5 = na
-var bool bullishSet5 = false
-var bool bearishSet5 = false
-
-var float bestBullishLow6 = na
-var float bestBearishHigh6 = na
-var bool bullishSet6 = false
-var bool bearishSet6 = false
-
-var float bestBullishLow7 = na
-var float bestBearishHigh7 = na
-var bool bullishSet7 = false
-var bool bearishSet7 = false
-
-// Timeframe 1 (M30)
+// --- Best wick rejection logic for each timeframe ---
+// M30
 if newBar1
-    bestBullishLow1 := na
-    bestBearishHigh1 := na
-    bullishSet1 := false
-    bearishSet1 := false
+    bestBullishLow1 := na, bestBearishHigh1 := na, bullishSet1 := false, bearishSet1 := false
 if inRange1
     if low < low1 and close > open and close > low1
         if na(bestBullishLow1) or low < bestBullishLow1
@@ -235,13 +185,9 @@ if inRange1
 if newBar1
     bullishTouch1 := bullishSet1
     bearishTouch1 := bearishSet1
-
-// Timeframe 2 (H1)
+// H1
 if newBar2
-    bestBullishLow2 := na
-    bestBearishHigh2 := na
-    bullishSet2 := false
-    bearishSet2 := false
+    bestBullishLow2 := na, bestBearishHigh2 := na, bullishSet2 := false, bearishSet2 := false
 if inRange2
     if low < low2 and close > open and close > low2
         if na(bestBullishLow2) or low < bestBullishLow2
@@ -254,13 +200,9 @@ if inRange2
 if newBar2
     bullishTouch2 := bullishSet2
     bearishTouch2 := bearishSet2
-
-// Timeframe 3 (H2)
+// H2
 if newBar3
-    bestBullishLow3 := na
-    bestBearishHigh3 := na
-    bullishSet3 := false
-    bearishSet3 := false
+    bestBullishLow3 := na, bestBearishHigh3 := na, bullishSet3 := false, bearishSet3 := false
 if inRange3
     if low < low3 and close > open and close > low3
         if na(bestBullishLow3) or low < bestBullishLow3
@@ -273,13 +215,9 @@ if inRange3
 if newBar3
     bullishTouch3 := bullishSet3
     bearishTouch3 := bearishSet3
-
-// Timeframe 4 (H4)
+// H4
 if newBar4
-    bestBullishLow4 := na
-    bestBearishHigh4 := na
-    bullishSet4 := false
-    bearishSet4 := false
+    bestBullishLow4 := na, bestBearishHigh4 := na, bullishSet4 := false, bearishSet4 := false
 if inRange4
     if low < low4 and close > open and close > low4
         if na(bestBullishLow4) or low < bestBullishLow4
@@ -292,13 +230,9 @@ if inRange4
 if newBar4
     bullishTouch4 := bullishSet4
     bearishTouch4 := bearishSet4
-
-// Timeframe 5 (D)
+// D
 if newBar5
-    bestBullishLow5 := na
-    bestBearishHigh5 := na
-    bullishSet5 := false
-    bearishSet5 := false
+    bestBullishLow5 := na, bestBearishHigh5 := na, bullishSet5 := false, bearishSet5 := false
 if inRange5
     if low < low5 and close > open and close > low5
         if na(bestBullishLow5) or low < bestBullishLow5
@@ -311,13 +245,9 @@ if inRange5
 if newBar5
     bullishTouch5 := bullishSet5
     bearishTouch5 := bearishSet5
-
-// Timeframe 6 (W)
+// W
 if newBar6
-    bestBullishLow6 := na
-    bestBearishHigh6 := na
-    bullishSet6 := false
-    bearishSet6 := false
+    bestBullishLow6 := na, bestBearishHigh6 := na, bullishSet6 := false, bearishSet6 := false
 if inRange6
     if low < low6 and close > open and close > low6
         if na(bestBullishLow6) or low < bestBullishLow6
@@ -330,13 +260,9 @@ if inRange6
 if newBar6
     bullishTouch6 := bullishSet6
     bearishTouch6 := bearishSet6
-
-// Timeframe 7 (M)
+// M
 if newBar7
-    bestBullishLow7 := na
-    bestBearishHigh7 := na
-    bullishSet7 := false
-    bearishSet7 := false
+    bestBullishLow7 := na, bestBearishHigh7 := na, bullishSet7 := false, bearishSet7 := false
 if inRange7
     if low < low7 and close > open and close > low7
         if na(bestBullishLow7) or low < bestBullishLow7
@@ -350,14 +276,13 @@ if newBar7
     bullishTouch7 := bullishSet7
     bearishTouch7 := bearishSet7
 
-// Modified plot_lines function
+// --- Plot lines function ---
 plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, bullishTouch, bearishTouch, tfName) =>
     var line highLine = na
     var line lowLine = na
     var line midLine = na
     var label highLabel = na
     var label lowLabel = na
-    
     if newBar and inRange
         if not na(highLine)
             line.delete(highLine)
@@ -366,32 +291,27 @@ plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, bu
         if not na(highLabel)
             label.delete(highLabel)
             label.delete(lowLabel)
-        
         validStart = math.max(start, 0)
         highLine := line.new(validStart, high, bar_index, high, color=tfColor, width=hllinewidth)
         lowLine := line.new(validStart, low, bar_index, low, color=tfColor, width=hllinewidth)
         if useMid
             midLine := line.new(validStart, mid, bar_index, mid, color=midColor, width=midlinewidth, style=line.style_dashed)
-        
         if show_eol_labels
             highLabel := label.new(bar_index + eol_label_offset, high, text=tfName + " CRT High", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
             lowLabel := label.new(bar_index + eol_label_offset, low, text=tfName + " CRT Low", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
-    
     if not na(highLine) and inRange
         line.set_x2(highLine, bar_index)
         line.set_x2(lowLine, bar_index)
         if useMid and not na(midLine)
             line.set_x2(midLine, bar_index)
-        
         if show_eol_labels
             label.set_x(highLabel, bar_index + eol_label_offset)
             label.set_y(highLabel, high)
             label.set_x(lowLabel, bar_index + eol_label_offset)
             label.set_y(lowLabel, low)
-    
     [bullishTouch, bearishTouch]
 
-// Plot lines for each timeframe
+// --- Plot lines for each timeframe ---
 if use_tf1
     [bullishTouch1, bearishTouch1] = plot_lines(tf1_color, tf1_mid_color, high1, low1, mid1, start1, inRange1, newBar1, use_tf1_mid, bullishTouch1, bearishTouch1, "M30")
 if use_tf2
@@ -407,7 +327,7 @@ if use_tf6
 if use_tf7
     [bullishTouch7, bearishTouch7] = plot_lines(tf7_color, tf7_mid_color, high7, low7, mid7, start7, inRange7, newBar7, use_tf7_mid, bullishTouch7, bearishTouch7, "M")
 
-// Function to convert string input to label style
+// --- Label and alert logic ---
 getLabelStyle(styleString) =>
     switch styleString
         "None" => label.style_none
@@ -428,9 +348,7 @@ getLabelStyle(styleString) =>
         "X-Cross" => label.style_xcross
         "Arrow Up" => label.style_arrowup
         "Arrow Down" => label.style_arrowdown
-        => label.style_label_up  // default
-
-// Function to convert string input to size
+        => label.style_label_up
 getLabelSize(sizeString) =>
     switch sizeString
         "Auto" => size.auto
@@ -439,25 +357,18 @@ getLabelSize(sizeString) =>
         "Normal" => size.normal
         "Large" => size.large
         "Huge" => size.huge
-        => size.auto  // default
-
-// Optimized label management
+        => size.auto
 var label[] labels = array.new_label()
-
 manageLabelCount(labelText, y, bgColor, textColor, style, size) =>
     if array.size(labels) >= max_labels
         label.delete(array.shift(labels))
     newLabel = label.new(bar_index, y, labelText, color=bgColor, textcolor=textColor, style=style, size=size)
     array.push(labels, newLabel)
-
-// Function to check and create labels for a timeframe
 checkAndCreateLabel(show, bullishTouch, bearishTouch, tfText) =>
     if show and bullishTouch
         manageLabelCount("BT-" + tfText, low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
     if show and bearishTouch
         manageLabelCount("BT-" + tfText, high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
-
-// Apply labels and alerts for each timeframe using best wick rejection logic
 checkAndCreateLabel(show_m30_labels, bullishTouch1, bearishTouch1, "M30")
 checkAndCreateLabel(show_h1_labels, bullishTouch2, bearishTouch2, "H1")
 checkAndCreateLabel(show_h2_labels, bullishTouch3, bearishTouch3, "H2")
@@ -465,8 +376,6 @@ checkAndCreateLabel(show_h4_labels, bullishTouch4, bearishTouch4, "H4")
 checkAndCreateLabel(show_daily_labels, bullishTouch5, bearishTouch5, "D")
 checkAndCreateLabel(show_weekly_labels, bullishTouch6, bearishTouch6, "W")
 checkAndCreateLabel(show_monthly_labels, bullishTouch7, bearishTouch7, "M")
-
-// Alert conditions using best wick rejection logic
 if alert_on_m30 and (bullishTouch1 or bearishTouch1)
     alert("M30 touch detected", alert.freq_once_per_bar_close)
 if alert_on_h1 and (bullishTouch2 or bearishTouch2)
