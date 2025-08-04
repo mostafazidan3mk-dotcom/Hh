@@ -192,7 +192,7 @@ process_tf(tf) =>
 
 
 // --- Best sweep detection for each timeframe ---
-// M30
+// 4H
 if newBar1
     bestBullishLow1 := na
     bestBullishBar1 := na
@@ -208,10 +208,10 @@ if high > high[1] and close < open and inRange1
         bestBearishBar1 := bar_index
 if newBar1
     if not na(bestBullishBar1)
-        label.new(bestBullishBar1, bestBullishLow1, "Best Bull Sweep M30", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar1, bestBullishLow1, "Best Bull Sweep 4H", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar1)
-        label.new(bestBullishBar1, bestBearishHigh1, "Best Bear Sweep M30", color=color.red, style=label.style_label_down, textcolor=color.white)
-// H1
+        label.new(bestBearishBar1, bestBearishHigh1, "Best Bear Sweep 4H", color=color.red, style=label.style_label_down, textcolor=color.white)
+// 1D
 if newBar2
     bestBullishLow2 := na
     bestBullishBar2 := na
@@ -227,10 +227,10 @@ if high > high[1] and close < open and inRange2
         bestBearishBar2 := bar_index
 if newBar2
     if not na(bestBullishBar2)
-        label.new(bestBullishBar2, bestBullishLow2, "Best Bull Sweep H1", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar2, bestBullishLow2, "Best Bull Sweep 1D", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar2)
-        label.new(bestBearishBar2, bestBearishHigh2, "Best Bear Sweep H1", color=color.red, style=label.style_label_down, textcolor=color.white)
-// H2
+        label.new(bestBearishBar2, bestBearishHigh2, "Best Bear Sweep 1D", color=color.red, style=label.style_label_down, textcolor=color.white)
+// 2D
 if newBar3
     bestBullishLow3 := na
     bestBullishBar3 := na
@@ -246,10 +246,10 @@ if high > high[1] and close < open and inRange3
         bestBearishBar3 := bar_index
 if newBar3
     if not na(bestBullishBar3)
-        label.new(bestBullishBar3, bestBullishLow3, "Best Bull Sweep H2", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar3, bestBullishLow3, "Best Bull Sweep 2D", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar3)
-        label.new(bestBearishBar3, bestBearishHigh3, "Best Bear Sweep H2", color=color.red, style=label.style_label_down, textcolor=color.white)
-// H4
+        label.new(bestBearishBar3, bestBearishHigh3, "Best Bear Sweep 2D", color=color.red, style=label.style_label_down, textcolor=color.white)
+// W
 if newBar4
     bestBullishLow4 := na
     bestBullishBar4 := na
@@ -265,10 +265,10 @@ if high > high[1] and close < open and inRange4
         bestBearishBar4 := bar_index
 if newBar4
     if not na(bestBullishBar4)
-        label.new(bestBullishBar4, bestBullishLow4, "Best Bull Sweep H4", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar4, bestBullishLow4, "Best Bull Sweep W", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar4)
-        label.new(bestBearishBar4, bestBearishHigh4, "Best Bear Sweep H4", color=color.red, style=label.style_label_down, textcolor=color.white)
-// D
+        label.new(bestBearishBar4, bestBearishHigh4, "Best Bear Sweep W", color=color.red, style=label.style_label_down, textcolor=color.white)
+// M
 if newBar5
     bestBullishLow5 := na
     bestBullishBar5 := na
@@ -284,47 +284,47 @@ if high > high[1] and close < open and inRange5
         bestBearishBar5 := bar_index
 if newBar5
     if not na(bestBullishBar5)
-        label.new(bestBullishBar5, bestBullishLow5, "Best Bull Sweep D", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar5, bestBullishLow5, "Best Bull Sweep M", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar5)
-        label.new(bestBearishBar5, bestBearishHigh5, "Best Bear Sweep D", color=color.red, style=label.style_label_down, textcolor=color.white)
-// W
+        label.new(bestBearishBar5, bestBearishHigh5, "Best Bear Sweep M", color=color.red, style=label.style_label_down, textcolor=color.white)
+// 3M
 if newBar6
     bestBullishLow6 := na
     bestBullishBar6 := na
     bestBearishHigh6 := na
     bestBearishBar6 := na
-if low < low6 and close > open and inRange6
+if low < low[1] and close > open and inRange6
     if na(bestBullishLow6) or low < bestBullishLow6
         bestBullishLow6 := low
         bestBullishBar6 := bar_index
-if high > high6 and close < open and inRange6
+if high > high[1] and close < open and inRange6
     if na(bestBearishHigh6) or high > bestBearishHigh6
         bestBearishHigh6 := high
         bestBearishBar6 := bar_index
 if newBar6
     if not na(bestBullishBar6)
-        label.new(bestBullishBar6, bestBullishLow6, "Best Bull Sweep W", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar6, bestBullishLow6, "Best Bull Sweep 3M", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar6)
-        label.new(bestBearishBar6, bestBearishHigh6, "Best Bear Sweep W", color=color.red, style=label.style_label_down, textcolor=color.white)
-// M
+        label.new(bestBearishBar6, bestBearishHigh6, "Best Bear Sweep 3M", color=color.red, style=label.style_label_down, textcolor=color.white)
+// 6M
 if newBar7
     bestBullishLow7 := na
     bestBullishBar7 := na
     bestBearishHigh7 := na
     bestBearishBar7 := na
-if low < low7 and close > open and inRange7
+if low < low[1] and close > open and inRange7
     if na(bestBullishLow7) or low < bestBullishLow7
         bestBullishLow7 := low
         bestBullishBar7 := bar_index
-if high > high7 and close < open and inRange7
+if high > high[1] and close < open and inRange7
     if na(bestBearishHigh7) or high > bestBearishHigh7
         bestBearishHigh7 := high
         bestBearishBar7 := bar_index
 if newBar7
     if not na(bestBullishBar7)
-        label.new(bestBullishBar7, bestBullishLow7, "Best Bull Sweep M", color=color.green, style=label.style_label_up, textcolor=color.white)
+        label.new(bestBullishBar7, bestBullishLow7, "Best Bull Sweep 6M", color=color.green, style=label.style_label_up, textcolor=color.white)
     if not na(bestBearishBar7)
-        label.new(bestBearishBar7, bestBearishHigh7, "Best Bear Sweep M", color=color.red, style=label.style_label_down, textcolor=color.white)
+        label.new(bestBearishBar7, bestBearishHigh7, "Best Bear Sweep 6M", color=color.red, style=label.style_label_down, textcolor=color.white)
 
 // --- Plot lines function ---
 plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, bullishTouch, bearishTouch, tfName) =>
