@@ -303,41 +303,41 @@ manageLabelCount(labelText, y, bgColor, textColor, style, size) =>
     newLabel = label.new(bar_index, y, labelText, color=bgColor, textcolor=textColor, style=style, size=size)
     array.push(labels, newLabel)
 
-// Apply labels for each timeframe independently
-if show_4h_labels and bullishDist1
-    manageLabelCount("Dist-4H", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_4h_labels and bearishDist1
-    manageLabelCount("Dist-4H", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+// Apply labels for each timeframe independently - ONLY at HTF candle close
+if show_4h_labels and bullishDist1 and newBar1_dist
+    manageLabelCount("Dist-4H", tf1Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_4h_labels and bearishDist1 and newBar1_dist
+    manageLabelCount("Dist-4H", tf1High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-if show_day_labels and bullishDist2
-    manageLabelCount("Dist-Day", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_day_labels and bearishDist2
-    manageLabelCount("Dist-Day", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+if show_day_labels and bullishDist2 and newBar2_dist
+    manageLabelCount("Dist-Day", tf2Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_day_labels and bearishDist2 and newBar2_dist
+    manageLabelCount("Dist-Day", tf2High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-if show_2day_labels and bullishDist3
-    manageLabelCount("Dist-2Day", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_2day_labels and bearishDist3
-    manageLabelCount("Dist-2Day", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+if show_2day_labels and bullishDist3 and newBar3_dist
+    manageLabelCount("Dist-2Day", tf3Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_2day_labels and bearishDist3 and newBar3_dist
+    manageLabelCount("Dist-2Day", tf3High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-if show_week_labels and bullishDist4
-    manageLabelCount("Dist-Week", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_week_labels and bearishDist4
-    manageLabelCount("Dist-Week", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+if show_week_labels and bullishDist4 and newBar4_dist
+    manageLabelCount("Dist-Week", tf4Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_week_labels and bearishDist4 and newBar4_dist
+    manageLabelCount("Dist-Week", tf4High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-if show_month_labels and bullishDist5
-    manageLabelCount("Dist-Month", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_month_labels and bearishDist5
-    manageLabelCount("Dist-Month", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+if show_month_labels and bullishDist5 and newBar5_dist
+    manageLabelCount("Dist-Month", tf5Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_month_labels and bearishDist5 and newBar5_dist
+    manageLabelCount("Dist-Month", tf5High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-if show_3month_labels and bullishDist6
-    manageLabelCount("Dist-3Month", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_3month_labels and bearishDist6
-    manageLabelCount("Dist-3Month", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+if show_3month_labels and bullishDist6 and newBar6_dist
+    manageLabelCount("Dist-3Month", tf6Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_3month_labels and bearishDist6 and newBar6_dist
+    manageLabelCount("Dist-3Month", tf6High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-if show_6month_labels and bullishDist7
-    manageLabelCount("Dist-6Month", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if show_6month_labels and bearishDist7
-    manageLabelCount("Dist-6Month", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+if show_6month_labels and bullishDist7 and newBar7_dist
+    manageLabelCount("Dist-6Month", tf7Low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_6month_labels and bearishDist7 and newBar7_dist
+    manageLabelCount("Dist-6Month", tf7High, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
 // Alert conditions
 if alert_on_4h and (bullishDist1 or bearishDist1)
