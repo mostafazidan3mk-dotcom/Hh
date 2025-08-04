@@ -113,58 +113,79 @@ newBar7_dist = ta.change(tf7Time) != 0
 // 4H Distribution - detect on LTF but only when 4H distribution occurs
 var bool bullishDist1 = false
 var bool bearishDist1 = false
-if use_distribution and newBar1_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist1 := (low < low[1]) and (close > close[1])
-    bearishDist1 := (high > high[1]) and (close < close[1])
+if newBar1_dist
+    bullishDist1 := false
+    bearishDist1 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist1 := (low < low[1]) and (close > close[1])
+        bearishDist1 := (high > high[1]) and (close < close[1])
 
 // Day Distribution - detect on LTF but only when Day distribution occurs
 var bool bullishDist2 = false
 var bool bearishDist2 = false
-if use_distribution and newBar2_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist2 := (low < low[1]) and (close > close[1])
-    bearishDist2 := (high > high[1]) and (close < close[1])
+if newBar2_dist
+    bullishDist2 := false
+    bearishDist2 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist2 := (low < low[1]) and (close > close[1])
+        bearishDist2 := (high > high[1]) and (close < close[1])
 
 // 2Day Distribution - detect on LTF but only when 2Day distribution occurs
 var bool bullishDist3 = false
 var bool bearishDist3 = false
-if use_distribution and newBar3_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist3 := (low < low[1]) and (close > close[1])
-    bearishDist3 := (high > high[1]) and (close < close[1])
+if newBar3_dist
+    bullishDist3 := false
+    bearishDist3 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist3 := (low < low[1]) and (close > close[1])
+        bearishDist3 := (high > high[1]) and (close < close[1])
 
 // Week Distribution - detect on LTF but only when Week distribution occurs
 var bool bullishDist4 = false
 var bool bearishDist4 = false
-if use_distribution and newBar4_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist4 := (low < low[1]) and (close > close[1])
-    bearishDist4 := (high > high[1]) and (close < close[1])
+if newBar4_dist
+    bullishDist4 := false
+    bearishDist4 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist4 := (low < low[1]) and (close > close[1])
+        bearishDist4 := (high > high[1]) and (close < close[1])
 
 // Month Distribution - detect on LTF but only when Month distribution occurs
 var bool bullishDist5 = false
 var bool bearishDist5 = false
-if use_distribution and newBar5_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist5 := (low < low[1]) and (close > close[1])
-    bearishDist5 := (high > high[1]) and (close < close[1])
+if newBar5_dist
+    bullishDist5 := false
+    bearishDist5 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist5 := (low < low[1]) and (close > close[1])
+        bearishDist5 := (high > high[1]) and (close < close[1])
 
 // 3Month Distribution - detect on LTF but only when 3Month distribution occurs
 var bool bullishDist6 = false
 var bool bearishDist6 = false
-if use_distribution and newBar6_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist6 := (low < low[1]) and (close > close[1])
-    bearishDist6 := (high > high[1]) and (close < close[1])
+if newBar6_dist
+    bullishDist6 := false
+    bearishDist6 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist6 := (low < low[1]) and (close > close[1])
+        bearishDist6 := (high > high[1]) and (close < close[1])
 
 // 6Month Distribution - detect on LTF but only when 6Month distribution occurs
 var bool bullishDist7 = false
 var bool bearishDist7 = false
-if use_distribution and newBar7_dist
-    // Check if current LTF candle meets distribution criteria
-    bullishDist7 := (low < low[1]) and (close > close[1])
-    bearishDist7 := (high > high[1]) and (close < close[1])
+if newBar7_dist
+    bullishDist7 := false
+    bearishDist7 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist7 := (low < low[1]) and (close > close[1])
+        bearishDist7 := (high > high[1]) and (close < close[1])
 
 // Modified process_tf function for range detection only
 process_tf(tf) =>
