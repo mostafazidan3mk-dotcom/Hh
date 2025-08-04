@@ -555,7 +555,7 @@ checkAndCreateLabel(show, bullishTouch, bearishTouch, tfText) =>
     if show and bearishTouch
         manageLabelCount("BT-" + tfText, high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
 
-// Apply labels for each timeframe
+// Apply labels and alerts for each timeframe using best wick rejection logic
 checkAndCreateLabel(show_m30_labels, bullishTouch1, bearishTouch1, "M30")
 checkAndCreateLabel(show_h1_labels, bullishTouch2, bearishTouch2, "H1")
 checkAndCreateLabel(show_h2_labels, bullishTouch3, bearishTouch3, "H2")
@@ -563,24 +563,19 @@ checkAndCreateLabel(show_h4_labels, bullishTouch4, bearishTouch4, "H4")
 checkAndCreateLabel(show_daily_labels, bullishTouch5, bearishTouch5, "D")
 checkAndCreateLabel(show_weekly_labels, bullishTouch6, bearishTouch6, "W")
 checkAndCreateLabel(show_monthly_labels, bullishTouch7, bearishTouch7, "M")
-// Alert conditions
+
+// Alert conditions using best wick rejection logic
 if alert_on_m30 and (bullishTouch1 or bearishTouch1)
     alert("M30 touch detected", alert.freq_once_per_bar_close)
-
 if alert_on_h1 and (bullishTouch2 or bearishTouch2)
     alert("H1 touch detected", alert.freq_once_per_bar_close)
-
 if alert_on_h2 and (bullishTouch3 or bearishTouch3)
     alert("H2 touch detected", alert.freq_once_per_bar_close)
-
 if alert_on_h4 and (bullishTouch4 or bearishTouch4)
     alert("H4 touch detected", alert.freq_once_per_bar_close)
-
 if alert_on_daily and (bullishTouch5 or bearishTouch5)
     alert("Daily touch detected", alert.freq_once_per_bar_close)
-
 if alert_on_weekly and (bullishTouch6 or bearishTouch6)
     alert("Weekly touch detected", alert.freq_once_per_bar_close)
-
 if alert_on_monthly and (bullishTouch7 or bearishTouch7)
     alert("Monthly touch detected", alert.freq_once_per_bar_close)
