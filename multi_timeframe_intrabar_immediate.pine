@@ -189,28 +189,34 @@ process_tf(tf) =>
 [high6, low6, mid6, start6, inRange6, newBar6, bullishTouch6, bearishTouch6, tfTime6, tfOpen6, tfHigh6, tfLow6, tfClose6] = process_tf(tf6)
 [high7, low7, mid7, start7, inRange7, newBar7, bullishTouch7, bearishTouch7, tfTime7, tfOpen7, tfHigh7, tfLow7, tfClose7] = process_tf(tf7)
 
-// --- Immediate sweep detection and labeling for each timeframe ---
+// --- Best sweep detection for each timeframe ---
 // 4H
 if newBar1
     bestBullishLow1 := na
     bestBullishBar1 := na
     bestBearishHigh1 := na
     bestBearishBar1 := na
+    hasBullishSweep1 := false
+    hasBearishSweep1 := false
 if inRange1
     // Bullish sweep: low sweeps previous low and closes bullish (reversal signal)
     if tfLow1 < tfLow1[1] and tfClose1 > tfOpen1
         if na(bestBullishLow1) or tfLow1 < bestBullishLow1
             bestBullishLow1 := tfLow1
             bestBullishBar1 := bar_index
-            // Plot label immediately when sweep is detected
-            label.new(bar_index, tfLow1, "Best Bull Sweep 4H", color=color.green, style=label.style_label_up, textcolor=color.white)
+            hasBullishSweep1 := true
     // Bearish sweep: high sweeps previous high and closes bearish (reversal signal)
     if tfHigh1 > tfHigh1[1] and tfClose1 < tfOpen1
         if na(bestBearishHigh1) or tfHigh1 > bestBearishHigh1
             bestBearishHigh1 := tfHigh1
             bestBearishBar1 := bar_index
-            // Plot label immediately when sweep is detected
-            label.new(bar_index, tfHigh1, "Best Bear Sweep 4H", color=color.red, style=label.style_label_down, textcolor=color.white)
+            hasBearishSweep1 := true
+// Only show labels when HTF candle closes AND there's actually a sweep
+if newBar1
+    if hasBullishSweep1 and not na(bestBullishBar1) and not na(bestBullishLow1)
+        label.new(bestBullishBar1, bestBullishLow1, "Best Bull Sweep 4H", color=color.green, style=label.style_label_up, textcolor=color.white)
+    if hasBearishSweep1 and not na(bestBearishBar1) and not na(bestBearishHigh1)
+        label.new(bestBearishBar1, bestBearishHigh1, "Best Bear Sweep 4H", color=color.red, style=label.style_label_down, textcolor=color.white)
 
 // 1D
 if newBar2
