@@ -114,8 +114,8 @@ if newBar1_sweep
     bullishSweep1 := false
     bearishSweep1 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep1 := (tf1Low < tf1Low[1]) and (tf1Close > tf1Close[1])
-    bearishSweep1 := (tf1High > tf1High[1]) and (tf1Close < tf1Close[1])
+    bullishSweep1 := (tf1Low < tf1Low[1]) and (tf1Close > tf1Low[1])
+    bearishSweep1 := (tf1High > tf1High[1]) and (tf1Close < tf1High[1])
 
 // Day Wick Sweep - detect on LTF but only when Day wick sweep occurs
 var bool bullishSweep2 = false
@@ -124,8 +124,8 @@ if newBar2_sweep
     bullishSweep2 := false
     bearishSweep2 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep2 := (tf2Low < tf2Low[1]) and (tf2Close > tf2Close[1])
-    bearishSweep2 := (tf2High > tf2High[1]) and (tf2Close < tf2Close[1])
+    bullishSweep2 := (tf2Low < tf2Low[1]) and (tf2Close > tf2Low[1])
+    bearishSweep2 := (tf2High > tf2High[1]) and (tf2Close < tf2High[1])
 
 // 2Day Wick Sweep - detect on LTF but only when 2Day wick sweep occurs
 var bool bullishSweep3 = false
@@ -134,8 +134,8 @@ if newBar3_sweep
     bullishSweep3 := false
     bearishSweep3 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep3 := (tf3Low < tf3Low[1]) and (tf3Close > tf3Close[1])
-    bearishSweep3 := (tf3High > tf3High[1]) and (tf3Close < tf3Close[1])
+    bullishSweep3 := (tf3Low < tf3Low[1]) and (tf3Close > tf3Low[1])
+    bearishSweep3 := (tf3High > tf3High[1]) and (tf3Close < tf3High[1])
 
 // Week Wick Sweep - detect on LTF but only when Week wick sweep occurs
 var bool bullishSweep4 = false
@@ -144,8 +144,8 @@ if newBar4_sweep
     bullishSweep4 := false
     bearishSweep4 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep4 := (tf4Low < tf4Low[1]) and (tf4Close > tf4Close[1])
-    bearishSweep4 := (tf4High > tf4High[1]) and (tf4Close < tf4Close[1])
+    bullishSweep4 := (tf4Low < tf4Low[1]) and (tf4Close > tf4Low[1])
+    bearishSweep4 := (tf4High > tf4High[1]) and (tf4Close < tf4High[1])
 
 // Month Wick Sweep - detect on LTF but only when Month wick sweep occurs
 var bool bullishSweep5 = false
@@ -154,8 +154,8 @@ if newBar5_sweep
     bullishSweep5 := false
     bearishSweep5 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep5 := (tf5Low < tf5Low[1]) and (tf5Close > tf5Close[1])
-    bearishSweep5 := (tf5High > tf5High[1]) and (tf5Close < tf5Close[1])
+    bullishSweep5 := (tf5Low < tf5Low[1]) and (tf5Close > tf5Low[1])
+    bearishSweep5 := (tf5High > tf5High[1]) and (tf5Close < tf5High[1])
 
 // 3Month Wick Sweep - detect on LTF but only when 3Month wick sweep occurs
 var bool bullishSweep6 = false
@@ -164,8 +164,8 @@ if newBar6_sweep
     bullishSweep6 := false
     bearishSweep6 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep6 := (tf6Low < tf6Low[1]) and (tf6Close > tf6Close[1])
-    bearishSweep6 := (tf6High > tf6High[1]) and (tf6Close < tf6Close[1])
+    bullishSweep6 := (tf6Low < tf6Low[1]) and (tf6Close > tf6Low[1])
+    bearishSweep6 := (tf6High > tf6High[1]) and (tf6Close < tf6High[1])
 
 // 6Month Wick Sweep - detect on LTF but only when 6Month wick sweep occurs
 var bool bullishSweep7 = false
@@ -174,8 +174,8 @@ if newBar7_sweep
     bullishSweep7 := false
     bearishSweep7 := false
     // Check if current LTF candle meets wick sweep criteria using HTF data
-    bullishSweep7 := (tf7Low < tf7Low[1]) and (tf7Close > tf7Close[1])
-    bearishSweep7 := (tf7High > tf7High[1]) and (tf7Close < tf7Close[1])
+    bullishSweep7 := (tf7Low < tf7Low[1]) and (tf7Close > tf7Low[1])
+    bearishSweep7 := (tf7High > tf7High[1]) and (tf7Close < tf7High[1])
 
 // Modified process_tf function for range detection only
 process_tf(tf) =>
