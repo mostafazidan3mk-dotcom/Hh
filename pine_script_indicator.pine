@@ -64,7 +64,6 @@ alert_on_monthly = input.bool(false, "Alert on Monthly touch", group = g_ALERT)
 var g_OPT = "Options"
 minbars         = input.int(1, "Minimum Bars", group = g_OPT)
 maxbars         = input.int(250, "Maximum Bars", group = g_OPT)
-hllinewidth     = input.int(2, "High/Low Line Width", group = g_OPT)
 midlinewidth    = input.int(1, "Mid Line Width", group = g_OPT)
 
 var g_LABEL = "Label Options"
@@ -151,44 +150,30 @@ process_tf(tf) =>
 [high6, low6, start6, inRange6, newBar6, bullishTouch6, bearishTouch6] = process_tf(tf6)
 [high7, low7, start7, inRange7, newBar7, bullishTouch7, bearishTouch7] = process_tf(tf7)
 
-// Modified plot_lines function
+// Modified plot_lines function - only mid line
 plot_lines(tfColor, midColor, high, low, start, inRange, newBar, useMid, bullishTouch, bearishTouch, tfName) =>
-    var line highLine = na
-    var line lowLine = na
     var line midLine = na
-    var label highLabel = na
-    var label lowLabel = na
+    var label midLabel = na
     
     if newBar and inRange
-        if not na(highLine)
-            line.delete(highLine)
-            line.delete(lowLine)
+        if not na(midLine)
             line.delete(midLine)
-        if not na(highLabel)
-            label.delete(highLabel)
-            label.delete(lowLabel)
+        if not na(midLabel)
+            label.delete(midLabel)
         
         validStart = math.max(start, 0)
-        highLine := line.new(validStart, high, bar_index, high, color=tfColor, width=hllinewidth)
-        lowLine := line.new(validStart, low, bar_index, low, color=tfColor, width=hllinewidth)
         if useMid
             midLine := line.new(validStart, (high + low) / 2, bar_index, (high + low) / 2, color=midColor, width=midlinewidth, style=line.style_dashed)
         
-        if show_eol_labels
-            highLabel := label.new(bar_index + eol_label_offset, high, text=tfName + " CRT High", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
-            lowLabel := label.new(bar_index + eol_label_offset, low, text=tfName + " CRT Low", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
+        if show_eol_labels and useMid
+            midLabel := label.new(bar_index + eol_label_offset, (high + low) / 2, text=tfName + " CRT Mid", color=color.new(midColor, 70), textcolor=midColor, style=label.style_none, size=size.small)
     
-    if not na(highLine) and inRange
-        line.set_x2(highLine, bar_index)
-        line.set_x2(lowLine, bar_index)
-        if useMid and not na(midLine)
-            line.set_x2(midLine, bar_index)
+    if not na(midLine) and inRange and useMid
+        line.set_x2(midLine, bar_index)
         
         if show_eol_labels
-            label.set_x(highLabel, bar_index + eol_label_offset)
-            label.set_y(highLabel, high)
-            label.set_x(lowLabel, bar_index + eol_label_offset)
-            label.set_y(lowLabel, low)
+            label.set_x(midLabel, bar_index + eol_label_offset)
+            label.set_y(midLabel, (high + low) / 2)
     
     [bullishTouch, bearishTouch]
 
