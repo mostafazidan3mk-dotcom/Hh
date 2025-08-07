@@ -131,10 +131,10 @@ process_tf(tf) =>
         bearishTouch := false
     
     if inConsolidation
-        bullishWickTouch = low < rangeLow and close > rangeLow and newBar
-        bullishBodyTouch = open < rangeLow and close > rangeLow and newBar
-        bearishWickTouch = high > rangeHigh and close < rangeHigh and newBar
-        bearishBodyTouch = open > rangeHigh and close < rangeHigh and newBar
+        bullishWickTouch = high > rangeHigh and close > rangeHigh and newBar
+        bullishBodyTouch = high > rangeHigh and close > rangeHigh and newBar
+        bearishWickTouch = low < rangeLow and close < rangeLow and newBar
+        bearishBodyTouch = low < rangeLow and close < rangeLow and newBar
         
         bullishTouch := (use_wick_touch and bullishWickTouch) or (use_body_touch and bullishBodyTouch)
         bearishTouch := (use_wick_touch and bearishWickTouch) or (use_body_touch and bearishBodyTouch)
