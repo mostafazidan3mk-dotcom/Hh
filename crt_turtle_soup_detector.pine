@@ -1,0 +1,302 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © Zidanola - CRT Turtle Soup Detector
+
+//@version=6
+indicator('CRT Turtle Soup Detector - Candle Range Theory', overlay = true, max_lines_count = 200, max_labels_count = 200, max_bars_back = 5000)
+
+//==============================================================================
+// CRT TURTLE SOUP DETECTION - CANDLE RANGE THEORY METHODOLOGY
+//==============================================================================
+
+// CRT Turtle Soup Inputs
+var g_CRT_TURTLE = 'CRT Turtle Soup'
+enable_crt_turtle = input.bool(true, 'Enable CRT Turtle Soup Detection', group = g_CRT_TURTLE)
+
+// CRT Time Sessions (Core CRT Methodology)
+crt_session_1 = input.session("0600-0800", "CRT Session 1 (6-8 AM EST)", group = g_CRT_TURTLE)
+crt_session_2 = input.session("1000-1200", "CRT Session 2 (10-12 PM EST)", group = g_CRT_TURTLE)  
+crt_session_3 = input.session("1400-1600", "CRT Session 3 (2-4 PM EST)", group = g_CRT_TURTLE)
+
+// CRT Candle Analysis
+crt_min_candle_size = input.float(0.5, "Minimum CRT Candle Size (%)", minval = 0.1, maxval = 5.0, step = 0.1, group = g_CRT_TURTLE)
+crt_wick_ratio = input.float(0.3, "Maximum Wick Ratio", minval = 0.1, maxval = 0.8, step = 0.05, group = g_CRT_TURTLE)
+crt_sweep_buffer = input.float(0.05, "CRT Sweep Buffer (%)", minval = 0.01, maxval = 0.5, step = 0.01, group = g_CRT_TURTLE)
+
+// CRT Range Parameters
+crt_range_lookback = input.int(20, "CRT Range Lookback", minval = 10, maxval = 50, group = g_CRT_TURTLE)
+crt_range_validation = input.int(5, "Range Validation Bars", minval = 3, maxval = 15, group = g_CRT_TURTLE)
+
+// Visual Settings
+crt_turtle_bull_color = input.color(color.new(color.lime, 60), 'CRT Bull Turtle Soup', group = g_CRT_TURTLE)
+crt_turtle_bear_color = input.color(color.new(color.red, 60), 'CRT Bear Turtle Soup', group = g_CRT_TURTLE)
+crt_range_color = input.color(color.new(color.blue, 80), 'CRT Range Color', group = g_CRT_TURTLE)
+crt_sweep_color = input.color(color.new(color.yellow, 70), 'CRT Sweep Color', group = g_CRT_TURTLE)
+
+// Timezone for CRT analysis
+var timezone = "America/New_York"
+
+//==============================================================================
+// CRT CORE FUNCTIONS
+//==============================================================================
+
+// Check if current time is in CRT session
+in_crt_session() =>
+    in_session_1 = not na(time(timeframe.period, crt_session_1, timezone))
+    in_session_2 = not na(time(timeframe.period, crt_session_2, timezone))
+    in_session_3 = not na(time(timeframe.period, crt_session_3, timezone))
+    in_session_1 or in_session_2 or in_session_3
+
+// CRT Candle Analysis - following Candle Range Theory
+is_crt_candle() =>
+    candle_size = math.abs(close - open)
+    candle_range = high - low
+    body_ratio = candle_size / candle_range
+    wick_ratio = (candle_range - candle_size) / candle_range
+    
+    // CRT criteria: Strong body, controlled wicks, significant size
+    size_threshold = close * (crt_min_candle_size / 100)
+    
+    candle_range > size_threshold and 
+     body_ratio > (1 - crt_wick_ratio) and 
+     wick_ratio <= crt_wick_ratio
+
+// CRT Range Detection - Key levels that matter in CRT
+type CRTRange
+    float high
+    float low
+    float mid
+    int start_bar
+    int validation_bars
+    bool is_validated
+    string session_type
+    bool swept_high = false
+    bool swept_low = false
+    int sweep_bar_high = 0
+    int sweep_bar_low = 0
+
+var crt_ranges = array.new<CRTRange>()
+var crt_boxes = array.new<box>()
+var crt_lines = array.new<line>()
+var crt_labels = array.new<label>()
+
+// Detect CRT ranges during key sessions
+detect_crt_ranges() =>
+    if in_crt_session()
+        // Get session type for labeling
+        session_name = not na(time(timeframe.period, crt_session_1, timezone)) ? "Session 1" :
+                      not na(time(timeframe.period, crt_session_2, timezone)) ? "Session 2" : "Session 3"
+        
+        // Calculate range for CRT analysis
+        range_high = ta.highest(high, crt_range_lookback)
+        range_low = ta.lowest(low, crt_range_lookback)
+        range_mid = (range_high + range_low) / 2
+        
+        // Check if we have a valid CRT range
+        range_size = range_high - range_low
+        if range_size > (close * (crt_min_candle_size / 100))
+            
+            // Create new CRT range
+            new_range = CRTRange.new()
+            new_range.high := range_high
+            new_range.low := range_low
+            new_range.mid := range_mid
+            new_range.start_bar := bar_index - crt_range_lookback
+            new_range.validation_bars := 0
+            new_range.is_validated := false
+            new_range.session_type := session_name
+            
+            array.push(crt_ranges, new_range)
+            
+            // Draw CRT range box
+            range_box = box.new(
+                left = new_range.start_bar,
+                top = new_range.high,
+                right = bar_index + 20,
+                bottom = new_range.low,
+                border_color = crt_range_color,
+                bgcolor = color.new(crt_range_color, 90),
+                text = "CRT Range " + session_name,
+                text_size = size.small
+            )
+            array.push(crt_boxes, range_box)
+
+// CRT Sweep Detection - Core of Candle Range Theory
+detect_crt_sweeps() =>
+    if array.size(crt_ranges) > 0
+        for i = array.size(crt_ranges) - 1 to 0
+            crt_range = array.get(crt_ranges, i)
+            
+            if not crt_range.is_validated
+                crt_range.validation_bars += 1
+                if crt_range.validation_bars >= crt_range_validation
+                    crt_range.is_validated := true
+            
+            if crt_range.is_validated
+                sweep_buffer = (crt_range.high - crt_range.low) * (crt_sweep_buffer / 100)
+                
+                // Check for HIGH sweep (bearish turtle soup setup)
+                if not crt_range.swept_high and high > (crt_range.high + sweep_buffer)
+                    crt_range.swept_high := true
+                    crt_range.sweep_bar_high := bar_index
+                    
+                    // Draw sweep line
+                    sweep_line = line.new(
+                        x1 = crt_range.sweep_bar_high,
+                        y1 = crt_range.high,
+                        x2 = bar_index + 10,
+                        y2 = crt_range.high,
+                        color = crt_sweep_color,
+                        width = 2,
+                        style = line.style_dashed
+                    )
+                    array.push(crt_lines, sweep_line)
+                
+                // Check for LOW sweep (bullish turtle soup setup)
+                if not crt_range.swept_low and low < (crt_range.low - sweep_buffer)
+                    crt_range.swept_low := true
+                    crt_range.sweep_bar_low := bar_index
+                    
+                    // Draw sweep line
+                    sweep_line = line.new(
+                        x1 = crt_range.sweep_bar_low,
+                        y1 = crt_range.low,
+                        x2 = bar_index + 10,
+                        y2 = crt_range.low,
+                        color = crt_sweep_color,
+                        width = 2,
+                        style = line.style_dashed
+                    )
+                    array.push(crt_lines, sweep_line)
+
+// CRT Turtle Soup Detection - When sweep fails and reverses
+detect_crt_turtle_soup() =>
+    if array.size(crt_ranges) > 0
+        for i = array.size(crt_ranges) - 1 to 0
+            crt_range = array.get(crt_ranges, i)
+            
+            // BEARISH CRT TURTLE SOUP
+            if crt_range.swept_high and bar_index > crt_range.sweep_bar_high
+                // Check if price has returned below the range high (failed breakout)
+                if close < crt_range.high and is_crt_candle()
+                    
+                    // CRT Turtle Soup confirmed!
+                    soup_label = label.new(
+                        x = bar_index,
+                        y = high,
+                        text = "🐢 CRT Bear Soup\n" + crt_range.session_type,
+                        color = crt_turtle_bear_color,
+                        textcolor = color.white,
+                        style = label.style_label_down,
+                        size = size.normal
+                    )
+                    array.push(crt_labels, soup_label)
+                    
+                    // Create soup zone box
+                    soup_box = box.new(
+                        left = crt_range.sweep_bar_high,
+                        top = math.max(high[1], high),
+                        right = bar_index + 5,
+                        bottom = crt_range.high,
+                        border_color = crt_turtle_bear_color,
+                        bgcolor = crt_turtle_bear_color,
+                        text = "CRT Soup Zone",
+                        text_size = size.small
+                    )
+                    array.push(crt_boxes, soup_box)
+                    
+                    // Alert
+                    alert("CRT Bearish Turtle Soup detected in " + crt_range.session_type + "!", alert.freq_once_per_bar)
+                    
+                    // Remove processed range
+                    array.remove(crt_ranges, i)
+                    break
+            
+            // BULLISH CRT TURTLE SOUP
+            if crt_range.swept_low and bar_index > crt_range.sweep_bar_low
+                // Check if price has returned above the range low (failed breakdown)
+                if close > crt_range.low and is_crt_candle()
+                    
+                    // CRT Turtle Soup confirmed!
+                    soup_label = label.new(
+                        x = bar_index,
+                        y = low,
+                        text = "🐢 CRT Bull Soup\n" + crt_range.session_type,
+                        color = crt_turtle_bull_color,
+                        textcolor = color.white,
+                        style = label.style_label_up,
+                        size = size.normal
+                    )
+                    array.push(crt_labels, soup_label)
+                    
+                    // Create soup zone box
+                    soup_box = box.new(
+                        left = crt_range.sweep_bar_low,
+                        top = crt_range.low,
+                        right = bar_index + 5,
+                        bottom = math.min(low[1], low),
+                        border_color = crt_turtle_bull_color,
+                        bgcolor = crt_turtle_bull_color,
+                        text = "CRT Soup Zone",
+                        text_size = size.small
+                    )
+                    array.push(crt_boxes, soup_box)
+                    
+                    // Alert
+                    alert("CRT Bullish Turtle Soup detected in " + crt_range.session_type + "!", alert.freq_once_per_bar)
+                    
+                    // Remove processed range
+                    array.remove(crt_ranges, i)
+                    break
+
+// Cleanup old data
+cleanup_crt_data() =>
+    // Remove old ranges (older than 100 bars)
+    if array.size(crt_ranges) > 0
+        for i = array.size(crt_ranges) - 1 to 0
+            crt_range = array.get(crt_ranges, i)
+            if bar_index - crt_range.start_bar > 100
+                array.remove(crt_ranges, i)
+    
+    // Limit visual elements
+    while array.size(crt_boxes) > 30
+        old_box = array.shift(crt_boxes)
+        box.delete(old_box)
+    
+    while array.size(crt_lines) > 30
+        old_line = array.shift(crt_lines)
+        line.delete(old_line)
+    
+    while array.size(crt_labels) > 20
+        old_label = array.shift(crt_labels)
+        label.delete(old_label)
+
+//==============================================================================
+// MAIN EXECUTION
+//==============================================================================
+
+if enable_crt_turtle
+    detect_crt_ranges()
+    detect_crt_sweeps()
+    detect_crt_turtle_soup()
+    cleanup_crt_data()
+
+// Additional CRT candle highlighting
+barcolor(in_crt_session() and is_crt_candle() ? 
+         (close > open ? color.new(color.green, 70) : color.new(color.red, 70)) : na, 
+         title="CRT Candles")
+
+// Plot CRT sessions background
+bgcolor(in_crt_session() ? color.new(color.blue, 95) : na, title="CRT Sessions")
+
+//==============================================================================
+// ALERT CONDITIONS
+//==============================================================================
+
+// CRT-specific alerts
+alertcondition(enable_crt_turtle and in_crt_session() and is_crt_candle(), 
+               "CRT Candle Detected", 
+               "Significant CRT candle formed during key session")
+
+alertcondition(enable_crt_turtle, 
+               "CRT Turtle Soup", 
+               "CRT Turtle Soup pattern detected")
