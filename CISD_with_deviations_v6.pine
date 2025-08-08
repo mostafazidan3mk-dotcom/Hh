@@ -107,15 +107,14 @@ if low < currentStructure.bottomPrice
         bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
         bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
 
-        // Find highest close before next green candle
-        int idx = bullishBreakIndex
-        int safeStart = math.max(bar_index - 5000, idx)
-        float highestClose = close[idx]
+        // Find highest close before next green candle using relative indexing
+        int maxOffset = math.min(5000, bar_index - bullishBreakIndex)
+        float highestClose = close[maxOffset]
         bool found = false
-        for i = safeStart to bar_index
-            if close[i] > highestClose
-                highestClose := close[i]
-            if close[i] < open[i] and i > idx // green candle
+        for offset = maxOffset to 0 by -1
+            if close[offset] > highestClose
+                highestClose := close[offset]
+            if close[offset] < open[offset] and offset < maxOffset // green candle
                 found := true
                 break
         // Plot deviations
@@ -148,15 +147,14 @@ if high > currentStructure.topPrice
         bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
         bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
 
-        // Find lowest close before next red candle
-        int idx = bearishBreakIndex
-        int safeStart = math.max(bar_index - 5000, idx)
-        float lowestClose = close[idx]
+        // Find lowest close before next red candle using relative indexing
+        int maxOffset = math.min(5000, bar_index - bearishBreakIndex)
+        float lowestClose = close[maxOffset]
         bool found = false
-        for i = safeStart to bar_index
-            if close[i] < lowestClose
-                lowestClose := close[i]
-            if close[i] > open[i] and i > idx // red candle
+        for offset = maxOffset to 0 by -1
+            if close[offset] < lowestClose
+                lowestClose := close[offset]
+            if close[offset] > open[offset] and offset < maxOffset // red candle
                 found := true
                 break
         // Plot deviations
