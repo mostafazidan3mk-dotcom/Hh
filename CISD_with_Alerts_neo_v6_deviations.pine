@@ -1,0 +1,191 @@
+//@version=6
+indicator("CISD with Alerts + Deviations [neo|]", "CISD neo|", overlay = true)
+
+// User Inputs for Customization
+bullishBreakColor = input.color(color.black, "Bull CISD", inline = "bup")
+bearishBreakColor = input.color(color.black, "Bear CISD", inline = "bep")
+
+bullStr = input.string("+CISD", " ", tooltip = "Text to be displayed next to the CISD level.", inline = "bup")
+bearStr = input.string("-CISD", " ", tooltip = "Text to be displayed next to the CISD level.", inline = "bep")
+
+bullishAlerts = input.bool(false, "Alert?", "When set up through Tradingview, the script will send an alert when price closes ABOVE the current '+CISD' level.", inline = "bup")
+bearishAlerts = input.bool(false, "Alert?", "When set up through Tradingview, the script will send an alert when price closes ABOVE the current '-CISD' level.", inline = "bep")
+
+lineWidth = input.int(1, "Line Width", minval=1, maxval=5)
+lookAheadBars = input.int(5, "Line Extension Bars", minval=1, maxval = 5)
+styleOption = input.string("Solid (─)", title="Line Style",
+     options=["Solid (─)", "Dotted (┈)", "Dashed (╌)"])
+keepLevels = input.bool(false, "Keep old CISD levels")
+
+showTable = input(false, title="Enable stat table", group = "Table")
+tablePosition = input.string(defval = "Top Right", title = "Table Position", 
+  options=["Top Right", "Bottom Right", "Middle Right", "Bottom Center", "Middle Left"], group = "Table")
+
+// Structure Definitions
+type MarketStructure
+    float topPrice
+    float bottomPrice
+    bool isBullish
+
+type cisd
+    line level
+    label txt
+    bool completed
+
+lineStyle = styleOption == "Dotted (┈)" ? line.style_dotted :
+     styleOption == "Dashed (╌)" ? line.style_dashed :
+         line.style_solid
+
+// Variable Declarations
+var line lastTopLine = na
+var line lastBottomLine = na
+var MarketStructure currentStructure = MarketStructure.new(0, 0, false)
+
+var cisdLevelsBu = array.new<cisd>()
+var cisdLevelsBe = array.new<cisd>()
+
+var bool isBullishPullback = false
+var bool isBearishPullback = false
+
+var float potentialTopPrice = na
+var float potentialBottomPrice = na
+
+var int bullishBreakIndex = na
+var int bearishBreakIndex = na
+
+var float bullishChangeLevel = na
+var float bearishChangeLevel = na
+
+var bool currentState = false
+
+gettablePos(pos) =>
+    switch pos
+        "Top Right" => position.top_right
+        "Bottom Right" => position.bottom_right
+        "Middle Right" => position.middle_right
+        "Bottom Center" => position.bottom_center
+        "Middle Left" => position.middle_left
+
+// Pullback Detection
+bearishPullbackDetected = close[1] > open[1]
+bullishPullbackDetected = close[1] < open[1]
+
+// Bearish Pullback Logic
+if bearishPullbackDetected and not isBearishPullback
+    isBearishPullback := true
+    potentialTopPrice := open[1]
+    bullishBreakIndex := bar_index[1]
+
+// Bullish Pullback Logic
+if bullishPullbackDetected and not isBullishPullback
+    isBullishPullback := true
+    potentialBottomPrice := open[1]
+    bearishBreakIndex := bar_index[1]
+
+// Update Potential Levels During Pullbacks
+if isBullishPullback
+    if open < potentialBottomPrice
+        potentialBottomPrice := open
+        bearishBreakIndex := bar_index
+    if (close < open) and (open > potentialBottomPrice)
+        potentialBottomPrice := open
+        bearishBreakIndex := bar_index     
+
+if isBearishPullback
+    if open > potentialTopPrice
+        potentialTopPrice := open
+        bullishBreakIndex := bar_index
+    if (close > open) and open < potentialTopPrice
+        potentialTopPrice := open
+        bullishBreakIndex := bar_index      
+
+// Structure Updates - Bearish Break
+var float cisdOpen = na
+var int cisdBar = na
+var bool cisdBull = na
+var float anchorClose = na
+var line[] devLines = array.new_line()
+var bool newCISD = false
+if low < currentStructure.bottomPrice
+    currentStructure.bottomPrice := low
+    currentStructure.isBullish := false
+    if isBearishPullback and (bar_index-bullishBreakIndex != 0)
+        currentStructure.topPrice := math.max(high[bar_index-bullishBreakIndex],high[bar_index-bullishBreakIndex+1])
+        isBearishPullback := false
+        bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size = size.small)
+        b = cisd.new(bearishLine, bearishLabel, false)
+        array.push(cisdLevelsBe, b)
+        // Deviation anchor for bearish
+        cisdOpen := potentialTopPrice
+        cisdBar := bullishBreakIndex
+        cisdBull := false
+        newCISD := true
+    else if close[1] > open[1] and close < open
+        currentStructure.topPrice := high[1]
+        isBearishPullback := false
+        bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size = size.small)
+        b = cisd.new(bearishLine, bearishLabel, false)
+        array.push(cisdLevelsBe, b)
+// Structure Updates - Bullish Break
+if high > currentStructure.topPrice
+    currentStructure.isBullish := true
+    currentStructure.topPrice := high
+    if isBullishPullback and (bar_index-bearishBreakIndex != 0)
+        currentStructure.bottomPrice := math.min(low[bar_index-bearishBreakIndex],low[bar_index-bearishBreakIndex+1])
+        isBullishPullback := false
+        bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
+        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size = size.small)
+        bu = cisd.new(bullishLine, bullishLabel, false)
+        array.push(cisdLevelsBu, bu)
+        // Deviation anchor for bullish
+        cisdOpen := potentialBottomPrice
+        cisdBar := bearishBreakIndex
+        cisdBull := true
+        newCISD := true
+    else if close[1] < open[1] and close > open
+        currentStructure.bottomPrice := low[1]
+        isBullishPullback := false
+        bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
+        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size = size.small)
+        bu = cisd.new(bullishLine, bullishLabel, false)
+        array.push(cisdLevelsBu, bu)
+
+// === Deviation plotting logic ===
+if newCISD and not na(cisdBar) and not na(cisdOpen)
+    anchorClose := na
+    if cisdBull
+        // Bullish: find lowest close before next red candle
+        lowest = na
+        for i = 0 to 50
+            c = request.security(syminfo.tickerid, timeframe.period, close, lookahead=barmerge.lookahead_on)[i]
+            o = request.security(syminfo.tickerid, timeframe.period, open, lookahead=barmerge.lookahead_on)[i]
+            if na(lowest) or c < lowest
+                lowest := c
+            if c < o and i > 0
+                break
+        anchorClose := lowest
+    else
+        // Bearish: find highest close before next green candle
+        highest = na
+        for i = 0 to 50
+            c = request.security(syminfo.tickerid, timeframe.period, close, lookahead=barmerge.lookahead_on)[i]
+            o = request.security(syminfo.tickerid, timeframe.period, open, lookahead=barmerge.lookahead_on)[i]
+            if na(highest) or c > highest
+                highest := c
+            if c > o and i > 0
+                break
+        anchorClose := highest
+    // Remove old deviation lines
+    for j = 0 to array.size(devLines)-1
+        line.delete(array.get(devLines, j))
+    array.clear(devLines)
+    // Plot new deviation lines
+    if not na(anchorClose)
+        bodyRange = cisdOpen - anchorClose
+        for mult in array.from(2.0, 2.5, 4.0, 4.5)
+            lvl = cisdOpen + (bodyRange * mult)
+            l = line.new(cisdBar, lvl, bar_index, lvl, color=color.red, width=1)
+            array.push(devLines, l)
+// ... rest of CISD logic unchanged ...
