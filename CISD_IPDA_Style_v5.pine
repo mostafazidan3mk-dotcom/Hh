@@ -112,7 +112,7 @@ if low < currentStructure.bottomPrice
         currentStructure.topPrice := math.max(high[bar_index-bullishBreakIndex],high[bar_index-bullishBreakIndex+1])
         isBearishPullback := false
         bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
-        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size=size.small)
         b = cisd.new(bearishLine, bearishLabel, false)
         array.push(cisdLevelsBe, b)
         // --- Find highest close before next bullish candle ---
@@ -134,7 +134,7 @@ if low < currentStructure.bottomPrice
         currentStructure.topPrice := high[1]
         isBearishPullback := false
         bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
-        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size=size.small)
         b = cisd.new(bearishLine, bearishLabel, false)
         array.push(cisdLevelsBe, b)
 if high > currentStructure.topPrice
@@ -144,7 +144,7 @@ if high > currentStructure.topPrice
         currentStructure.bottomPrice := math.min(low[bar_index-bearishBreakIndex],low[bar_index-bearishBreakIndex+1])
         isBullishPullback := false
         bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
-        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
+        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size=size.small)
         bu = cisd.new(bullishLine, bullishLabel, false)
         array.push(cisdLevelsBu, bu)
         // --- Find lowest close before next bearish candle ---
@@ -166,7 +166,7 @@ if high > currentStructure.topPrice
         currentStructure.bottomPrice := low[1]
         isBullishPullback := false
         bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
-        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
+        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size=size.small)
         bu = cisd.new(bullishLine, bullishLabel, false)
         array.push(cisdLevelsBu, bu)
 if array.size(cisdLevelsBu) > 1 and not keepLevels
@@ -186,7 +186,7 @@ if array.size(cisdLevelsBu) >= 1
         latest.completed := true
         alert("Bearish CISD Formed")
         bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
-        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_monospace, size = size.small, text_formatting = text.format_italic)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size=size.small)
         b = cisd.new(bearishLine, bearishLabel, false)
         array.push(cisdLevelsBe, b)
         currentState := false
@@ -199,15 +199,15 @@ if array.size(cisdLevelsBe) >= 1 and not keepLevels
         latest.completed := true
         alert("Bullish CISD Formed")
         bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
-        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_monospace, size = size.small, text_formatting = text.format_italic)
+        bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, size=size.small)
         bu = cisd.new(bullishLine, bullishLabel, false)
         array.push(cisdLevelsBu, bu)
         currentState := true
 if showTable and barstate.islast
     var tbl = table.new(gettablePos(tablePosition), 4, 4, bgcolor=chart.bg_color, border_color=chart.fg_color, frame_color = chart.fg_color, frame_width = 1, border_width = 1)
-    table.cell(tbl, 0,0, syminfo.ticker+", "+timeframe.period+" neo|", text_size = size.tiny, text_color = chart.fg_color, text_font_family = font.family_monospace)
-    table.cell(tbl, 0, 1, "Current State", text_color=chart.bg_color, text_size=size.small, text_font_family = font.family_monospace, text_formatting = text.format_bold, bgcolor = chart.fg_color)
-    table.cell(tbl, 0, 2, currentState ? "Bullish" : "Bearish",  text_color=chart.fg_color, text_size=size.small, text_font_family = font.family_monospace, text_formatting = text.format_bold)
+    table.cell(tbl, 0,0, syminfo.ticker+", "+timeframe.period+" neo|", text_size = size.tiny, text_color = chart.fg_color)
+    table.cell(tbl, 0, 1, "Current State", text_color=chart.bg_color, text_size=size.small, bgcolor = chart.fg_color)
+    table.cell(tbl, 0, 2, currentState ? "Bullish" : "Bearish",  text_color=chart.fg_color, text_size=size.small)
 
 // --- IPDA Deviation Plotting Engine, but anchored to CISD ---
 plotCISDDeviations(anchorBar, anchorOpen, anchorClose, isBull, deviations, devColor, labelPrefix) =>
