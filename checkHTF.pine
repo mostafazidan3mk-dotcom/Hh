@@ -17,7 +17,8 @@ indicator("HTF Sweep Helper (checkHTF)", overlay=false, max_bars_back=5000)
 // Note: This function is designed to run in the HTF context via request.security with lookahead_off
 
 checkHTF(minBars, maxBars) =>
-    // Build consolidation range scanning back from the last CLOSED HTF bar (index 1)
+    // Build consolidation range EXCLUDING the current closed HTF bar (index 0)
+    // Start from previous closed HTF bar (index 1) and scan backward
     float hi = high[1]
     float lo = low[1]
     int spanLen = 1
@@ -42,12 +43,8 @@ checkHTF(minBars, maxBars) =>
     float rangeLowUsed = inConsolidation ? lo : prevLow
     bool sweptRange    = (low < rangeLowUsed) and (close > prevClose)
 
-    // For closed HTF bars (lookahead_off), crossed is bar-local and true iff a sweep occurred
-    var bool crossed = false
-    if ta.change(time)
-        crossed := false
-    if sweptPrev or sweptRange
-        crossed := true
+    // One-bar pulse on the LTF bar that receives the new closed HTF bar
+    bool crossed = ta.change(time) and (sweptPrev or sweptRange)
 
     float sweepLevel = sweptPrev ? prevLow : (sweptRange ? rangeLowUsed : na)
 
