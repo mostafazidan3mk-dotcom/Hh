@@ -75,11 +75,11 @@ var float bearishChangeLevel = na
 var bool currentState = false
 
 gettablePos(pos) =>
-    pos == "Top Right"      ? position.top_right      : \
-    pos == "Bottom Right"   ? position.bottom_right   : \
-    pos == "Middle Right"   ? position.middle_right   : \
-    pos == "Bottom Center"  ? position.bottom_center  : \
-                              position.middle_left
+    pos == "Top Right"      ? position.top_right
+    : pos == "Bottom Right" ? position.bottom_right
+    : pos == "Middle Right" ? position.middle_right
+    : pos == "Bottom Center"? position.bottom_center
+    :                         position.middle_left
 
 bearishPullbackDetected = close[1] > open[1]
 bullishPullbackDetected = close[1] < open[1]
