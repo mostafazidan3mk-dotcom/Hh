@@ -104,14 +104,15 @@ if low < currentStructure.bottomPrice
     if isBearishPullback and (bar_index-bullishBreakIndex != 0)
         currentStructure.topPrice := math.max(high[bar_index-bullishBreakIndex],high[bar_index-bullishBreakIndex+1])
         isBearishPullback := false
-        bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bullishBreakColor, width=lineWidth, style = lineStyle)
-        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bullishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
+        bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
 
         // Find highest close before next green candle
         int idx = bullishBreakIndex
+        int safeStart = math.max(bar_index - 5000, idx)
         float highestClose = close[idx]
         bool found = false
-        for i = idx to bar_index
+        for i = safeStart to bar_index
             if close[i] > highestClose
                 highestClose := close[i]
             if close[i] < open[i] and i > idx // green candle
@@ -131,8 +132,8 @@ if low < currentStructure.bottomPrice
     else if close[1] > open[1] and close < open
         currentStructure.topPrice := high[1]
         isBearishPullback := false
-        bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bullishBreakColor, width=lineWidth, style = lineStyle)
-        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bullishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
+        bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
+        bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
         b = cisd.new(bearishLine, bearishLabel, false, bullishBreakIndex, potentialTopPrice, na, false)
         array.push(cisdLevelsBe, b)
 
@@ -149,9 +150,10 @@ if high > currentStructure.topPrice
 
         // Find lowest close before next red candle
         int idx = bearishBreakIndex
+        int safeStart = math.max(bar_index - 5000, idx)
         float lowestClose = close[idx]
         bool found = false
-        for i = idx to bar_index
+        for i = safeStart to bar_index
             if close[i] < lowestClose
                 lowestClose := close[i]
             if close[i] > open[i] and i > idx // red candle
