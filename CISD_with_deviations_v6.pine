@@ -109,12 +109,11 @@ if low < currentStructure.bottomPrice
 
         // Find highest close before next green candle using safe offset
         int cisdOffset = bar_index - bullishBreakIndex
-        int maxOffset = math.min(5000, cisdOffset)
+        int maxOffset = math.min(5000, bar_index, cisdOffset)
         float highestClose = na
         bool found = false
         for offset = maxOffset to 0 by -1
-            // Only reference if bar_index - offset >= 0
-            if (bar_index - offset) >= 0
+            if offset <= bar_index
                 c = close[offset]
                 o = open[offset]
                 if na(highestClose) or c > highestClose
@@ -155,11 +154,11 @@ if high > currentStructure.topPrice
 
         // Find lowest close before next red candle using safe offset
         int cisdOffset = bar_index - bearishBreakIndex
-        int maxOffset = math.min(5000, cisdOffset)
+        int maxOffset = math.min(5000, bar_index, cisdOffset)
         float lowestClose = na
         bool found = false
         for offset = maxOffset to 0 by -1
-            if (bar_index - offset) >= 0
+            if offset <= bar_index
                 c = close[offset]
                 o = open[offset]
                 if na(lowestClose) or c < lowestClose
