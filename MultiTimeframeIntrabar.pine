@@ -285,21 +285,7 @@ pulseLtf7 = (bullPrev7 or bullCon7) and not crossedLtf7
 if pulseLtf7
     crossedLtf7 := true
 
-// Optional LTF sweep labels (use existing label manager and per-TF visibility switches)
-if use_tf1 and show_m30_labels and pulseLtf1
-    manageLabelCount("LTF-SW-M30", bullPrev1 ? prevL1 : crL1, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if use_tf2 and show_h1_labels and pulseLtf2
-    manageLabelCount("LTF-SW-H1", bullPrev2 ? prevL2 : crL2, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if use_tf3 and show_h2_labels and pulseLtf3
-    manageLabelCount("LTF-SW-H2", bullPrev3 ? prevL3 : crL3, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if use_tf4 and show_h4_labels and pulseLtf4
-    manageLabelCount("LTF-SW-H4", bullPrev4 ? prevL4 : crL4, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if use_tf5 and show_daily_labels and pulseLtf5
-    manageLabelCount("LTF-SW-D", bullPrev5 ? prevL5 : crL5, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if use_tf6 and show_weekly_labels and pulseLtf6
-    manageLabelCount("LTF-SW-W", bullPrev6 ? prevL6 : crL6, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
-if use_tf7 and show_monthly_labels and pulseLtf7
-    manageLabelCount("LTF-SW-M", bullPrev7 ? prevL7 : crL7, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+// Optional LTF sweep labels will be applied later (after label helpers are defined)
 
 // Modified plot_lines function
 plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, bullishTouch, bearishTouch, tfName) =>
@@ -439,6 +425,22 @@ if use_tf6
     checkAndCreateSweepLabel(show_weekly_labels, crossed6, swPrev6, swRange6, "W", swLvl6)
 if use_tf7
     checkAndCreateSweepLabel(show_monthly_labels, crossed7, swPrev7, swRange7, "M", swLvl7)
+
+// Optional LTF sweep labels (applied after label helpers)
+if use_tf1 and show_m30_labels and pulseLtf1
+    manageLabelCount("LTF-SW-M30", bullPrev1 ? prevL1 : crL1, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf2 and show_h1_labels and pulseLtf2
+    manageLabelCount("LTF-SW-H1", bullPrev2 ? prevL2 : crL2, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf3 and show_h2_labels and pulseLtf3
+    manageLabelCount("LTF-SW-H2", bullPrev3 ? prevL3 : crL3, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf4 and show_h4_labels and pulseLtf4
+    manageLabelCount("LTF-SW-H4", bullPrev4 ? prevL4 : crL4, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf5 and show_daily_labels and pulseLtf5
+    manageLabelCount("LTF-SW-D", bullPrev5 ? prevL5 : crL5, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf6 and show_weekly_labels and pulseLtf6
+    manageLabelCount("LTF-SW-W", bullPrev6 ? prevL6 : crL6, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf7 and show_monthly_labels and pulseLtf7
+    manageLabelCount("LTF-SW-M", bullPrev7 ? prevL7 : crL7, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
 
 // Alert conditions (existing touch alerts)
 if alert_on_m30 and (bullishTouch1 or bearishTouch1)
