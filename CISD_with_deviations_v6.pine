@@ -96,6 +96,34 @@ if isBearishPullback
         potentialTopPrice := open
         bullishBreakIndex := bar_index      
 
+// --- Deviation plotting function (IPDA style, modular) ---
+plotCISDDeviations(anchorBar, anchorOpen, anchorClose, isBull, lookAheadBars, deviations, devColor, lineStyle, labelPrefix) =>
+    // anchorBar: bar_index of CISD event
+    // anchorOpen: open price of CISD event
+    // anchorClose: close price of CISD event
+    // isBull: true for bullish CISD, false for bearish
+    // deviations: array of floats (deviation multipliers)
+    // devColor: color for deviation lines
+    // lineStyle: line style
+    // labelPrefix: string for label prefix
+    for i = 0 to array.size(deviations)-1
+        dev = array.get(deviations, i)
+        lvl = anchorOpen + ((anchorOpen - anchorClose) * dev)
+        line.new(anchorBar, lvl, bar_index + lookAheadBars, lvl, color=devColor, width=1, style=lineStyle)
+        label.new(bar_index + lookAheadBars, lvl, labelPrefix + str.tostring(dev), color=color.new(color.white,100), textcolor=devColor, style=label.style_label_left, size=size.tiny)
+// --- End deviation plotting function ---
+
+// --- Parse user deviation input (like IPDA) ---
+var float[] userDevs = array.new_float()
+if bar_index == 0
+    userDevs.clear()
+    string[] devStrs = str.split(devMultipliers, ",")
+    for i = 0 to array.size(devStrs)-1
+        val = str.tonumber(str.trim(array.get(devStrs, i)))
+        if not na(val)
+            array.push(userDevs, val)
+// --- End parse ---
+
 // Structure Updates - Bearish Break
 if low < currentStructure.bottomPrice
     currentStructure.bottomPrice := low
@@ -134,6 +162,9 @@ if low < currentStructure.bottomPrice
 
         b = cisd.new(bearishLine, bearishLabel, false, bullishBreakIndex, potentialTopPrice, highestClose, false)
         array.push(cisdLevelsBe, b)
+        // Plot deviations (IPDA style)
+        if showDevs and not na(potentialTopPrice) and not na(highestClose)
+            plotCISDDeviations(bullishBreakIndex, potentialTopPrice, highestClose, false, lookAheadBars, userDevs, devColors, lineStyle, "Lvl")
     else if close[1] > open[1] and close < open
         currentStructure.topPrice := high[1]
         isBearishPullback := false
@@ -180,6 +211,9 @@ if high > currentStructure.topPrice
 
         bu = cisd.new(bullishLine, bullishLabel, false, bearishBreakIndex, potentialBottomPrice, lowestClose, true)
         array.push(cisdLevelsBu, bu)
+        // Plot deviations (IPDA style)
+        if showDevs and not na(potentialBottomPrice) and not na(lowestClose)
+            plotCISDDeviations(bearishBreakIndex, potentialBottomPrice, lowestClose, true, lookAheadBars, userDevs, devColors, lineStyle, "Lvl")
     else if close[1] < open[1] and close > open
         currentStructure.bottomPrice := low[1]
         isBullishPullback := false
