@@ -204,6 +204,103 @@ process_tf(tf) =>
 [crH6, crL6, prevL6, prevC6, swPrev6, swRange6, crossed6, swLvl6] = request.security(syminfo.tickerid, tf6, checkHTF(minbars, maxbars), barmerge.gaps_off, barmerge.lookahead_off)
 [crH7, crL7, prevL7, prevC7, swPrev7, swRange7, crossed7, swLvl7] = request.security(syminfo.tickerid, tf7, checkHTF(minbars, maxbars), barmerge.gaps_off, barmerge.lookahead_off)
 
+// ---------------------------------------------
+// Lower-timeframe (intrabar) sweep detection against HTF reference lows
+// - Uses prevL (previous HTF low) and crL (consolidation low) as static reference during the HTF bar
+// - Pulses once per HTF bar when a valid LTF sweep+reclaim occurs; resets on new HTF bar
+var bool crossedLtf1 = false
+var bool crossedLtf2 = false
+var bool crossedLtf3 = false
+var bool crossedLtf4 = false
+var bool crossedLtf5 = false
+var bool crossedLtf6 = false
+var bool crossedLtf7 = false
+
+// Reset latches on new HTF bars
+if newBar1
+    crossedLtf1 := false
+if newBar2
+    crossedLtf2 := false
+if newBar3
+    crossedLtf3 := false
+if newBar4
+    crossedLtf4 := false
+if newBar5
+    crossedLtf5 := false
+if newBar6
+    crossedLtf6 := false
+if newBar7
+    crossedLtf7 := false
+
+// Helper to build wick/body reclaim conditions
+reclaimWick(level) => low < level and close > level
+reclaimBody(level) => open < level and close > level
+
+// M30
+bullPrev1 = (use_wick_touch and reclaimWick(prevL1)) or (use_body_touch and reclaimBody(prevL1))
+bullCon1  = (use_wick_touch and reclaimWick(crL1))   or (use_body_touch and reclaimBody(crL1))
+pulseLtf1 = (bullPrev1 or bullCon1) and not crossedLtf1
+if pulseLtf1
+    crossedLtf1 := true
+
+// H1
+bullPrev2 = (use_wick_touch and reclaimWick(prevL2)) or (use_body_touch and reclaimBody(prevL2))
+bullCon2  = (use_wick_touch and reclaimWick(crL2))   or (use_body_touch and reclaimBody(crL2))
+pulseLtf2 = (bullPrev2 or bullCon2) and not crossedLtf2
+if pulseLtf2
+    crossedLtf2 := true
+
+// H2
+bullPrev3 = (use_wick_touch and reclaimWick(prevL3)) or (use_body_touch and reclaimBody(prevL3))
+bullCon3  = (use_wick_touch and reclaimWick(crL3))   or (use_body_touch and reclaimBody(crL3))
+pulseLtf3 = (bullPrev3 or bullCon3) and not crossedLtf3
+if pulseLtf3
+    crossedLtf3 := true
+
+// H4
+bullPrev4 = (use_wick_touch and reclaimWick(prevL4)) or (use_body_touch and reclaimBody(prevL4))
+bullCon4  = (use_wick_touch and reclaimWick(crL4))   or (use_body_touch and reclaimBody(crL4))
+pulseLtf4 = (bullPrev4 or bullCon4) and not crossedLtf4
+if pulseLtf4
+    crossedLtf4 := true
+
+// D
+bullPrev5 = (use_wick_touch and reclaimWick(prevL5)) or (use_body_touch and reclaimBody(prevL5))
+bullCon5  = (use_wick_touch and reclaimWick(crL5))   or (use_body_touch and reclaimBody(crL5))
+pulseLtf5 = (bullPrev5 or bullCon5) and not crossedLtf5
+if pulseLtf5
+    crossedLtf5 := true
+
+// W
+bullPrev6 = (use_wick_touch and reclaimWick(prevL6)) or (use_body_touch and reclaimBody(prevL6))
+bullCon6  = (use_wick_touch and reclaimWick(crL6))   or (use_body_touch and reclaimBody(crL6))
+pulseLtf6 = (bullPrev6 or bullCon6) and not crossedLtf6
+if pulseLtf6
+    crossedLtf6 := true
+
+// M
+bullPrev7 = (use_wick_touch and reclaimWick(prevL7)) or (use_body_touch and reclaimBody(prevL7))
+bullCon7  = (use_wick_touch and reclaimWick(crL7))   or (use_body_touch and reclaimBody(crL7))
+pulseLtf7 = (bullPrev7 or bullCon7) and not crossedLtf7
+if pulseLtf7
+    crossedLtf7 := true
+
+// Optional LTF sweep labels (use existing label manager and per-TF visibility switches)
+if use_tf1 and show_m30_labels and pulseLtf1
+    manageLabelCount("LTF-SW-M30", bullPrev1 ? prevL1 : crL1, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf2 and show_h1_labels and pulseLtf2
+    manageLabelCount("LTF-SW-H1", bullPrev2 ? prevL2 : crL2, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf3 and show_h2_labels and pulseLtf3
+    manageLabelCount("LTF-SW-H2", bullPrev3 ? prevL3 : crL3, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf4 and show_h4_labels and pulseLtf4
+    manageLabelCount("LTF-SW-H4", bullPrev4 ? prevL4 : crL4, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf5 and show_daily_labels and pulseLtf5
+    manageLabelCount("LTF-SW-D", bullPrev5 ? prevL5 : crL5, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf6 and show_weekly_labels and pulseLtf6
+    manageLabelCount("LTF-SW-W", bullPrev6 ? prevL6 : crL6, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if use_tf7 and show_monthly_labels and pulseLtf7
+    manageLabelCount("LTF-SW-M", bullPrev7 ? prevL7 : crL7, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+
 // Modified plot_lines function
 plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, bullishTouch, bearishTouch, tfName) =>
     var line highLine = na
