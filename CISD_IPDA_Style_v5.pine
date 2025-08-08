@@ -1,0 +1,78 @@
+//@version=5
+indicator("CISD IPDA Deviations", shorttitle="CISD IPDA Dev", overlay=true, max_bars_back=500, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+
+// --- User Inputs (from IPDA) ---
+dvs        = input.text_area("0\n1\n-1\n-1.5\n-2\n-2.5\n-4", title="Insert the Deviations you want to plot, one per line:")
+label_size = input.string("Small", title="Label Size", options = ['Auto', 'Tiny', 'Small', 'Normal', 'Large', 'Huge'], inline = "lbl")
+lbl        = input.bool(false, title="Hide Labels?", inline="lbl")
+remove     = input.bool(false, title="Remove Deviations Once Invalidated?", group="Standard Deviations", tooltip="Once the '1' anchor price line is traded above/below the Deviation will disappear.")
+
+// --- Deviation parsing (from IPDA) ---
+var deviations = array.new_float()
+if bar_index == 0
+    array.clear(deviations)
+    string[] chrs = str.split(dvs, "")
+    if chrs.size()>0
+        var string num = ""
+        for i=0 to chrs.size()-1
+            c = chrs.get(i)
+            if chrs.get(i)=="\n"
+                array.unshift(deviations, str.tonumber(num))
+                num := ""
+            else
+                num += c
+        array.unshift(deviations, str.tonumber(num))
+
+size(string _size) =>
+    switch _size
+        "Tiny"   => size.tiny
+        "Small"  => size.small
+        "Normal" => size.normal
+        "Large"  => size.large
+        "Huge"   => size.huge
+        => size.small
+
+noColor  = color.new(color.white, 100)
+
+// --- CISD Logic (simplified for anchor detection) ---
+// You can expand this with your full CISD logic as needed
+var float cisdAnchorOpen = na
+var float cisdAnchorClose = na
+var int   cisdAnchorBar = na
+var bool  cisdBull = na
+
+// Example CISD event detection (replace with your real logic)
+// Here, we use a simple bullish/bearish engulfing as a placeholder
+bullishCISD = close > open and close[1] < open[1] and close > high[1]
+bearishCISD = close < open and close[1] > open[1] and close < low[1]
+
+if bullishCISD
+    cisdAnchorOpen := open
+    cisdAnchorClose := close
+    cisdAnchorBar := bar_index
+    cisdBull := true
+    // Plot anchor marker
+    label.new(bar_index, open, "CISD Bull", color=color.green, style=label.style_label_up, size=size.small)
+if bearishCISD
+    cisdAnchorOpen := open
+    cisdAnchorClose := close
+    cisdAnchorBar := bar_index
+    cisdBull := false
+    // Plot anchor marker
+    label.new(bar_index, open, "CISD Bear", color=color.red, style=label.style_label_down, size=size.small)
+
+// --- IPDA Deviation Plotting Engine, but anchored to CISD ---
+plotCISDDeviations(anchorBar, anchorOpen, anchorClose, isBull, deviations, devColor, labelPrefix) =>
+    for i = 0 to array.size(deviations)-1
+        dev = array.get(deviations, i)
+        lvl = anchorOpen + ((anchorOpen - anchorClose) * dev)
+        line.new(anchorBar, lvl, bar_index, lvl, color=devColor, width=1, style=line.style_solid)
+        if not lbl
+            label.new(bar_index, lvl, labelPrefix + str.tostring(dev), color=noColor, style=label.style_label_left, textcolor=color.gray, size=size(label_size))
+
+// --- Plot deviations for each CISD event ---
+if not na(cisdAnchorBar) and not na(cisdAnchorOpen) and not na(cisdAnchorClose)
+    plotCISDDeviations(cisdAnchorBar, cisdAnchorOpen, cisdAnchorClose, cisdBull, deviations, cisdBull ? color.green : color.red, cisdBull ? "+" : "-")
+
+// --- Remove deviations if invalidated (optional, like IPDA) ---
+// (You can add this logic if you want deviations to disappear after being traded through)
