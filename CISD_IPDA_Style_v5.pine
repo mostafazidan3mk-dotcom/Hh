@@ -115,8 +115,21 @@ if low < currentStructure.bottomPrice
         bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
         b = cisd.new(bearishLine, bearishLabel, false)
         array.push(cisdLevelsBe, b)
-        // --- IPDA-style deviation plotting for bearish CISD ---
-        plotCISDDeviations(bullishBreakIndex, potentialTopPrice, close, false, deviations, color.red, "-")
+        // --- Find highest close before next bullish candle ---
+        float highestClose = na
+        bool found = false
+        for i = 0 to 50  // scan up to 50 bars ahead (adjust as needed)
+            idx = bar_index - bullishBreakIndex + i
+            if (bullishBreakIndex + i) <= bar_index
+                c = close[i]
+                o = open[i]
+                if na(highestClose) or c > highestClose
+                    highestClose := c
+                if c > o and i > 0  // next bullish candle
+                    found := true
+                    break
+        if found and not na(highestClose)
+            plotCISDDeviations(bullishBreakIndex, potentialTopPrice, highestClose, false, deviations, color.red, "-")
     else if close[1] > open[1] and close < open
         currentStructure.topPrice := high[1]
         isBearishPullback := false
@@ -134,8 +147,21 @@ if high > currentStructure.topPrice
         bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
         bu = cisd.new(bullishLine, bullishLabel, false)
         array.push(cisdLevelsBu, bu)
-        // --- IPDA-style deviation plotting for bullish CISD ---
-        plotCISDDeviations(bearishBreakIndex, potentialBottomPrice, close, true, deviations, color.green, "+")
+        // --- Find lowest close before next bearish candle ---
+        float lowestClose = na
+        bool found = false
+        for i = 0 to 50  // scan up to 50 bars ahead (adjust as needed)
+            idx = bar_index - bearishBreakIndex + i
+            if (bearishBreakIndex + i) <= bar_index
+                c = close[i]
+                o = open[i]
+                if na(lowestClose) or c < lowestClose
+                    lowestClose := c
+                if c < o and i > 0  // next bearish candle
+                    found := true
+                    break
+        if found and not na(lowestClose)
+            plotCISDDeviations(bearishBreakIndex, potentialBottomPrice, lowestClose, true, deviations, color.green, "+")
     else if close[1] < open[1] and close > open
         currentStructure.bottomPrice := low[1]
         isBullishPullback := false
