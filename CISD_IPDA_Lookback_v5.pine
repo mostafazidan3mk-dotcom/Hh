@@ -1,0 +1,99 @@
+//@version=5
+indicator("CISD IPDA Lookback Deviations", shorttitle="CISD IPDA Lookback", overlay=true, max_bars_back=500, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+
+// --- User Inputs (from IPDA) ---
+dvs        = input.text_area("0\n1\n-1\n-1.5\n-2\n-2.5\n-4", title="Insert the Deviations you want to plot, one per line:")
+label_size = input.string("Small", title="Label Size", options = ['Auto', 'Tiny', 'Small', 'Normal', 'Large', 'Huge'], inline = "lbl")
+lbl        = input.bool(false, title="Hide Labels?", inline="lbl")
+
+MLB = input.bool(true , title="Monthly"     , group="Fractal IPDA Lookback", inline="M"), lMTF = input.timeframe("D"  , title="", group="Fractal IPDA Lookback", inline="M"), hMTF = input.timeframe("D"  , title="", group="Fractal IPDA Lookback", inline="M")
+WLB = input.bool(true , title="Weekly "     , group="Fractal IPDA Lookback", inline="W"), lWTF = input.timeframe("240", title="", group="Fractal IPDA Lookback", inline="W"), hWTF = input.timeframe("480", title="", group="Fractal IPDA Lookback", inline="W")
+DLB = input.bool(true , title="Daily     "  , group="Fractal IPDA Lookback", inline="D"), lDTF = input.timeframe("15" , title="", group="Fractal IPDA Lookback", inline="D"), hDTF = input.timeframe("60" , title="", group="Fractal IPDA Lookback", inline="D")
+ILB = input.bool(true , title="Intraday"    , group="Fractal IPDA Lookback", inline="I"), lITF = input.timeframe("1"  , title="", group="Fractal IPDA Lookback", inline="I"), hITF = input.timeframe("5"  , title="", group="Fractal IPDA Lookback", inline="I")
+
+remove = input.bool(false, title="Remove Deviations Once Invalidated?", group="Standard Deviations", tooltip="Once the '1' anchor price line is traded above/below the Deviation will disappear.")
+tw3_up = input.bool(true, title="TW3 Up     ", group="Standard Deviations", inline="UP"), tw2_up = input.bool(true, title="TW2 Up    ", group="Standard Deviations", inline="UP"), tw1_up = input.bool(true , title="TW1 Up"  , group="Standard Deviations", inline="UP")
+tw3_dw = input.bool(true, title="TW3 Down"   , group="Standard Deviations", inline="DW"), tw2_dw = input.bool(true, title="TW2 Down"  , group="Standard Deviations", inline="DW"), tw1_dw = input.bool(true , title="TW1 Down", group="Standard Deviations", inline="DW")
+
+// --- Deviation parsing (from IPDA) ---
+var deviations = array.new_float()
+if bar_index == 0
+    array.clear(deviations)
+    string[] chrs = str.split(dvs, "")
+    if chrs.size()>0
+        var string num = ""
+        for i=0 to chrs.size()-1
+            c = chrs.get(i)
+            if chrs.get(i)=="\n"
+                array.unshift(deviations, str.tonumber(num))
+                num := ""
+            else
+                num += c
+        array.unshift(deviations, str.tonumber(num))
+
+size(string _size) =>
+    switch _size
+        "Tiny"   => size.tiny
+        "Small"  => size.small
+        "Normal" => size.normal
+        "Large"  => size.large
+        "Huge"   => size.huge
+        => size.small
+
+noColor  = color.new(color.white, 100)
+
+// --- HTF Lookback Logic (from IPDA) ---
+tfRange(string LOW, string HIGH)=>
+    timeframe.in_seconds(timeframe.period)>=timeframe.in_seconds(LOW) and timeframe.in_seconds(timeframe.period)<=timeframe.in_seconds(HIGH)
+
+// --- CISD LOGIC (anchor detection only) ---
+var float cisdAnchorOpen = na
+var float cisdAnchorClose = na
+var int   cisdAnchorBar = na
+var bool  cisdBull = na
+
+// Example CISD event detection (replace with your real logic)
+bullishCISD = close > open and close[1] < open[1] and close > high[1]
+bearishCISD = close < open and close[1] > open[1] and close < low[1]
+
+if bullishCISD
+    cisdAnchorOpen := open
+    cisdAnchorClose := close
+    cisdAnchorBar := bar_index
+    cisdBull := true
+if bearishCISD
+    cisdAnchorOpen := open
+    cisdAnchorClose := close
+    cisdAnchorBar := bar_index
+    cisdBull := false
+
+// --- IPDA Deviation Plotting Engine, but anchored to CISD ---
+plotCISDDeviations(anchorBar, anchorOpen, anchorClose, isBull, deviations, devColor, labelPrefix) =>
+    for i = 0 to array.size(deviations)-1
+        dev = array.get(deviations, i)
+        lvl = anchorOpen + ((anchorOpen - anchorClose) * dev)
+        line.new(anchorBar, lvl, bar_index, lvl, color=devColor, width=1, style=line.style_solid)
+        if not lbl
+            label.new(bar_index, lvl, labelPrefix + str.tostring(dev), color=noColor, style=label.style_label_left, textcolor=color.gray, size=size(label_size))
+
+// --- HTF Window Detection (from IPDA) ---
+var int htfStartBar = na
+if MLB and tfRange(lMTF, hMTF)
+    if na(htfStartBar) or timeframe.change(lMTF)
+        htfStartBar := bar_index
+else if WLB and tfRange(lWTF, hWTF)
+    if na(htfStartBar) or timeframe.change(lWTF)
+        htfStartBar := bar_index
+else if DLB and tfRange(lDTF, hDTF)
+    if na(htfStartBar) or timeframe.change(lDTF)
+        htfStartBar := bar_index
+else if ILB and tfRange(lITF, hITF)
+    if na(htfStartBar) or timeframe.change(lITF)
+        htfStartBar := bar_index
+
+// --- Plot deviations for CISD anchor if within current HTF window ---
+if not na(cisdAnchorBar) and not na(htfStartBar) and cisdAnchorBar >= htfStartBar
+    plotCISDDeviations(cisdAnchorBar, cisdAnchorOpen, cisdAnchorClose, cisdBull, deviations, cisdBull ? color.green : color.red, cisdBull ? "+" : "-")
+
+// --- Remove deviations if invalidated (optional, like IPDA) ---
+// (You can add this logic if you want deviations to disappear after being traded through)
