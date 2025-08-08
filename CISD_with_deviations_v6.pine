@@ -107,18 +107,24 @@ if low < currentStructure.bottomPrice
         bearishLine = line.new(bullishBreakIndex, potentialTopPrice, bar_index + lookAheadBars, potentialTopPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
         bearishLabel = label.new(bar_index + lookAheadBars, potentialTopPrice, bullStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
 
-        // Find highest close before next green candle using relative indexing
-        int maxOffset = math.min(5000, bar_index - bullishBreakIndex)
-        float highestClose = close[maxOffset]
+        // Find highest close before next green candle using safe offset
+        int cisdOffset = bar_index - bullishBreakIndex
+        int maxOffset = math.min(5000, cisdOffset)
+        float highestClose = na
         bool found = false
         for offset = maxOffset to 0 by -1
-            if close[offset] > highestClose
-                highestClose := close[offset]
-            if close[offset] < open[offset] and offset < maxOffset // green candle
-                found := true
-                break
+            // Only reference if bar_index - offset >= 0
+            if (bar_index - offset) >= 0
+                c = close[offset]
+                o = open[offset]
+                if na(highestClose) or c > highestClose
+                    highestClose := c
+                // green candle (close > open) after CISD bar
+                if c > o and offset < maxOffset
+                    found := true
+                    break
         // Plot deviations
-        if showDevs and found
+        if showDevs and found and not na(highestClose)
             devs = str.split(devMultipliers, ",")
             for j = 0 to array.size(devs)-1
                 mult = str.tonumber(array.get(devs, j))
@@ -147,18 +153,23 @@ if high > currentStructure.topPrice
         bullishLine = line.new(bearishBreakIndex, potentialBottomPrice, bar_index + lookAheadBars, potentialBottomPrice, color=bearishBreakColor, width=lineWidth, style = lineStyle)
         bullishLabel = label.new(bar_index + lookAheadBars, potentialBottomPrice, bearStr, color=color.new(color.white,100), textcolor=bearishBreakColor, style=label.style_label_left, text_font_family = font.family_default, size = size.small, text_formatting = text.format_italic)
 
-        // Find lowest close before next red candle using relative indexing
-        int maxOffset = math.min(5000, bar_index - bearishBreakIndex)
-        float lowestClose = close[maxOffset]
+        // Find lowest close before next red candle using safe offset
+        int cisdOffset = bar_index - bearishBreakIndex
+        int maxOffset = math.min(5000, cisdOffset)
+        float lowestClose = na
         bool found = false
         for offset = maxOffset to 0 by -1
-            if close[offset] < lowestClose
-                lowestClose := close[offset]
-            if close[offset] > open[offset] and offset < maxOffset // red candle
-                found := true
-                break
+            if (bar_index - offset) >= 0
+                c = close[offset]
+                o = open[offset]
+                if na(lowestClose) or c < lowestClose
+                    lowestClose := c
+                // red candle (close < open) after CISD bar
+                if c < o and offset < maxOffset
+                    found := true
+                    break
         // Plot deviations
-        if showDevs and found
+        if showDevs and found and not na(lowestClose)
             devs = str.split(devMultipliers, ",")
             for j = 0 to array.size(devs)-1
                 mult = str.tonumber(array.get(devs, j))
