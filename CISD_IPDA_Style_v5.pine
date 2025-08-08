@@ -34,6 +34,15 @@ size(string _size) =>
 
 noColor  = color.new(color.white, 100)
 
+// --- IPDA Deviation Plotting Engine, but anchored to CISD ---
+plotCISDDeviations(anchorBar, anchorOpen, anchorClose, isBull, deviations, devColor, labelPrefix) =>
+    for i = 0 to array.size(deviations)-1
+        dev = array.get(deviations, i)
+        lvl = anchorOpen + ((anchorOpen - anchorClose) * dev)
+        line.new(anchorBar, lvl, bar_index, lvl, color=devColor, width=1, style=line.style_solid)
+        if not lbl
+            label.new(bar_index, lvl, labelPrefix + str.tostring(dev), color=noColor, style=label.style_label_left, textcolor=color.gray, size=size(label_size))
+
 // --- CISD LOGIC (from your v6 script, adapted to v5) ---
 bullishBreakColor = input.color(color.black, "Bull CISD", inline = "bup")
 bearishBreakColor = input.color(color.black, "Bear CISD", inline = "bep")
@@ -203,15 +212,6 @@ if showTable and barstate.islast
     table.cell(tbl, 0,0, syminfo.ticker+", "+timeframe.period+" neo|", text_size = size.tiny, text_color = chart.fg_color)
     table.cell(tbl, 0, 1, "Current State", text_color=chart.bg_color, text_size=size.small, bgcolor = chart.fg_color)
     table.cell(tbl, 0, 2, currentState ? "Bullish" : "Bearish",  text_color=chart.fg_color, text_size=size.small)
-
-// --- IPDA Deviation Plotting Engine, but anchored to CISD ---
-plotCISDDeviations(anchorBar, anchorOpen, anchorClose, isBull, deviations, devColor, labelPrefix) =>
-    for i = 0 to array.size(deviations)-1
-        dev = array.get(deviations, i)
-        lvl = anchorOpen + ((anchorOpen - anchorClose) * dev)
-        line.new(anchorBar, lvl, bar_index, lvl, color=devColor, width=1, style=line.style_solid)
-        if not lbl
-            label.new(bar_index, lvl, labelPrefix + str.tostring(dev), color=noColor, style=label.style_label_left, textcolor=color.gray, size=size(label_size))
 
 // --- Remove deviations if invalidated (optional, like IPDA) ---
 // (You can add this logic if you want deviations to disappear after being traded through)
