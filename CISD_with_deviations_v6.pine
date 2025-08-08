@@ -112,16 +112,17 @@ if low < currentStructure.bottomPrice
         int maxOffset = math.min(5000, bar_index, cisdOffset)
         float highestClose = na
         bool found = false
-        for offset = 0 to maxOffset
-            if offset <= bar_index
-                c = close[offset]
-                o = open[offset]
-                if na(highestClose) or c > highestClose
-                    highestClose := c
-                // green candle (close > open) after CISD bar
-                if c > o and offset > 0
-                    found := true
-                    break
+        if maxOffset >= 0
+            for offset = 0 to maxOffset
+                if offset <= bar_index
+                    c = close[offset]
+                    o = open[offset]
+                    if na(highestClose) or c > highestClose
+                        highestClose := c
+                    // green candle (close > open) after CISD bar
+                    if c > o and offset > 0
+                        found := true
+                        break
         // Plot deviations
         if showDevs and found and not na(highestClose)
             devs = str.split(devMultipliers, ",")
@@ -157,16 +158,17 @@ if high > currentStructure.topPrice
         int maxOffset = math.min(5000, bar_index, cisdOffset)
         float lowestClose = na
         bool found = false
-        for offset = 0 to maxOffset
-            if offset <= bar_index
-                c = close[offset]
-                o = open[offset]
-                if na(lowestClose) or c < lowestClose
-                    lowestClose := c
-                // red candle (close < open) after CISD bar
-                if c < o and offset > 0
-                    found := true
-                    break
+        if maxOffset >= 0
+            for offset = 0 to maxOffset
+                if offset <= bar_index
+                    c = close[offset]
+                    o = open[offset]
+                    if na(lowestClose) or c < lowestClose
+                        lowestClose := c
+                    // red candle (close < open) after CISD bar
+                    if c < o and offset > 0
+                        found := true
+                        break
         // Plot deviations
         if showDevs and found and not na(lowestClose)
             devs = str.split(devMultipliers, ",")
