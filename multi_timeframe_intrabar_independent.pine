@@ -1,0 +1,390 @@
+//@version=5
+indicator("Multi-Timeframe Intrabar Independent", overlay=true, max_lines_count=500, max_labels_count=500, max_bars_back = 5000)
+
+// Explicitly set max_bars_back for key variables
+max_bars_back(time, 5000)
+max_bars_back(high, 5000)
+max_bars_back(low, 5000)
+max_bars_back(close, 5000)
+max_bars_back(open, 5000)
+
+// Inputs
+var g_TF = "Timeframes"
+use_tf1         = input.bool(true, "4 Hours", inline = "TF1", group = g_TF)
+tf1             = input.timeframe("240", "", inline = "TF1", group = g_TF)
+tf1_color       = input.color(color.new(#1E90FF, 70), "", inline = "TF1", group = g_TF)
+use_tf1_mid     = input.bool(true, "50% Level", inline = "TF1M", group = g_TF)
+tf1_mid_color   = input.color(color.new(#1E90FF, 50), "", inline = "TF1M", group = g_TF)
+
+use_tf2         = input.bool(true, "Day", inline = "TF2", group = g_TF)
+tf2             = input.timeframe("D", "", inline = "TF2", group = g_TF)
+tf2_color       = input.color(color.new(#9932CC, 70), "", inline = "TF2", group = g_TF)
+use_tf2_mid     = input.bool(true, "50% Level", inline = "TF2M", group = g_TF)
+tf2_mid_color   = input.color(color.new(#9932CC, 50), "", inline = "TF2M", group = g_TF)
+
+use_tf3         = input.bool(true, "2 Day", inline = "TF3", group = g_TF)
+tf3             = input.timeframe("2D", "", inline = "TF3", group = g_TF)
+tf3_color       = input.color(color.new(#32CD32, 70), "", inline = "TF3", group = g_TF)
+use_tf3_mid     = input.bool(true, "50% Level", inline = "TF3M", group = g_TF)
+tf3_mid_color   = input.color(color.new(#32CD32, 50), "", inline = "TF3M", group = g_TF)
+
+use_tf4         = input.bool(true, "Week", inline = "TF4", group = g_TF)
+tf4             = input.timeframe("W", "", inline = "TF4", group = g_TF)
+tf4_color       = input.color(color.new(#FFD700, 70), "", inline = "TF4", group = g_TF)
+use_tf4_mid     = input.bool(true, "50% Level", inline = "TF4M", group = g_TF)
+tf4_mid_color   = input.color(color.new(#FFD700, 50), "", inline = "TF4M", group = g_TF)
+
+use_tf5         = input.bool(true, "Month", inline = "TF5", group = g_TF)
+tf5             = input.timeframe("M", "", inline = "TF5", group = g_TF)
+tf5_color       = input.color(color.new(#FF69B4, 70), "", inline = "TF5", group = g_TF)
+use_tf5_mid     = input.bool(true, "50% Level", inline = "TF5M", group = g_TF)
+tf5_mid_color   = input.color(color.new(#FF69B4, 50), "", inline = "TF5M", group = g_TF)
+
+use_tf6         = input.bool(true, "3 Month", inline = "TF6", group = g_TF)
+tf6             = input.timeframe("3M", "", inline = "TF6", group = g_TF)
+tf6_color       = input.color(color.new(#FF4500, 70), "", inline = "TF6", group = g_TF)
+use_tf6_mid     = input.bool(true, "50% Level", inline = "TF6M", group = g_TF)
+tf6_mid_color   = input.color(color.new(#FF4500, 50), "", inline = "TF6M", group = g_TF)
+
+use_tf7         = input.bool(true, "6 Month", inline = "TF7", group = g_TF)
+tf7             = input.timeframe("6M", "", inline = "TF7", group = g_TF)
+tf7_color       = input.color(color.new(#FF1493, 70), "", inline = "TF7", group = g_TF)
+use_tf7_mid     = input.bool(true, "50% Level", inline = "TF7M", group = g_TF)
+tf7_mid_color   = input.color(color.new(#FF1493, 50), "", inline = "TF7M", group = g_TF)
+
+var g_ALERT = "Alert Options"
+alert_on_4h    = input.bool(false, "Alert on 4H distribution", group = g_ALERT)
+alert_on_day   = input.bool(false, "Alert on Day distribution", group = g_ALERT)
+alert_on_2day  = input.bool(false, "Alert on 2Day distribution", group = g_ALERT)
+alert_on_week  = input.bool(false, "Alert on Week distribution", group = g_ALERT)
+alert_on_month = input.bool(false, "Alert on Month distribution", group = g_ALERT)
+alert_on_3month = input.bool(false, "Alert on 3Month distribution", group = g_ALERT)
+alert_on_6month = input.bool(false, "Alert on 6Month distribution", group = g_ALERT)
+
+var g_OPT = "Options"
+minbars         = input.int(1, "Minimum Bars", group = g_OPT)
+maxbars         = input.int(250, "Maximum Bars", group = g_OPT)
+hllinewidth     = input.int(2, "High/Low Line Width", group = g_OPT)
+midlinewidth    = input.int(1, "Mid Line Width", group = g_OPT)
+
+var g_LABEL = "Label Options"
+bullishLabelStyle = input.string("Label Up", "Bullish Label Style", options=[  "None", "Label Up", "Label Down", "Label Left", "Label Right", "Label Center",   "Triangle Up", "Triangle Down", "Triangle Left", "Triangle Right",   "Flag", "Circle", "Square", "Diamond", "Cross", "X-Cross", "Arrow Up", "Arrow Down" ], group=g_LABEL)
+bearishLabelStyle = input.string("Label Down", "Bearish Label Style", options=[ "None", "Label Up", "Label Down", "Label Left", "Label Right", "Label Center", "Triangle Up", "Triangle Down", "Triangle Left", "Triangle Right", "Flag", "Circle", "Square", "Diamond",  "Cross", "X-Cross", "Arrow Up", "Arrow Down"  ], group=g_LABEL)
+labelSize = input.string("Small", "Label Size", options=["Auto", "Tiny", "Small", "Normal", "Large", "Huge"], group=g_LABEL)
+
+bullishBgColor = input.color(color.new(color.green, 50), "Bullish Background Color", group=g_LABEL)
+bullishTextColor = input.color(color.green, "Bullish Text Color", group=g_LABEL)
+bearishBgColor = input.color(color.new(color.red, 50), "Bearish Background Color", group=g_LABEL)
+bearishTextColor = input.color(color.red, "Bearish Text Color", group=g_LABEL)
+
+show_4h_labels = input.bool(true, "Show 4H Labels", group = g_LABEL)
+show_day_labels = input.bool(true, "Show Day Labels", group = g_LABEL)
+show_2day_labels = input.bool(true, "Show 2Day Labels", group = g_LABEL)
+show_week_labels = input.bool(true, "Show Week Labels", group = g_LABEL)
+show_month_labels = input.bool(true, "Show Month Labels", group = g_LABEL)
+show_3month_labels = input.bool(true, "Show 3Month Labels", group = g_LABEL)
+show_6month_labels = input.bool(true, "Show 6Month Labels", group = g_LABEL)
+max_labels      = input.int(50, "Maximum number of labels to show", minval=1, maxval=500, group = g_LABEL)
+show_eol_labels = input.bool(true, "Show End-of-Line Labels", group = g_LABEL)
+eol_label_offset = input.int(5, "End-of-Line Label Offset", minval=1, maxval=50, group = g_LABEL)
+
+var g_DISTRIBUTION = "Distribution Options"
+use_distribution = input.bool(true, "Use Distribution Detection", group=g_DISTRIBUTION)
+
+// Get HTF data for each timeframe independently
+[tf1Open, tf1High, tf1Low, tf1Close, tf1Time] = request.security(syminfo.tickerid, tf1, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+[tf2Open, tf2High, tf2Low, tf2Close, tf2Time] = request.security(syminfo.tickerid, tf2, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+[tf3Open, tf3High, tf3Low, tf3Close, tf3Time] = request.security(syminfo.tickerid, tf3, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+[tf4Open, tf4High, tf4Low, tf4Close, tf4Time] = request.security(syminfo.tickerid, tf4, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+[tf5Open, tf5High, tf5Low, tf5Close, tf5Time] = request.security(syminfo.tickerid, tf5, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+[tf6Open, tf6High, tf6Low, tf6Close, tf6Time] = request.security(syminfo.tickerid, tf6, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+[tf7Open, tf7High, tf7Low, tf7Close, tf7Time] = request.security(syminfo.tickerid, tf7, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+
+// Detect new bars for each timeframe (these are used for distribution detection)
+newBar1_dist = ta.change(tf1Time) != 0
+newBar2_dist = ta.change(tf2Time) != 0
+newBar3_dist = ta.change(tf3Time) != 0
+newBar4_dist = ta.change(tf4Time) != 0
+newBar5_dist = ta.change(tf5Time) != 0
+newBar6_dist = ta.change(tf6Time) != 0
+newBar7_dist = ta.change(tf7Time) != 0
+
+// Independent distribution detection for each timeframe
+// 4H Distribution - detect on LTF but only when 4H distribution occurs
+var bool bullishDist1 = false
+var bool bearishDist1 = false
+if newBar1_dist
+    bullishDist1 := false
+    bearishDist1 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist1 := (low < low[1]) and (close > close[1])
+        bearishDist1 := (high > high[1]) and (close < close[1])
+
+// Day Distribution - detect on LTF but only when Day distribution occurs
+var bool bullishDist2 = false
+var bool bearishDist2 = false
+if newBar2_dist
+    bullishDist2 := false
+    bearishDist2 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist2 := (low < low[1]) and (close > close[1])
+        bearishDist2 := (high > high[1]) and (close < close[1])
+
+// 2Day Distribution - detect on LTF but only when 2Day distribution occurs
+var bool bullishDist3 = false
+var bool bearishDist3 = false
+if newBar3_dist
+    bullishDist3 := false
+    bearishDist3 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist3 := (low < low[1]) and (close > close[1])
+        bearishDist3 := (high > high[1]) and (close < close[1])
+
+// Week Distribution - detect on LTF but only when Week distribution occurs
+var bool bullishDist4 = false
+var bool bearishDist4 = false
+if newBar4_dist
+    bullishDist4 := false
+    bearishDist4 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist4 := (low < low[1]) and (close > close[1])
+        bearishDist4 := (high > high[1]) and (close < close[1])
+
+// Month Distribution - detect on LTF but only when Month distribution occurs
+var bool bullishDist5 = false
+var bool bearishDist5 = false
+if newBar5_dist
+    bullishDist5 := false
+    bearishDist5 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist5 := (low < low[1]) and (close > close[1])
+        bearishDist5 := (high > high[1]) and (close < close[1])
+
+// 3Month Distribution - detect on LTF but only when 3Month distribution occurs
+var bool bullishDist6 = false
+var bool bearishDist6 = false
+if newBar6_dist
+    bullishDist6 := false
+    bearishDist6 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist6 := (low < low[1]) and (close > close[1])
+        bearishDist6 := (high > high[1]) and (close < close[1])
+
+// 6Month Distribution - detect on LTF but only when 6Month distribution occurs
+var bool bullishDist7 = false
+var bool bearishDist7 = false
+if newBar7_dist
+    bullishDist7 := false
+    bearishDist7 := false
+    if use_distribution
+        // Check if current LTF candle meets distribution criteria
+        bullishDist7 := (low < low[1]) and (close > close[1])
+        bearishDist7 := (high > high[1]) and (close < close[1])
+
+// Modified process_tf function for range detection only
+process_tf(tf) =>
+    var float rangeHigh = na
+    var float rangeLow = na
+    var float rangeMid = na
+    var int rangeStart = 0
+    var bool inConsolidation = true
+    
+    [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_off)
+    
+    newBar = ta.change(tfTime) != 0
+    
+    tfUp = tfHigh
+    tfDown = tfLow
+    tfChildUp = tfOpen > tfClose ? tfOpen : tfClose
+    tfChildDown = tfOpen > tfClose ? tfClose : tfOpen
+    
+    if newBar
+        upControl = tfChildUp > rangeHigh and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
+        downControl = tfChildDown < rangeLow and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
+        
+        if (upControl or downControl)
+            inConsolidation := false
+        
+        if (inConsolidation and tfChildDown <= rangeHigh and tfChildDown >= rangeLow and tfChildUp <= rangeHigh and tfChildUp >= rangeLow and bar_index > 1)
+            rangeStart := rangeStart
+        else
+            rangeHigh := tfHigh
+            rangeLow := tfLow
+            rangeStart := bar_index
+            inConsolidation := true
+        
+        if not inConsolidation and (bar_index - rangeStart > maxbars or bar_index - rangeStart < minbars)
+            inConsolidation := true
+        
+        rangeMid := (rangeHigh + rangeLow) / 2
+    
+    [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar]
+
+// Process range data for each timeframe
+[high1, low1, mid1, start1, inRange1, newBar1] = process_tf(tf1)
+[high2, low2, mid2, start2, inRange2, newBar2] = process_tf(tf2)
+[high3, low3, mid3, start3, inRange3, newBar3] = process_tf(tf3)
+[high4, low4, mid4, start4, inRange4, newBar4] = process_tf(tf4)
+[high5, low5, mid5, start5, inRange5, newBar5] = process_tf(tf5)
+[high6, low6, mid6, start6, inRange6, newBar6] = process_tf(tf6)
+[high7, low7, mid7, start7, inRange7, newBar7] = process_tf(tf7)
+
+// Modified plot_lines function
+plot_lines(tfColor, midColor, high, low, mid, start, inRange, newBar, useMid, tfName) =>
+    var line highLine = na
+    var line lowLine = na
+    var line midLine = na
+    var label highLabel = na
+    var label lowLabel = na
+    
+    if newBar and inRange
+        if not na(highLine)
+            line.delete(highLine)
+            line.delete(lowLine)
+            line.delete(midLine)
+        if not na(highLabel)
+            label.delete(highLabel)
+            label.delete(lowLabel)
+        
+        validStart = math.max(start, 0)
+        highLine := line.new(validStart, high, bar_index, high, color=tfColor, width=hllinewidth)
+        lowLine := line.new(validStart, low, bar_index, low, color=tfColor, width=hllinewidth)
+        if useMid
+            midLine := line.new(validStart, mid, bar_index, mid, color=midColor, width=midlinewidth, style=line.style_dashed)
+        
+        if show_eol_labels
+            highLabel := label.new(bar_index + eol_label_offset, high, text=tfName + " CRT High", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
+            lowLabel := label.new(bar_index + eol_label_offset, low, text=tfName + " CRT Low", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
+    
+    if not na(highLine) and inRange
+        line.set_x2(highLine, bar_index)
+        line.set_x2(lowLine, bar_index)
+        if useMid and not na(midLine)
+            line.set_x2(midLine, bar_index)
+        
+        if show_eol_labels
+            label.set_x(highLabel, bar_index + eol_label_offset)
+            label.set_y(highLabel, high)
+            label.set_x(lowLabel, bar_index + eol_label_offset)
+            label.set_y(lowLabel, low)
+
+// Plot lines for each timeframe
+if use_tf1
+    plot_lines(tf1_color, tf1_mid_color, high1, low1, mid1, start1, inRange1, newBar1, use_tf1_mid, "4H")
+if use_tf2
+    plot_lines(tf2_color, tf2_mid_color, high2, low2, mid2, start2, inRange2, newBar2, use_tf2_mid, "Day")
+if use_tf3
+    plot_lines(tf3_color, tf3_mid_color, high3, low3, mid3, start3, inRange3, newBar3, use_tf3_mid, "2Day")
+if use_tf4
+    plot_lines(tf4_color, tf4_mid_color, high4, low4, mid4, start4, inRange4, newBar4, use_tf4_mid, "Week")
+if use_tf5
+    plot_lines(tf5_color, tf5_mid_color, high5, low5, mid5, start5, inRange5, newBar5, use_tf5_mid, "Month")
+if use_tf6
+    plot_lines(tf6_color, tf6_mid_color, high6, low6, mid6, start6, inRange6, newBar6, use_tf6_mid, "3Month")
+if use_tf7
+    plot_lines(tf7_color, tf7_mid_color, high7, low7, mid7, start7, inRange7, newBar7, use_tf7_mid, "6Month")
+
+// Optimized label management
+getLabelStyle(styleString) =>
+    switch styleString
+        "None" => label.style_none
+        "Label Up" => label.style_label_up
+        "Label Down" => label.style_label_down
+        "Label Left" => label.style_label_left
+        "Label Right" => label.style_label_right
+        "Label Center" => label.style_label_center
+        "Triangle Up" => label.style_triangleup
+        "Triangle Down" => label.style_triangledown
+        "Triangle Left" => label.style_triangleleft
+        "Triangle Right" => label.style_triangleright
+        "Flag" => label.style_flag
+        "Circle" => label.style_circle
+        "Square" => label.style_square
+        "Diamond" => label.style_diamond
+        "Cross" => label.style_cross
+        "X-Cross" => label.style_xcross
+        "Arrow Up" => label.style_arrowup
+        "Arrow Down" => label.style_arrowdown
+        => label.style_label_up
+
+getLabelSize(sizeString) =>
+    switch sizeString
+        "Auto" => size.auto
+        "Tiny" => size.tiny
+        "Small" => size.small
+        "Normal" => size.normal
+        "Large" => size.large
+        "Huge" => size.huge
+        => size.auto
+
+var label[] labels = array.new_label()
+
+manageLabelCount(labelText, y, bgColor, textColor, style, size) =>
+    if array.size(labels) >= max_labels
+        label.delete(array.shift(labels))
+    newLabel = label.new(bar_index, y, labelText, color=bgColor, textcolor=textColor, style=style, size=size)
+    array.push(labels, newLabel)
+
+// Apply labels for each timeframe independently - on LTF like original indicator
+if show_4h_labels and bullishDist1
+    manageLabelCount("Dist-4H", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_4h_labels and bearishDist1
+    manageLabelCount("Dist-4H", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+if show_day_labels and bullishDist2
+    manageLabelCount("Dist-Day", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_day_labels and bearishDist2
+    manageLabelCount("Dist-Day", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+if show_2day_labels and bullishDist3
+    manageLabelCount("Dist-2Day", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_2day_labels and bearishDist3
+    manageLabelCount("Dist-2Day", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+if show_week_labels and bullishDist4
+    manageLabelCount("Dist-Week", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_week_labels and bearishDist4
+    manageLabelCount("Dist-Week", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+if show_month_labels and bullishDist5
+    manageLabelCount("Dist-Month", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_month_labels and bearishDist5
+    manageLabelCount("Dist-Month", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+if show_3month_labels and bullishDist6
+    manageLabelCount("Dist-3Month", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_3month_labels and bearishDist6
+    manageLabelCount("Dist-3Month", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+if show_6month_labels and bullishDist7
+    manageLabelCount("Dist-6Month", low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+if show_6month_labels and bearishDist7
+    manageLabelCount("Dist-6Month", high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+// Alert conditions
+if alert_on_4h and (bullishDist1 or bearishDist1)
+    alert("4H distribution detected", alert.freq_once_per_bar_close)
+
+if alert_on_day and (bullishDist2 or bearishDist2)
+    alert("Day distribution detected", alert.freq_once_per_bar_close)
+
+if alert_on_2day and (bullishDist3 or bearishDist3)
+    alert("2Day distribution detected", alert.freq_once_per_bar_close)
+
+if alert_on_week and (bullishDist4 or bearishDist4)
+    alert("Week distribution detected", alert.freq_once_per_bar_close)
+
+if alert_on_month and (bullishDist5 or bearishDist5)
+    alert("Month distribution detected", alert.freq_once_per_bar_close)
+
+if alert_on_3month and (bullishDist6 or bearishDist6)
+    alert("3Month distribution detected", alert.freq_once_per_bar_close)
+
+if alert_on_6month and (bullishDist7 or bearishDist7)
+    alert("6Month distribution detected", alert.freq_once_per_bar_close)
