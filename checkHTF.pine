@@ -1,0 +1,73 @@
+//@version=5
+indicator("HTF Sweep Helper (checkHTF)", overlay=false, max_bars_back=5000)
+
+// This file provides a reusable function you can copy into your script:
+// checkHTF(minBars, maxBars) ->
+//   [rangeHigh, rangeLow, prevLow, prevClose, sweptPrev, sweptRange, crossed, sweepLevel]
+//
+// - sweptPrev: current closed HTF bar swept previous bar's low and reclaimed (low < low[1] and close > close[1])
+// - sweptRange: current closed HTF bar swept a computed consolidation low and reclaimed
+// - crossed: true when a sweep (prev or range) happened on THIS closed HTF bar
+// - sweepLevel: the level that was swept (prevLow or consolidation low)
+//
+// Usage from another script:
+// [rH, rL, pL, pC, sweptPrev, sweptRange, crossed, sweepLvl] =
+//     request.security(syminfo.tickerid, tf, checkHTF(minBars, maxBars), barmerge.gaps_off, barmerge.lookahead_off)
+//
+// Note: This function is designed to run in the HTF context via request.security with lookahead_off
+
+checkHTF(minBars, maxBars) =>
+    // Build consolidation range EXCLUDING the current closed HTF bar (index 0)
+    // Start from previous closed HTF bar (index 1) and scan backward
+    float hi = high[1]
+    float lo = low[1]
+    int spanLen = 1
+    for i = 2 to maxBars
+        float bodyUp = math.max(open[i], close[i])
+        float bodyDn = math.min(open[i], close[i])
+        if bodyUp <= hi and bodyDn >= lo
+            hi := math.max(hi, high[i])
+            lo := math.min(lo, low[i])
+            spanLen += 1
+        else
+            break
+
+    bool inConsolidation = spanLen >= minBars
+
+    // Sweep checks on the CURRENT CLOSED HTF bar (index 0) vs previous (index 1)
+    float prevLow   = low[1]
+    float prevClose = close[1]
+
+    bool sweptPrev  = (low < prevLow) and (close > prevClose)
+
+    float rangeLowUsed = inConsolidation ? lo : prevLow
+    bool sweptRange    = (low < rangeLowUsed) and (close > prevClose)
+
+    // One-bar pulse on the LTF bar that receives the new closed HTF bar
+    bool crossed = ta.change(time) and (sweptPrev or sweptRange)
+
+    float sweepLevel = sweptPrev ? prevLow : (sweptRange ? rangeLowUsed : na)
+
+    [hi, lo, prevLow, prevClose, sweptPrev, sweptRange, crossed, sweepLevel]
+
+// -----------------------------
+// Minimal demo usage (you can remove this section in your main script)
+// -----------------------------
+var string g_demo = "Demo"
+demoTF      = input.timeframe("60", "HTF for demo", group=g_demo)
+demoMinBars = input.int(1, "Min bars in consolidation", minval=1, maxval=500, group=g_demo)
+demoMaxBars = input.int(250, "Max bars in consolidation", minval=1, maxval=5000, group=g_demo)
+showDemo    = input.bool(true, "Show demo shapes", group=g_demo)
+
+[rH, rL, pL, pC, sweptPrev, sweptRange, crossed, sweepLvl] =
+    request.security(syminfo.tickerid, demoTF, checkHTF(demoMinBars, demoMaxBars), barmerge.gaps_off, barmerge.lookahead_off)
+
+plot(showDemo ? rH : na, color=color.new(color.teal, 0), title="HTF Range High")
+plot(showDemo ? rL : na, color=color.new(color.orange, 0), title="HTF Range Low")
+
+plotshape(showDemo and crossed and sweptPrev,  style=shape.triangledown, color=color.new(color.green, 0), size=size.tiny, location=location.abovebar, title="HTF swept previous low")
+plotshape(showDemo and crossed and sweptRange, style=shape.triangledown, color=color.new(color.blue, 0),  size=size.tiny, location=location.abovebar, title="HTF swept consolidation low")
+
+// Uncomment to enable alerts in the demo
+// if crossed and (sweptPrev or sweptRange)
+//     alert("HTF sweep detected on " + demoTF, alert.freq_once_per_bar_close)
