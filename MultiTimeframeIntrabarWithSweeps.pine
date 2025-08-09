@@ -250,52 +250,94 @@ plot_lines(tfColor, midColor, highLvl, lowLvl, midLvl, startIdx, inRange, newBar
     [highLine, lowLine, midLine, highLabel, lowLabel]
 
 // Per-timeframe state
-var float rh1 = na, rl1 = na, rm1 = na
+var float rh1 = na
+var float rl1 = na
+var float rm1 = na
 var int   rs1 = 0
 var bool  ic1 = true
-var float rh2 = na, rl2 = na, rm2 = na
+var float rh2 = na
+var float rl2 = na
+var float rm2 = na
 var int   rs2 = 0
 var bool  ic2 = true
-var float rh3 = na, rl3 = na, rm3 = na
+var float rh3 = na
+var float rl3 = na
+var float rm3 = na
 var int   rs3 = 0
 var bool  ic3 = true
-var float rh4 = na, rl4 = na, rm4 = na
+var float rh4 = na
+var float rl4 = na
+var float rm4 = na
 var int   rs4 = 0
 var bool  ic4 = true
-var float rh5 = na, rl5 = na, rm5 = na
+var float rh5 = na
+var float rl5 = na
+var float rm5 = na
 var int   rs5 = 0
 var bool  ic5 = true
-var float rh6 = na, rl6 = na, rm6 = na
+var float rh6 = na
+var float rl6 = na
+var float rm6 = na
 var int   rs6 = 0
 var bool  ic6 = true
-var float rh7 = na, rl7 = na, rm7 = na
+var float rh7 = na
+var float rl7 = na
+var float rm7 = na
 var int   rs7 = 0
 var bool  ic7 = true
 
 // Per-timeframe drawing handles
-var line hl1 = na, ll1 = na, ml1 = na
-var label hLb1 = na, lLb1 = na
-var line hl2 = na, ll2 = na, ml2 = na
-var label hLb2 = na, lLb2 = na
-var line hl3 = na, ll3 = na, ml3 = na
-var label hLb3 = na, lLb3 = na
-var line hl4 = na, ll4 = na, ml4 = na
-var label hLb4 = na, lLb4 = na
-var line hl5 = na, ll5 = na, ml5 = na
-var label hLb5 = na, lLb5 = na
-var line hl6 = na, ll6 = na, ml6 = na
-var label hLb6 = na, lLb6 = na
-var line hl7 = na, ll7 = na, ml7 = na
-var label hLb7 = na, lLb7 = na
+var line hl1 = na
+var line ll1 = na
+var line ml1 = na
+var label hLb1 = na
+var label lLb1 = na
+var line hl2 = na
+var line ll2 = na
+var line ml2 = na
+var label hLb2 = na
+var label lLb2 = na
+var line hl3 = na
+var line ll3 = na
+var line ml3 = na
+var label hLb3 = na
+var label lLb3 = na
+var line hl4 = na
+var line ll4 = na
+var line ml4 = na
+var label hLb4 = na
+var label lLb4 = na
+var line hl5 = na
+var line ll5 = na
+var line ml5 = na
+var label hLb5 = na
+var label lLb5 = na
+var line hl6 = na
+var line ll6 = na
+var line ml6 = na
+var label hLb6 = na
+var label lLb6 = na
+var line hl7 = na
+var line ll7 = na
+var line ml7 = na
+var label hLb7 = na
+var label lLb7 = na
 
 // Sweep line handles per TF
-var line swHigh1 = na, swLow1 = na
-var line swHigh2 = na, swLow2 = na
-var line swHigh3 = na, swLow3 = na
-var line swHigh4 = na, swLow4 = na
-var line swHigh5 = na, swLow5 = na
-var line swHigh6 = na, swLow6 = na
-var line swHigh7 = na, swLow7 = na
+var line swHigh1 = na
+var line swLow1 = na
+var line swHigh2 = na
+var line swLow2 = na
+var line swHigh3 = na
+var line swLow3 = na
+var line swHigh4 = na
+var line swLow4 = na
+var line swHigh5 = na
+var line swLow5 = na
+var line swHigh6 = na
+var line swLow6 = na
+var line swHigh7 = na
+var line swLow7 = na
 
 // Process data for each timeframe
 [rh1, rl1, rm1, rs1, ic1, newBar1, bullT1, bearT1, bullS1, bearS1] = process_tf(tf1, rh1, rl1, rm1, rs1, ic1)
