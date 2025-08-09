@@ -286,6 +286,15 @@ var float mi_rm7 = na
 var int   mi_rs7 = 0
 var bool  mi_ic7 = true
 
+// Declare per-timeframe flags (so tuple assignment can use '=' without redeclaration)
+var bool mi_newBar1 = false, mi_bullT1 = false, mi_bearT1 = false, mi_bullS1 = false, mi_bearS1 = false
+var bool mi_newBar2 = false, mi_bullT2 = false, mi_bearT2 = false, mi_bullS2 = false, mi_bearS2 = false
+var bool mi_newBar3 = false, mi_bullT3 = false, mi_bearT3 = false, mi_bullS3 = false, mi_bearS3 = false
+var bool mi_newBar4 = false, mi_bullT4 = false, mi_bearT4 = false, mi_bullS4 = false, mi_bearS4 = false
+var bool mi_newBar5 = false, mi_bullT5 = false, mi_bearT5 = false, mi_bullS5 = false, mi_bearS5 = false
+var bool mi_newBar6 = false, mi_bullT6 = false, mi_bearT6 = false, mi_bullS6 = false, mi_bearS6 = false
+var bool mi_newBar7 = false, mi_bullT7 = false, mi_bearT7 = false, mi_bullS7 = false, mi_bearS7 = false
+
 // Per-timeframe drawing handles
 var line mi_hl1 = na
 var line mi_ll1 = na
