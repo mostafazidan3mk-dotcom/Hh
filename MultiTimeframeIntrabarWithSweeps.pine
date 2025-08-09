@@ -308,19 +308,19 @@ var line swHigh7 = na, swLow7 = na
 
 // Plot lines for each timeframe
 if use_tf1
-    [hl1, ll1, ml1, hLb1, lLb1] := plot_lines(tf1_color, tf1_mid_color, rh1, rl1, rm1, rs1, ic1, newBar1, use_tf1_mid, "M30", hl1, ll1, ml1, hLb1, lLb1)
+    [hl1, ll1, ml1, hLb1, lLb1] = plot_lines(tf1_color, tf1_mid_color, rh1, rl1, rm1, rs1, ic1, newBar1, use_tf1_mid, "M30", hl1, ll1, ml1, hLb1, lLb1)
 if use_tf2
-    [hl2, ll2, ml2, hLb2, lLb2] := plot_lines(tf2_color, tf2_mid_color, rh2, rl2, rm2, rs2, ic2, newBar2, use_tf2_mid, "H1", hl2, ll2, ml2, hLb2, lLb2)
+    [hl2, ll2, ml2, hLb2, lLb2] = plot_lines(tf2_color, tf2_mid_color, rh2, rl2, rm2, rs2, ic2, newBar2, use_tf2_mid, "H1", hl2, ll2, ml2, hLb2, lLb2)
 if use_tf3
-    [hl3, ll3, ml3, hLb3, lLb3] := plot_lines(tf3_color, tf3_mid_color, rh3, rl3, rm3, rs3, ic3, newBar3, use_tf3_mid, "H2", hl3, ll3, ml3, hLb3, lLb3)
+    [hl3, ll3, ml3, hLb3, lLb3] = plot_lines(tf3_color, tf3_mid_color, rh3, rl3, rm3, rs3, ic3, newBar3, use_tf3_mid, "H2", hl3, ll3, ml3, hLb3, lLb3)
 if use_tf4
-    [hl4, ll4, ml4, hLb4, lLb4] := plot_lines(tf4_color, tf4_mid_color, rh4, rl4, rm4, rs4, ic4, newBar4, use_tf4_mid, "H4", hl4, ll4, ml4, hLb4, lLb4)
+    [hl4, ll4, ml4, hLb4, lLb4] = plot_lines(tf4_color, tf4_mid_color, rh4, rl4, rm4, rs4, ic4, newBar4, use_tf4_mid, "H4", hl4, ll4, ml4, hLb4, lLb4)
 if use_tf5
-    [hl5, ll5, ml5, hLb5, lLb5] := plot_lines(tf5_color, tf5_mid_color, rh5, rl5, rm5, rs5, ic5, newBar5, use_tf5_mid, "D", hl5, ll5, ml5, hLb5, lLb5)
+    [hl5, ll5, ml5, hLb5, lLb5] = plot_lines(tf5_color, tf5_mid_color, rh5, rl5, rm5, rs5, ic5, newBar5, use_tf5_mid, "D", hl5, ll5, ml5, hLb5, lLb5)
 if use_tf6
-    [hl6, ll6, ml6, hLb6, lLb6] := plot_lines(tf6_color, tf6_mid_color, rh6, rl6, rm6, rs6, ic6, newBar6, use_tf6_mid, "W", hl6, ll6, ml6, hLb6, lLb6)
+    [hl6, ll6, ml6, hLb6, lLb6] = plot_lines(tf6_color, tf6_mid_color, rh6, rl6, rm6, rs6, ic6, newBar6, use_tf6_mid, "W", hl6, ll6, ml6, hLb6, lLb6)
 if use_tf7
-    [hl7, ll7, ml7, hLb7, lLb7] := plot_lines(tf7_color, tf7_mid_color, rh7, rl7, rm7, rs7, ic7, newBar7, use_tf7_mid, "M", hl7, ll7, ml7, hLb7, lLb7)
+    [hl7, ll7, ml7, hLb7, lLb7] = plot_lines(tf7_color, tf7_mid_color, rh7, rl7, rm7, rs7, ic7, newBar7, use_tf7_mid, "M", hl7, ll7, ml7, hLb7, lLb7)
 
 // Optimized label creation on touches
 checkAndCreateLabel(show, bullishTouch, bearishTouch, tfText) =>
@@ -386,19 +386,19 @@ draw_sweeps(tfName, highLvl, lowLvl, startIdx, newBar, bullSweep, bearSweep, tfC
 
 // Draw sweeps for each timeframe
 if use_tf1
-    [swHigh1, swLow1] := draw_sweeps("M30", rh1, rl1, rs1, newBar1, bullS1, bearS1, tf1_color, swHigh1, swLow1)
+    [swHigh1, swLow1] = draw_sweeps("M30", rh1, rl1, rs1, newBar1, bullS1, bearS1, tf1_color, swHigh1, swLow1)
 if use_tf2
-    [swHigh2, swLow2] := draw_sweeps("H1",  rh2, rl2, rs2, newBar2, bullS2, bearS2, tf2_color, swHigh2, swLow2)
+    [swHigh2, swLow2] = draw_sweeps("H1",  rh2, rl2, rs2, newBar2, bullS2, bearS2, tf2_color, swHigh2, swLow2)
 if use_tf3
-    [swHigh3, swLow3] := draw_sweeps("H2",  rh3, rl3, rs3, newBar3, bullS3, bearS3, tf3_color, swHigh3, swLow3)
+    [swHigh3, swLow3] = draw_sweeps("H2",  rh3, rl3, rs3, newBar3, bullS3, bearS3, tf3_color, swHigh3, swLow3)
 if use_tf4
-    [swHigh4, swLow4] := draw_sweeps("H4",  rh4, rl4, rs4, newBar4, bullS4, bearS4, tf4_color, swHigh4, swLow4)
+    [swHigh4, swLow4] = draw_sweeps("H4",  rh4, rl4, rs4, newBar4, bullS4, bearS4, tf4_color, swHigh4, swLow4)
 if use_tf5
-    [swHigh5, swLow5] := draw_sweeps("D",   rh5, rl5, rs5, newBar5, bullS5, bearS5, tf5_color, swHigh5, swLow5)
+    [swHigh5, swLow5] = draw_sweeps("D",   rh5, rl5, rs5, newBar5, bullS5, bearS5, tf5_color, swHigh5, swLow5)
 if use_tf6
-    [swHigh6, swLow6] := draw_sweeps("W",   rh6, rl6, rs6, newBar6, bullS6, bearS6, tf6_color, swHigh6, swLow6)
+    [swHigh6, swLow6] = draw_sweeps("W",   rh6, rl6, rs6, newBar6, bullS6, bearS6, tf6_color, swHigh6, swLow6)
 if use_tf7
-    [swHigh7, swLow7] := draw_sweeps("M",   rh7, rl7, rs7, newBar7, bullS7, bearS7, tf7_color, swHigh7, swLow7)
+    [swHigh7, swLow7] = draw_sweeps("M",   rh7, rl7, rs7, newBar7, bullS7, bearS7, tf7_color, swHigh7, swLow7)
 
 // Alerts for touches
 if alert_on_m30 and (bullT1 or bearT1)
