@@ -145,10 +145,17 @@ manageLabelCount(labelText, y, bgColor, textColor, style, sz) =>
 
 // Core TF processor: maintains and returns per-TF state
 process_tf(tf, rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation) =>
-    var bool bullishTouch = false
-    var bool bearishTouch = false
-    var bool bullishSweep = false
-    var bool bearishSweep = false
+    // Local copies to avoid mutating parameters
+    float rh = rangeHigh
+    float rl = rangeLow
+    float rm = rangeMid
+    int   rs = rangeStart
+    bool  ic = inConsolidation
+
+    bool bullishTouch = false
+    bool bearishTouch = false
+    bool bullishSweep = false
+    bool bearishSweep = false
 
     [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_on)
     newBar = ta.change(tfTime) != 0
@@ -157,46 +164,54 @@ process_tf(tf, rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation) =>
     tfChildDown = math.min(tfOpen, tfClose)
 
     if newBar
-        upControl = (not na(rangeHigh)) and tfChildUp > rangeHigh and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
-        downControl = (not na(rangeLow)) and tfChildDown < rangeLow and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
+        upControl = (not na(rh)) and tfChildUp > rh and bar_index - rs > minbars and bar_index - rs <= maxbars
+        downControl = (not na(rl)) and tfChildDown < rl and bar_index - rs > minbars and bar_index - rs <= maxbars
 
         if (upControl or downControl)
-            inConsolidation := false
+            ic := false
 
-        if inConsolidation and not na(rangeHigh) and not na(rangeLow) and tfChildDown <= rangeHigh and tfChildDown >= rangeLow and tfChildUp <= rangeHigh and tfChildUp >= rangeLow and bar_index > 1
-            rangeStart := rangeStart
+        if ic and not na(rh) and not na(rl) and tfChildDown <= rh and tfChildDown >= rl and tfChildUp <= rh and tfChildUp >= rl and bar_index > 1
+            // keep current range
+            rs := rs
         else
-            rangeHigh := tfHigh
-            rangeLow := tfLow
-            rangeStart := bar_index
-            inConsolidation := true
+            rh := tfHigh
+            rl := tfLow
+            rs := bar_index
+            ic := true
 
-        if not inConsolidation and (bar_index - rangeStart > maxbars or bar_index - rangeStart < minbars)
-            inConsolidation := true
+        if not ic and (bar_index - rs > maxbars or bar_index - rs < minbars)
+            ic := true
 
-        rangeMid := na(rangeHigh) or na(rangeLow) ? na : (rangeHigh + rangeLow) / 2
+        rm := na(rh) or na(rl) ? na : (rh + rl) / 2
         bullishTouch := false
         bearishTouch := false
         bullishSweep := false
         bearishSweep := false
 
-    if inConsolidation and not na(rangeHigh) and not na(rangeLow)
-        bullishWickTouch = low < rangeLow and close > rangeLow and high < rangeHigh
-        bullishBodyTouch = open < rangeLow and close > rangeLow
-        bearishWickTouch = high > rangeHigh and close < rangeHigh and low > rangeLow
-        bearishBodyTouch = open > rangeHigh and close < rangeHigh
+    if ic and not na(rh) and not na(rl)
+        bullishWickTouch = low < rl and close > rl and high < rh
+        bullishBodyTouch = open < rl and close > rl
+        bearishWickTouch = high > rh and close < rh and low > rl
+        bearishBodyTouch = open > rh and close < rh
 
         bullishTouch := (use_wick_touch and bullishWickTouch) or (use_body_touch and bullishBodyTouch)
         bearishTouch := (use_wick_touch and bearishWickTouch) or (use_body_touch and bearishBodyTouch)
 
         // sweeps: wick beyond the level and close back inside
-        bullishSweep := low < rangeLow and close > rangeLow
-        bearishSweep := high > rangeHigh and close < rangeHigh
+        bullishSweep := low < rl and close > rl
+        bearishSweep := high > rh and close < rh
 
-    [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch, bullishSweep, bearishSweep]
+    [rh, rl, rm, rs, ic, newBar, bullishTouch, bearishTouch, bullishSweep, bearishSweep]
 
 // Line plotting helper: returns updated handles
-plot_lines(tfColor, midColor, highLvl, lowLvl, midLvl, startIdx, inRange, newBar, useMid, tfName, highLine, lowLine, midLine, highLabel, lowLabel) =>
+plot_lines(tfColor, midColor, highLvl, lowLvl, midLvl, startIdx, inRange, newBar, useMid, tfName, highLineIn, lowLineIn, midLineIn, highLabelIn, lowLabelIn) =>
+    // Local typed copies of handles
+    line highLine = highLineIn
+    line lowLine  = lowLineIn
+    line midLine  = midLineIn
+    label highLabel = highLabelIn
+    label lowLabel  = lowLabelIn
+
     if newBar and inRange and not na(highLvl) and not na(lowLvl)
         if not na(highLine)
             line.delete(highLine)
@@ -323,7 +338,11 @@ checkAndCreateLabel(show_weekly_labels, bullT6, bearT6, "W")
 checkAndCreateLabel(show_monthly_labels, bullT7, bearT7, "M")
 
 // Sweep drawer per TF
-draw_sweeps(tfName, highLvl, lowLvl, startIdx, newBar, bullSweep, bearSweep, tfColor, swHigh, swLow) =>
+draw_sweeps(tfName, highLvl, lowLvl, startIdx, newBar, bullSweep, bearSweep, tfColor, swHighIn, swLowIn) =>
+    // Local typed copies of handles
+    line swHigh = swHighIn
+    line swLow  = swLowIn
+
     if newBar and show_latest_only
         if not na(swHigh)
             line.delete(swHigh)
