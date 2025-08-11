@@ -348,140 +348,90 @@ var line mi_swLow6 = na
 var line mi_swHigh7 = na
 var line mi_swLow7 = na
 
-// Temp holders for tuple results per timeframe
-var float _mi_rh1 = na
-var float _mi_rl1 = na
-var float _mi_rm1 = na
-var int   _mi_rs1 = 0
-var bool  _mi_ic1 = true
-var bool  _mi_newBar1 = false, _mi_bullT1 = false, _mi_bearT1 = false, _mi_bullS1 = false, _mi_bearS1 = false
-
-var float _mi_rh2 = na
-var float _mi_rl2 = na
-var float _mi_rm2 = na
-var int   _mi_rs2 = 0
-var bool  _mi_ic2 = true
-var bool  _mi_newBar2 = false, _mi_bullT2 = false, _mi_bearT2 = false, _mi_bullS2 = false, _mi_bearS2 = false
-
-var float _mi_rh3 = na
-var float _mi_rl3 = na
-var float _mi_rm3 = na
-var int   _mi_rs3 = 0
-var bool  _mi_ic3 = true
-var bool  _mi_newBar3 = false, _mi_bullT3 = false, _mi_bearT3 = false, _mi_bullS3 = false, _mi_bearS3 = false
-
-var float _mi_rh4 = na
-var float _mi_rl4 = na
-var float _mi_rm4 = na
-var int   _mi_rs4 = 0
-var bool  _mi_ic4 = true
-var bool  _mi_newBar4 = false, _mi_bullT4 = false, _mi_bearT4 = false, _mi_bullS4 = false, _mi_bearS4 = false
-
-var float _mi_rh5 = na
-var float _mi_rl5 = na
-var float _mi_rm5 = na
-var int   _mi_rs5 = 0
-var bool  _mi_ic5 = true
-var bool  _mi_newBar5 = false, _mi_bullT5 = false, _mi_bearT5 = false, _mi_bullS5 = false, _mi_bearS5 = false
-
-var float _mi_rh6 = na
-var float _mi_rl6 = na
-var float _mi_rm6 = na
-var int   _mi_rs6 = 0
-var bool  _mi_ic6 = true
-var bool  _mi_newBar6 = false, _mi_bullT6 = false, _mi_bearT6 = false, _mi_bullS6 = false, _mi_bearS6 = false
-
-var float _mi_rh7 = na
-var float _mi_rl7 = na
-var float _mi_rm7 = na
-var int   _mi_rs7 = 0
-var bool  _mi_ic7 = true
-var bool  _mi_newBar7 = false, _mi_bullT7 = false, _mi_bearT7 = false, _mi_bullS7 = false, _mi_bearS7 = false
-
 // Process data for each timeframe
-[_mi_rh1, _mi_rl1, _mi_rm1, _mi_rs1, _mi_ic1, _mi_newBar1, _mi_bullT1, _mi_bearT1, _mi_bullS1, _mi_bearS1] = mi_process_tf(mi_tf1, mi_rh1, mi_rl1, mi_rm1, mi_rs1, mi_ic1)
-mi_rh1 := _mi_rh1
-mi_rl1 := _mi_rl1
-mi_rm1 := _mi_rm1
-mi_rs1 := _mi_rs1
-mi_ic1 := _mi_ic1
-mi_newBar1 := _mi_newBar1
-mi_bullT1 := _mi_bullT1
-mi_bearT1 := _mi_bearT1
-mi_bullS1 := _mi_bullS1
-mi_bearS1 := _mi_bearS1
+[rh1_, rl1_, rm1_, rs1_, ic1_, newBar1_, bullT1_, bearT1_, bullS1_, bearS1_] = mi_process_tf(mi_tf1, mi_rh1, mi_rl1, mi_rm1, mi_rs1, mi_ic1)
+mi_rh1 := rh1_
+mi_rl1 := rl1_
+mi_rm1 := rm1_
+mi_rs1 := rs1_
+mi_ic1 := ic1_
+mi_newBar1 := newBar1_
+mi_bullT1 := bullT1_
+mi_bearT1 := bearT1_
+mi_bullS1 := bullS1_
+mi_bearS1 := bearS1_
 
-[_mi_rh2, _mi_rl2, _mi_rm2, _mi_rs2, _mi_ic2, _mi_newBar2, _mi_bullT2, _mi_bearT2, _mi_bullS2, _mi_bearS2] = mi_process_tf(mi_tf2, mi_rh2, mi_rl2, mi_rm2, mi_rs2, mi_ic2)
-mi_rh2 := _mi_rh2
-mi_rl2 := _mi_rl2
-mi_rm2 := _mi_rm2
-mi_rs2 := _mi_rs2
-mi_ic2 := _mi_ic2
-mi_newBar2 := _mi_newBar2
-mi_bullT2 := _mi_bullT2
-mi_bearT2 := _mi_bearT2
-mi_bullS2 := _mi_bullS2
-mi_bearS2 := _mi_bearS2
+[rh2_, rl2_, rm2_, rs2_, ic2_, newBar2_, bullT2_, bearT2_, bullS2_, bearS2_] = mi_process_tf(mi_tf2, mi_rh2, mi_rl2, mi_rm2, mi_rs2, mi_ic2)
+mi_rh2 := rh2_
+mi_rl2 := rl2_
+mi_rm2 := rm2_
+mi_rs2 := rs2_
+mi_ic2 := ic2_
+mi_newBar2 := newBar2_
+mi_bullT2 := bullT2_
+mi_bearT2 := bearT2_
+mi_bullS2 := bullS2_
+mi_bearS2 := bearS2_
 
-[_mi_rh3, _mi_rl3, _mi_rm3, _mi_rs3, _mi_ic3, _mi_newBar3, _mi_bullT3, _mi_bearT3, _mi_bullS3, _mi_bearS3] = mi_process_tf(mi_tf3, mi_rh3, mi_rl3, mi_rm3, mi_rs3, mi_ic3)
-mi_rh3 := _mi_rh3
-mi_rl3 := _mi_rl3
-mi_rm3 := _mi_rm3
-mi_rs3 := _mi_rs3
-mi_ic3 := _mi_ic3
-mi_newBar3 := _mi_newBar3
-mi_bullT3 := _mi_bullT3
-mi_bearT3 := _mi_bearT3
-mi_bullS3 := _mi_bullS3
-mi_bearS3 := _mi_bearS3
+[rh3_, rl3_, rm3_, rs3_, ic3_, newBar3_, bullT3_, bearT3_, bullS3_, bearS3_] = mi_process_tf(mi_tf3, mi_rh3, mi_rl3, mi_rm3, mi_rs3, mi_ic3)
+mi_rh3 := rh3_
+mi_rl3 := rl3_
+mi_rm3 := rm3_
+mi_rs3 := rs3_
+mi_ic3 := ic3_
+mi_newBar3 := newBar3_
+mi_bullT3 := bullT3_
+mi_bearT3 := bearT3_
+mi_bullS3 := bullS3_
+mi_bearS3 := bearS3_
 
-[_mi_rh4, _mi_rl4, _mi_rm4, _mi_rs4, _mi_ic4, _mi_newBar4, _mi_bullT4, _mi_bearT4, _mi_bullS4, _mi_bearS4] = mi_process_tf(mi_tf4, mi_rh4, mi_rl4, mi_rm4, mi_rs4, mi_ic4)
-mi_rh4 := _mi_rh4
-mi_rl4 := _mi_rl4
-mi_rm4 := _mi_rm4
-mi_rs4 := _mi_rs4
-mi_ic4 := _mi_ic4
-mi_newBar4 := _mi_newBar4
-mi_bullT4 := _mi_bullT4
-mi_bearT4 := _mi_bearT4
-mi_bullS4 := _mi_bullS4
-mi_bearS4 := _mi_bearS4
+[rh4_, rl4_, rm4_, rs4_, ic4_, newBar4_, bullT4_, bearT4_, bullS4_, bearS4_] = mi_process_tf(mi_tf4, mi_rh4, mi_rl4, mi_rm4, mi_rs4, mi_ic4)
+mi_rh4 := rh4_
+mi_rl4 := rl4_
+mi_rm4 := rm4_
+mi_rs4 := rs4_
+mi_ic4 := ic4_
+mi_newBar4 := newBar4_
+mi_bullT4 := bullT4_
+mi_bearT4 := bearT4_
+mi_bullS4 := bullS4_
+mi_bearS4 := bearS4_
 
-[_mi_rh5, _mi_rl5, _mi_rm5, _mi_rs5, _mi_ic5, _mi_newBar5, _mi_bullT5, _mi_bearT5, _mi_bullS5, _mi_bearS5] = mi_process_tf(mi_tf5, mi_rh5, mi_rl5, mi_rm5, mi_rs5, mi_ic5)
-mi_rh5 := _mi_rh5
-mi_rl5 := _mi_rl5
-mi_rm5 := _mi_rm5
-mi_rs5 := _mi_rs5
-mi_ic5 := _mi_ic5
-mi_newBar5 := _mi_newBar5
-mi_bullT5 := _mi_bullT5
-mi_bearT5 := _mi_bearT5
-mi_bullS5 := _mi_bullS5
-mi_bearS5 := _mi_bearS5
+[rh5_, rl5_, rm5_, rs5_, ic5_, newBar5_, bullT5_, bearT5_, bullS5_, bearS5_] = mi_process_tf(mi_tf5, mi_rh5, mi_rl5, mi_rm5, mi_rs5, mi_ic5)
+mi_rh5 := rh5_
+mi_rl5 := rl5_
+mi_rm5 := rm5_
+mi_rs5 := rs5_
+mi_ic5 := ic5_
+mi_newBar5 := newBar5_
+mi_bullT5 := bullT5_
+mi_bearT5 := bearT5_
+mi_bullS5 := bullS5_
+mi_bearS5 := bearS5_
 
-[_mi_rh6, _mi_rl6, _mi_rm6, _mi_rs6, _mi_ic6, _mi_newBar6, _mi_bullT6, _mi_bearT6, _mi_bullS6, _mi_bearS6] = mi_process_tf(mi_tf6, mi_rh6, mi_rl6, mi_rm6, mi_rs6, mi_ic6)
-mi_rh6 := _mi_rh6
-mi_rl6 := _mi_rl6
-mi_rm6 := _mi_rm6
-mi_rs6 := _mi_rs6
-mi_ic6 := _mi_ic6
-mi_newBar6 := _mi_newBar6
-mi_bullT6 := _mi_bullT6
-mi_bearT6 := _mi_bearT6
-mi_bullS6 := _mi_bullS6
-mi_bearS6 := _mi_bearS6
+[rh6_, rl6_, rm6_, rs6_, ic6_, newBar6_, bullT6_, bearT6_, bullS6_, bearS6_] = mi_process_tf(mi_tf6, mi_rh6, mi_rl6, mi_rm6, mi_rs6, mi_ic6)
+mi_rh6 := rh6_
+mi_rl6 := rl6_
+mi_rm6 := rm6_
+mi_rs6 := rs6_
+mi_ic6 := ic6_
+mi_newBar6 := newBar6_
+mi_bullT6 := bullT6_
+mi_bearT6 := bearT6_
+mi_bullS6 := bullS6_
+mi_bearS6 := bearS6_
 
-[_mi_rh7, _mi_rl7, _mi_rm7, _mi_rs7, _mi_ic7, _mi_newBar7, _mi_bullT7, _mi_bearT7, _mi_bullS7, _mi_bearS7] = mi_process_tf(mi_tf7, mi_rh7, mi_rl7, mi_rm7, mi_rs7, mi_ic7)
-mi_rh7 := _mi_rh7
-mi_rl7 := _mi_rl7
-mi_rm7 := _mi_rm7
-mi_rs7 := _mi_rs7
-mi_ic7 := _mi_ic7
-mi_newBar7 := _mi_newBar7
-mi_bullT7 := _mi_bullT7
-mi_bearT7 := _mi_bearT7
-mi_bullS7 := _mi_bullS7
-mi_bearS7 := _mi_bearS7
+[rh7_, rl7_, rm7_, rs7_, ic7_, newBar7_, bullT7_, bearT7_, bullS7_, bearS7_] = mi_process_tf(mi_tf7, mi_rh7, mi_rl7, mi_rm7, mi_rs7, mi_ic7)
+mi_rh7 := rh7_
+mi_rl7 := rl7_
+mi_rm7 := rm7_
+mi_rs7 := rs7_
+mi_ic7 := ic7_
+mi_newBar7 := newBar7_
+mi_bullT7 := bullT7_
+mi_bearT7 := bearT7_
+mi_bullS7 := bullS7_
+mi_bearS7 := bearS7_
 
 // Plot lines for each timeframe
 if mi_use_tf1
