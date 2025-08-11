@@ -1,0 +1,459 @@
+//@version=5
+indicator("Multi-Timeframe Intrabar", overlay=true, max_lines_count=500, max_labels_count=500, max_bars_back=5000)
+
+// Explicitly set max_bars_back for key variables
+max_bars_back(time, 5000)
+max_bars_back(high, 5000)
+max_bars_back(low, 5000)
+max_bars_back(close, 5000)
+max_bars_back(open, 5000)
+
+// Inputs
+var g_TF = "Timeframes"
+use_tf1         = input.bool(true, "30 Minutes", inline="TF1", group=g_TF)
+tf1             = input.timeframe("30", "", inline="TF1", group=g_TF)
+tf1_color       = input.color(color.new(#FF1493, 70), "", inline="TF1", group=g_TF)
+use_tf1_mid     = input.bool(true, "50% Level", inline="TF1M", group=g_TF)
+tf1_mid_color   = input.color(color.new(#FF1493, 50), "", inline="TF1M", group=g_TF)
+
+use_tf2         = input.bool(true, "1 Hour", inline="TF2", group=g_TF)
+tf2             = input.timeframe("60", "", inline="TF2", group=g_TF)
+tf2_color       = input.color(color.new(#FF4500, 70), "", inline="TF2", group=g_TF)
+use_tf2_mid     = input.bool(true, "50% Level", inline="TF2M", group=g_TF)
+tf2_mid_color   = input.color(color.new(#FF4500, 50), "", inline="TF2M", group=g_TF)
+
+use_tf3         = input.bool(true, "2 Hours", inline="TF3", group=g_TF)
+tf3             = input.timeframe("120", "", inline="TF3", group=g_TF)
+tf3_color       = input.color(color.new(#32CD32, 70), "", inline="TF3", group=g_TF)
+use_tf3_mid     = input.bool(true, "50% Level", inline="TF3M", group=g_TF)
+tf3_mid_color   = input.color(color.new(#32CD32, 50), "", inline="TF3M", group=g_TF)
+
+use_tf4         = input.bool(true, "4 Hours", inline="TF4", group=g_TF)
+tf4             = input.timeframe("240", "", inline="TF4", group=g_TF)
+tf4_color       = input.color(color.new(#1E90FF, 70), "", inline="TF4", group=g_TF)
+use_tf4_mid     = input.bool(true, "50% Level", inline="TF4M", group=g_TF)
+tf4_mid_color   = input.color(color.new(#1E90FF, 50), "", inline="TF4M", group=g_TF)
+
+use_tf5         = input.bool(true, "Daily", inline="TF5", group=g_TF)
+tf5             = input.timeframe("D", "", inline="TF5", group=g_TF)
+tf5_color       = input.color(color.new(#9932CC, 70), "", inline="TF5", group=g_TF)
+use_tf5_mid     = input.bool(true, "50% Level", inline="TF5M", group=g_TF)
+tf5_mid_color   = input.color(color.new(#9932CC, 50), "", inline="TF5M", group=g_TF)
+
+use_tf6         = input.bool(true, "Weekly", inline="TF6", group=g_TF)
+tf6             = input.timeframe("W", "", inline="TF6", group=g_TF)
+tf6_color       = input.color(color.new(#FFD700, 70), "", inline="TF6", group=g_TF)
+use_tf6_mid     = input.bool(true, "50% Level", inline="TF6M", group=g_TF)
+tf6_mid_color   = input.color(color.new(#FFD700, 50), "", inline="TF6M", group=g_TF)
+
+use_tf7         = input.bool(true, "Monthly", inline="TF7", group=g_TF)
+tf7             = input.timeframe("M", "", inline="TF7", group=g_TF)
+tf7_color       = input.color(color.new(#FF69B4, 70), "", inline="TF7", group=g_TF)
+use_tf7_mid     = input.bool(true, "50% Level", inline="TF7M", group=g_TF)
+tf7_mid_color   = input.color(color.new(#FF69B4, 50), "", inline="TF7M", group=g_TF)
+
+var g_ALERT = "Alert Options"
+alert_on_m30     = input.bool(false, "Alert on M30 touch", group=g_ALERT)
+alert_on_h1      = input.bool(false, "Alert on H1 touch", group=g_ALERT)
+alert_on_h2      = input.bool(false, "Alert on H2 touch", group=g_ALERT)
+alert_on_h4      = input.bool(false, "Alert on H4 touch", group=g_ALERT)
+alert_on_daily   = input.bool(false, "Alert on Daily touch", group=g_ALERT)
+alert_on_weekly  = input.bool(false, "Alert on Weekly touch", group=g_ALERT)
+alert_on_monthly = input.bool(false, "Alert on Monthly touch", group=g_ALERT)
+
+var g_OPT = "Options"
+minbars         = input.int(1, "Minimum Bars", group=g_OPT)
+maxbars         = input.int(250, "Maximum Bars", group=g_OPT)
+hllinewidth     = input.int(2, "High/Low Line Width", group=g_OPT)
+midlinewidth    = input.int(1, "Mid Line Width", group=g_OPT)
+
+var g_LABEL = "Label Options"
+bullishLabelStyle = input.string("Label Up", "Bullish Label Style", options=[ "None","Label Up","Label Down","Label Left","Label Right","Label Center","Triangle Up","Triangle Down","Triangle Left","Triangle Right","Flag","Circle","Square","Diamond","Cross","X-Cross","Arrow Up","Arrow Down" ], group=g_LABEL)
+bearishLabelStyle = input.string("Label Down", "Bearish Label Style", options=[ "None","Label Up","Label Down","Label Left","Label Right","Label Center","Triangle Up","Triangle Down","Triangle Left","Triangle Right","Flag","Circle","Square","Diamond","Cross","X-Cross","Arrow Up","Arrow Down" ], group=g_LABEL)
+labelSize = input.string("Small", "Label Size", options=["Auto","Tiny","Small","Normal","Large","Huge"], group=g_LABEL)
+
+bullishBgColor   = input.color(color.new(color.green, 50), "Bullish Background Color", group=g_LABEL)
+bullishTextColor = input.color(color.green, "Bullish Text Color", group=g_LABEL)
+bearishBgColor   = input.color(color.new(color.red, 50), "Bearish Background Color", group=g_LABEL)
+bearishTextColor = input.color(color.red, "Bearish Text Color", group=g_LABEL)
+
+show_m30_labels    = input.bool(true, "Show M30 Labels", group=g_LABEL)
+show_h1_labels     = input.bool(true, "Show H1 Labels", group=g_LABEL)
+show_h2_labels     = input.bool(true, "Show H2 Labels", group=g_LABEL)
+show_h4_labels     = input.bool(true, "Show H4 Labels", group=g_LABEL)
+show_daily_labels  = input.bool(true, "Show Daily Labels", group=g_LABEL)
+show_weekly_labels = input.bool(true, "Show Weekly Labels", group=g_LABEL)
+show_monthly_labels= input.bool(true, "Show Monthly Labels", group=g_LABEL)
+max_labels         = input.int(50, "Maximum number of labels to show", minval=1, maxval=500, group=g_LABEL)
+show_eol_labels    = input.bool(true, "Show End-of-Line Labels", group=g_LABEL)
+eol_label_offset   = input.int(5, "End-of-Line Label Offset", minval=1, maxval=50, group=g_LABEL)
+
+var g_TOUCH = "Touch Options"
+use_wick_touch = input.bool(true, "Use Wick Touch", group=g_TOUCH)
+use_body_touch = input.bool(true, "Use Body Touch", group=g_TOUCH)
+
+// Sweep Options
+var g_SWEEP = "Sweep Options"
+show_sweeps        = input.bool(true, "Show Sweeps", group=g_SWEEP)
+sweep_color        = input.color(color.new(color.fuchsia, 40), "Sweep Color", group=g_SWEEP)
+sweep_width        = input.int(2, "Sweep Width", minval=1, maxval=5, group=g_SWEEP)
+sweep_style_choice = input.string("Dotted", "Sweep Style", options=["Solid","Dashed","Dotted"], group=g_SWEEP)
+sweep_alerts       = input.bool(false, "Alerts on Sweep", group=g_SWEEP)
+show_latest_only   = input.bool(true, "Show Latest Only (per TF)", group=g_SWEEP)
+
+styleFromString(s) => s == "Dashed" ? line.style_dashed : s == "Dotted" ? line.style_dotted : line.style_solid
+
+// Label helpers
+getLabelStyle(styleString) =>
+    switch styleString
+        "None" => label.style_none
+        "Label Up" => label.style_label_up
+        "Label Down" => label.style_label_down
+        "Label Left" => label.style_label_left
+        "Label Right" => label.style_label_right
+        "Label Center" => label.style_label_center
+        "Triangle Up" => label.style_triangleup
+        "Triangle Down" => label.style_triangledown
+        "Triangle Left" => label.style_triangleleft
+        "Triangle Right" => label.style_triangleright
+        "Flag" => label.style_flag
+        "Circle" => label.style_circle
+        "Square" => label.style_square
+        "Diamond" => label.style_diamond
+        "Cross" => label.style_cross
+        "X-Cross" => label.style_xcross
+        "Arrow Up" => label.style_arrowup
+        "Arrow Down" => label.style_arrowdown
+        => label.style_label_up
+
+getLabelSize(sizeString) =>
+    switch sizeString
+        "Auto" => size.auto
+        "Tiny" => size.tiny
+        "Small" => size.small
+        "Normal" => size.normal
+        "Large" => size.large
+        "Huge" => size.huge
+        => size.auto
+
+var label[] labels = array.new_label()
+manageLabelCount(labelText, y, bgColor, textColor, style, sz) =>
+    if array.size(labels) >= max_labels
+        label.delete(array.shift(labels))
+    newLabel = label.new(bar_index, y, labelText, color=bgColor, textcolor=textColor, style=style, size=sz)
+    array.push(labels, newLabel)
+
+// Core TF processor: maintains and returns per-TF state
+process_tf(tf, rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation) =>
+    // Local copies to avoid mutating parameters
+    float rh = rangeHigh
+    float rl = rangeLow
+    float rm = rangeMid
+    int   rs = rangeStart
+    bool  ic = inConsolidation
+
+    bool bullishTouch = false
+    bool bearishTouch = false
+    bool bullishSweep = false
+    bool bearishSweep = false
+
+    [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_on)
+    newBar = ta.change(tfTime) != 0
+
+    tfChildUp = math.max(tfOpen, tfClose)
+    tfChildDown = math.min(tfOpen, tfClose)
+
+    if newBar
+        upControl = (not na(rh)) and tfChildUp > rh and bar_index - rs > minbars and bar_index - rs <= maxbars
+        downControl = (not na(rl)) and tfChildDown < rl and bar_index - rs > minbars and bar_index - rs <= maxbars
+
+        if (upControl or downControl)
+            ic := false
+
+        if ic and not na(rh) and not na(rl) and tfChildDown <= rh and tfChildDown >= rl and tfChildUp <= rh and tfChildUp >= rl and bar_index > 1
+            // keep current range
+            rs := rs
+        else
+            rh := tfHigh
+            rl := tfLow
+            rs := bar_index
+            ic := true
+
+        if not ic and (bar_index - rs > maxbars or bar_index - rs < minbars)
+            ic := true
+
+        rm := na(rh) or na(rl) ? na : (rh + rl) / 2
+        bullishTouch := false
+        bearishTouch := false
+        bullishSweep := false
+        bearishSweep := false
+
+    if ic and not na(rh) and not na(rl)
+        bullishWickTouch = low < rl and close > rl and high < rh
+        bullishBodyTouch = open < rl and close > rl
+        bearishWickTouch = high > rh and close < rh and low > rl
+        bearishBodyTouch = open > rh and close < rh
+
+        bullishTouch := (use_wick_touch and bullishWickTouch) or (use_body_touch and bullishBodyTouch)
+        bearishTouch := (use_wick_touch and bearishWickTouch) or (use_body_touch and bearishBodyTouch)
+
+        // sweeps: wick beyond the level and close back inside
+        bullishSweep := low < rl and close > rl
+        bearishSweep := high > rh and close < rh
+
+    [rh, rl, rm, rs, ic, newBar, bullishTouch, bearishTouch, bullishSweep, bearishSweep]
+
+// Line plotting helper: returns updated handles
+plot_lines(tfColor, midColor, highLvl, lowLvl, midLvl, startIdx, inRange, newBar, useMid, tfName, highLineIn, lowLineIn, midLineIn, highLabelIn, lowLabelIn) =>
+    // Local typed copies of handles
+    line highLine = highLineIn
+    line lowLine  = lowLineIn
+    line midLine  = midLineIn
+    label highLabel = highLabelIn
+    label lowLabel  = lowLabelIn
+
+    if newBar and inRange and not na(highLvl) and not na(lowLvl)
+        if not na(highLine)
+            line.delete(highLine)
+            line.delete(lowLine)
+        if not na(midLine)
+            line.delete(midLine)
+        if not na(highLabel)
+            label.delete(highLabel)
+        if not na(lowLabel)
+            label.delete(lowLabel)
+
+        validStart = math.max(startIdx, 0)
+        highLine := line.new(validStart, highLvl, bar_index, highLvl, color=tfColor, width=hllinewidth)
+        lowLine  := line.new(validStart, lowLvl,  bar_index, lowLvl,  color=tfColor, width=hllinewidth)
+        if useMid and not na(midLvl)
+            midLine := line.new(validStart, midLvl, bar_index, midLvl, color=midColor, width=midlinewidth, style=line.style_dashed)
+
+        if show_eol_labels
+            highLabel := label.new(bar_index + eol_label_offset, highLvl, text=tfName + " CRT High", color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
+            lowLabel  := label.new(bar_index + eol_label_offset, lowLvl,  text=tfName + " CRT Low",  color=color.new(tfColor, 70), textcolor=tfColor, style=label.style_none, size=size.small)
+
+    if inRange
+        if not na(highLine)
+            line.set_x2(highLine, bar_index)
+        if not na(lowLine)
+            line.set_x2(lowLine, bar_index)
+        if useMid and not na(midLine)
+            line.set_x2(midLine, bar_index)
+
+        if show_eol_labels and not na(highLabel) and not na(lowLabel) and not na(highLvl) and not na(lowLvl)
+            label.set_x(highLabel, bar_index + eol_label_offset)
+            label.set_y(highLabel, highLvl)
+            label.set_x(lowLabel, bar_index + eol_label_offset)
+            label.set_y(lowLabel, lowLvl)
+
+    [highLine, lowLine, midLine, highLabel, lowLabel]
+
+// Per-timeframe state
+var float rh1 = na
+var float rl1 = na
+var float rm1 = na
+var int   rs1 = 0
+var bool  ic1 = true
+var float rh2 = na
+var float rl2 = na
+var float rm2 = na
+var int   rs2 = 0
+var bool  ic2 = true
+var float rh3 = na
+var float rl3 = na
+var float rm3 = na
+var int   rs3 = 0
+var bool  ic3 = true
+var float rh4 = na
+var float rl4 = na
+var float rm4 = na
+var int   rs4 = 0
+var bool  ic4 = true
+var float rh5 = na
+var float rl5 = na
+var float rm5 = na
+var int   rs5 = 0
+var bool  ic5 = true
+var float rh6 = na
+var float rl6 = na
+var float rm6 = na
+var int   rs6 = 0
+var bool  ic6 = true
+var float rh7 = na
+var float rl7 = na
+var float rm7 = na
+var int   rs7 = 0
+var bool  ic7 = true
+
+// Per-timeframe drawing handles
+var line hl1 = na
+var line ll1 = na
+var line ml1 = na
+var label hLb1 = na
+var label lLb1 = na
+var line hl2 = na
+var line ll2 = na
+var line ml2 = na
+var label hLb2 = na
+var label lLb2 = na
+var line hl3 = na
+var line ll3 = na
+var line ml3 = na
+var label hLb3 = na
+var label lLb3 = na
+var line hl4 = na
+var line ll4 = na
+var line ml4 = na
+var label hLb4 = na
+var label lLb4 = na
+var line hl5 = na
+var line ll5 = na
+var line ml5 = na
+var label hLb5 = na
+var label lLb5 = na
+var line hl6 = na
+var line ll6 = na
+var line ml6 = na
+var label hLb6 = na
+var label lLb6 = na
+var line hl7 = na
+var line ll7 = na
+var line ml7 = na
+var label hLb7 = na
+var label lLb7 = na
+
+// Sweep line handles per TF
+var line swHigh1 = na
+var line swLow1 = na
+var line swHigh2 = na
+var line swLow2 = na
+var line swHigh3 = na
+var line swLow3 = na
+var line swHigh4 = na
+var line swLow4 = na
+var line swHigh5 = na
+var line swLow5 = na
+var line swHigh6 = na
+var line swLow6 = na
+var line swHigh7 = na
+var line swLow7 = na
+
+// Process data for each timeframe
+[rh1, rl1, rm1, rs1, ic1, newBar1, bullT1, bearT1, bullS1, bearS1] = process_tf(tf1, rh1, rl1, rm1, rs1, ic1)
+[rh2, rl2, rm2, rs2, ic2, newBar2, bullT2, bearT2, bullS2, bearS2] = process_tf(tf2, rh2, rl2, rm2, rs2, ic2)
+[rh3, rl3, rm3, rs3, ic3, newBar3, bullT3, bearT3, bullS3, bearS3] = process_tf(tf3, rh3, rl3, rm3, rs3, ic3)
+[rh4, rl4, rm4, rs4, ic4, newBar4, bullT4, bearT4, bullS4, bearS4] = process_tf(tf4, rh4, rl4, rm4, rs4, ic4)
+[rh5, rl5, rm5, rs5, ic5, newBar5, bullT5, bearT5, bullS5, bearS5] = process_tf(tf5, rh5, rl5, rm5, rs5, ic5)
+[rh6, rl6, rm6, rs6, ic6, newBar6, bullT6, bearT6, bullS6, bearS6] = process_tf(tf6, rh6, rl6, rm6, rs6, ic6)
+[rh7, rl7, rm7, rs7, ic7, newBar7, bullT7, bearT7, bullS7, bearS7] = process_tf(tf7, rh7, rl7, rm7, rs7, ic7)
+
+// Plot lines for each timeframe
+if use_tf1
+    [hl1, ll1, ml1, hLb1, lLb1] = plot_lines(tf1_color, tf1_mid_color, rh1, rl1, rm1, rs1, ic1, newBar1, use_tf1_mid, "M30", hl1, ll1, ml1, hLb1, lLb1)
+if use_tf2
+    [hl2, ll2, ml2, hLb2, lLb2] = plot_lines(tf2_color, tf2_mid_color, rh2, rl2, rm2, rs2, ic2, newBar2, use_tf2_mid, "H1", hl2, ll2, ml2, hLb2, lLb2)
+if use_tf3
+    [hl3, ll3, ml3, hLb3, lLb3] = plot_lines(tf3_color, tf3_mid_color, rh3, rl3, rm3, rs3, ic3, newBar3, use_tf3_mid, "H2", hl3, ll3, ml3, hLb3, lLb3)
+if use_tf4
+    [hl4, ll4, ml4, hLb4, lLb4] = plot_lines(tf4_color, tf4_mid_color, rh4, rl4, rm4, rs4, ic4, newBar4, use_tf4_mid, "H4", hl4, ll4, ml4, hLb4, lLb4)
+if use_tf5
+    [hl5, ll5, ml5, hLb5, lLb5] = plot_lines(tf5_color, tf5_mid_color, rh5, rl5, rm5, rs5, ic5, newBar5, use_tf5_mid, "D", hl5, ll5, ml5, hLb5, lLb5)
+if use_tf6
+    [hl6, ll6, ml6, hLb6, lLb6] = plot_lines(tf6_color, tf6_mid_color, rh6, rl6, rm6, rs6, ic6, newBar6, use_tf6_mid, "W", hl6, ll6, ml6, hLb6, lLb6)
+if use_tf7
+    [hl7, ll7, ml7, hLb7, lLb7] = plot_lines(tf7_color, tf7_mid_color, rh7, rl7, rm7, rs7, ic7, newBar7, use_tf7_mid, "M", hl7, ll7, ml7, hLb7, lLb7)
+
+// Optimized label creation on touches
+checkAndCreateLabel(show, bullishTouch, bearishTouch, tfText) =>
+    if show and bullishTouch
+        manageLabelCount("BT-" + tfText, low, bullishBgColor, bullishTextColor, getLabelStyle(bullishLabelStyle), getLabelSize(labelSize))
+    if show and bearishTouch
+        manageLabelCount("BT-" + tfText, high, bearishBgColor, bearishTextColor, getLabelStyle(bearishLabelStyle), getLabelSize(labelSize))
+
+checkAndCreateLabel(show_m30_labels, bullT1, bearT1, "M30")
+checkAndCreateLabel(show_h1_labels,  bullT2, bearT2, "H1")
+checkAndCreateLabel(show_h2_labels,  bullT3, bearT3, "H2")
+checkAndCreateLabel(show_h4_labels,  bullT4, bearT4, "H4")
+checkAndCreateLabel(show_daily_labels,  bullT5, bearT5, "D")
+checkAndCreateLabel(show_weekly_labels, bullT6, bearT6, "W")
+checkAndCreateLabel(show_monthly_labels, bullT7, bearT7, "M")
+
+// Sweep drawer per TF
+draw_sweeps(tfName, highLvl, lowLvl, startIdx, newBar, bullSweep, bearSweep, tfColor, swHighIn, swLowIn) =>
+    // Local typed copies of handles
+    line swHigh = swHighIn
+    line swLow  = swLowIn
+
+    if newBar and show_latest_only
+        if not na(swHigh)
+            line.delete(swHigh)
+            swHigh := na
+        if not na(swLow)
+            line.delete(swLow)
+            swLow := na
+
+    validStart = math.max(startIdx, 0)
+    ls = styleFromString(sweep_style_choice)
+
+    if show_sweeps and bearSweep and not na(highLvl)
+        if na(swHigh)
+            swHigh := line.new(validStart, highLvl, bar_index, highLvl, color=sweep_color, width=sweep_width, style=ls)
+        else
+            line.set_xy1(swHigh, validStart, highLvl)
+            line.set_xy2(swHigh, bar_index, highLvl)
+        if sweep_alerts
+            alert(tfName + " Bearish sweep", alert.freq_once_per_bar)
+
+    if show_sweeps and bullSweep and not na(lowLvl)
+        if na(swLow)
+            swLow := line.new(validStart, lowLvl, bar_index, lowLvl, color=sweep_color, width=sweep_width, style=ls)
+        else
+            line.set_xy1(swLow, validStart, lowLvl)
+            line.set_xy2(swLow, bar_index, lowLvl)
+        if sweep_alerts
+            alert(tfName + " Bullish sweep", alert.freq_once_per_bar)
+
+    if show_sweeps
+        if not na(swHigh) and not na(highLvl)
+            line.set_x2(swHigh, bar_index)
+            line.set_y1(swHigh, highLvl)
+            line.set_y2(swHigh, highLvl)
+        if not na(swLow) and not na(lowLvl)
+            line.set_x2(swLow, bar_index)
+            line.set_y1(swLow, lowLvl)
+            line.set_y2(swLow, lowLvl)
+
+    [swHigh, swLow]
+
+// Draw sweeps for each timeframe
+if use_tf1
+    [swHigh1, swLow1] = draw_sweeps("M30", rh1, rl1, rs1, newBar1, bullS1, bearS1, tf1_color, swHigh1, swLow1)
+if use_tf2
+    [swHigh2, swLow2] = draw_sweeps("H1",  rh2, rl2, rs2, newBar2, bullS2, bearS2, tf2_color, swHigh2, swLow2)
+if use_tf3
+    [swHigh3, swLow3] = draw_sweeps("H2",  rh3, rl3, rs3, newBar3, bullS3, bearS3, tf3_color, swHigh3, swLow3)
+if use_tf4
+    [swHigh4, swLow4] = draw_sweeps("H4",  rh4, rl4, rs4, newBar4, bullS4, bearS4, tf4_color, swHigh4, swLow4)
+if use_tf5
+    [swHigh5, swLow5] = draw_sweeps("D",   rh5, rl5, rs5, newBar5, bullS5, bearS5, tf5_color, swHigh5, swLow5)
+if use_tf6
+    [swHigh6, swLow6] = draw_sweeps("W",   rh6, rl6, rs6, newBar6, bullS6, bearS6, tf6_color, swHigh6, swLow6)
+if use_tf7
+    [swHigh7, swLow7] = draw_sweeps("M",   rh7, rl7, rs7, newBar7, bullS7, bearS7, tf7_color, swHigh7, swLow7)
+
+// Alerts for touches
+if alert_on_m30 and (bullT1 or bearT1)
+    alert("M30 touch detected", alert.freq_once_per_bar_close)
+if alert_on_h1 and (bullT2 or bearT2)
+    alert("H1 touch detected", alert.freq_once_per_bar_close)
+if alert_on_h2 and (bullT3 or bearT3)
+    alert("H2 touch detected", alert.freq_once_per_bar_close)
+if alert_on_h4 and (bullT4 or bearT4)
+    alert("H4 touch detected", alert.freq_once_per_bar_close)
+if alert_on_daily and (bullT5 or bearT5)
+    alert("Daily touch detected", alert.freq_once_per_bar_close)
+if alert_on_weekly and (bullT6 or bearT6)
+    alert("Weekly touch detected", alert.freq_once_per_bar_close)
+if alert_on_monthly and (bullT7 or bearT7)
+    alert("Monthly touch detected", alert.freq_once_per_bar_close)
