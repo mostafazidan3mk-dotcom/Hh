@@ -418,6 +418,137 @@ var bool bearT7 = false
 var bool bullS7 = false
 var bool bearS7 = false
 
+// Temporary variables for tuple returns (range values)
+var float rh1_ = na
+var float rl1_ = na
+var float rm1_ = na
+var int   rs1_ = 0
+var bool  ic1_ = true
+var bool  newBar1_ = false
+var bool  bullT1_ = false
+var bool  bearT1_ = false
+var bool  bullS1_ = false
+var bool  bearS1_ = false
+
+var float rh2_ = na
+var float rl2_ = na
+var float rm2_ = na
+var int   rs2_ = 0
+var bool  ic2_ = true
+var bool  newBar2_ = false
+var bool  bullT2_ = false
+var bool  bearT2_ = false
+var bool  bullS2_ = false
+var bool  bearS2_ = false
+
+var float rh3_ = na
+var float rl3_ = na
+var float rm3_ = na
+var int   rs3_ = 0
+var bool  ic3_ = true
+var bool  newBar3_ = false
+var bool  bullT3_ = false
+var bool  bearT3_ = false
+var bool  bullS3_ = false
+var bool  bearS3_ = false
+
+var float rh4_ = na
+var float rl4_ = na
+var float rm4_ = na
+var int   rs4_ = 0
+var bool  ic4_ = true
+var bool  newBar4_ = false
+var bool  bullT4_ = false
+var bool  bearT4_ = false
+var bool  bullS4_ = false
+var bool  bearS4_ = false
+
+var float rh5_ = na
+var float rl5_ = na
+var float rm5_ = na
+var int   rs5_ = 0
+var bool  ic5_ = true
+var bool  newBar5_ = false
+var bool  bullT5_ = false
+var bool  bearT5_ = false
+var bool  bullS5_ = false
+var bool  bearS5_ = false
+
+var float rh6_ = na
+var float rl6_ = na
+var float rm6_ = na
+var int   rs6_ = 0
+var bool  ic6_ = true
+var bool  newBar6_ = false
+var bool  bullT6_ = false
+var bool  bearT6_ = false
+var bool  bullS6_ = false
+var bool  bearS6_ = false
+
+var float rh7_ = na
+var float rl7_ = na
+var float rm7_ = na
+var int   rs7_ = 0
+var bool  ic7_ = true
+var bool  newBar7_ = false
+var bool  bullT7_ = false
+var bool  bearT7_ = false
+var bool  bullS7_ = false
+var bool  bearS7_ = false
+
+// Temporary variables for tuple returns (line/label handles)
+var line hl1_ = na
+var line ll1_ = na
+var line ml1_ = na
+var label hLb1_ = na
+var label lLb1_ = na
+var line hl2_ = na
+var line ll2_ = na
+var line ml2_ = na
+var label hLb2_ = na
+var label lLb2_ = na
+var line hl3_ = na
+var line ll3_ = na
+var line ml3_ = na
+var label hLb3_ = na
+var label lLb3_ = na
+var line hl4_ = na
+var line ll4_ = na
+var line ml4_ = na
+var label hLb4_ = na
+var label lLb4_ = na
+var line hl5_ = na
+var line ll5_ = na
+var line ml5_ = na
+var label hLb5_ = na
+var label lLb5_ = na
+var line hl6_ = na
+var line ll6_ = na
+var line ml6_ = na
+var label hLb6_ = na
+var label lLb6_ = na
+var line hl7_ = na
+var line ll7_ = na
+var line ml7_ = na
+var label hLb7_ = na
+var label lLb7_ = na
+
+// Temporary variables for tuple returns (sweep handles)
+var line swHigh1_ = na
+var line swLow1_ = na
+var line swHigh2_ = na
+var line swLow2_ = na
+var line swHigh3_ = na
+var line swLow3_ = na
+var line swHigh4_ = na
+var line swLow4_ = na
+var line swHigh5_ = na
+var line swLow5_ = na
+var line swHigh6_ = na
+var line swLow6_ = na
+var line swHigh7_ = na
+var line swLow7_ = na
+
 //========================= Execution =========================
 // Compute ranges per TF (use scratch locals, then reassign with :=)
 [rh1_, rl1_, rm1_, rs1_, ic1_, newBar1_, bullT1_, bearT1_, bullS1_, bearS1_] = process_tf(tf1, rh1, rl1, rm1, rs1, ic1)
