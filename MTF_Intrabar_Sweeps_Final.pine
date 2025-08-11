@@ -75,7 +75,7 @@ labelSize         = input.string("Small", "Label Size", options=["Auto","Tiny","
 bullishBgColor   = input.color(color.new(color.green, 50), "Bullish Background Color", group=g_LABEL)
 bullishTextColor = input.color(color.green, "Bullish Text Color", group=g_LABEL)
 bearishBgColor   = input.color(color.new(color.red, 50), "Bearish Background Color", group=g_LABEL)
-be arishTextColor = input.color(color.red, "Bearish Text Color", group=g_LABEL)
+bearishTextColor = input.color(color.red, "Bearish Text Color", group=g_LABEL)
 
 show_eol_labels  = input.bool(true, "Show End-of-Line Labels", group=g_LABEL)
 eol_label_offset = input.int(5, "End-of-Line Label Offset", minval=1, maxval=50, group=g_LABEL)
