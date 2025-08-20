@@ -1,0 +1,195 @@
+//@version=5
+indicator("ICT Trade Framer - Like Michael", overlay=true, max_lines_count=500, max_labels_count=500, max_bars_back = 5000)
+
+// ICT Trade Framing Logic
+// This works exactly like Michael ICT when he opens a chart
+
+// === INPUTS ===
+var g_ICT = "ICT Trade Framing"
+use_ict_framing = input.bool(true, "Enable ICT Trade Framing", group=g_ICT)
+show_trade_plan = input.bool(true, "Show Trade Plan", group=g_ICT)
+show_risk_reward = input.bool(true, "Show Risk/Reward", group=g_ICT)
+
+var g_TIMEFRAMES = "Timeframe Analysis"
+use_daily = input.bool(true, "Daily (HTF)", group=g_TIMEFRAMES)
+use_h4 = input.bool(true, "4H (MTF)", group=g_TIMEFRAMES)
+use_h1 = input.bool(true, "1H (LTF)", group=g_TIMEFRAMES)
+
+var g_ENTRY = "Entry Logic"
+entry_type = input.string("Break & Retest", "Entry Type", options=["Break & Retest", "Pullback", "Breakout", "Reversal"], group=g_ENTRY)
+min_consolidation_bars = input.int(3, "Min Consolidation Bars", minval=1, maxval=20, group=g_ENTRY)
+max_consolidation_bars = input.int(15, "Max Consolidation Bars", minval=5, maxval=50, group=g_ENTRY)
+
+var g_RISK = "Risk Management"
+risk_percent = input.float(1.0, "Risk %", minval=0.1, maxval=5.0, step=0.1, group=g_RISK)
+use_atr_stop = input.bool(true, "Use ATR for Stop Loss", group=g_RISK)
+atr_multiplier = input.float(2.0, "ATR Multiplier", minval=0.5, maxval=5.0, step=0.1, group=g_RISK)
+
+// === ICT TRADE FRAMING LOGIC ===
+
+// Get higher timeframe data
+[daily_high, daily_low, daily_close, daily_open] = request.security(syminfo.tickerid, "D", [high, low, close, open], barmerge.gaps_off, barmerge.lookahead_off)
+[h4_high, h4_low, h4_close, h4_open] = request.security(syminfo.tickerid, "240", [high, low, close, open], barmerge.gaps_off, barmerge.lookahead_off)
+[h1_high, h1_low, h1_close, h1_open] = request.security(syminfo.tickerid, "60", [high, low, close, open], barmerge.gaps_off, barmerge.lookahead_off)
+
+// ATR for dynamic stops
+atr_value = ta.atr(14)
+
+// === ICT MARKET STRUCTURE ANALYSIS ===
+
+// Daily structure
+var float daily_swing_high = na
+var float daily_swing_low = na
+var bool daily_bullish = na
+
+if ta.change(time("D")) != 0
+    if daily_close > daily_open
+        daily_bullish := true
+        daily_swing_high := daily_high
+        daily_swing_low := daily_low
+    else
+        daily_bullish := false
+        daily_swing_high := daily_high
+        daily_swing_low := daily_low
+
+// 4H structure
+var float h4_swing_high = na
+var float h4_swing_low = na
+var bool h4_bullish = na
+
+if ta.change(time("240")) != 0
+    if h4_close > h4_open
+        h4_bullish := true
+        h4_swing_high := h4_high
+        h4_swing_low := h4_low
+    else
+        h4_bullish := false
+        h4_swing_high := h4_high
+        h4_swing_low := h4_low
+
+// === ICT TRADE SETUP DETECTION ===
+
+// Consolidation detection
+var float consolidation_high = na
+var float consolidation_low = na
+var int consolidation_start = 0
+var int consolidation_bars = 0
+var bool in_consolidation = false
+
+// Detect consolidation
+if not in_consolidation
+    consolidation_high := high
+    consolidation_low := low
+    consolidation_start := bar_index
+    consolidation_bars := 1
+    in_consolidation := true
+else
+    if high > consolidation_high
+        consolidation_high := high
+    if low < consolidation_low
+        consolidation_low := low
+    
+    consolidation_bars := bar_index - consolidation_start + 1
+    
+    // Check if still in consolidation
+    if consolidation_bars > max_consolidation_bars
+        in_consolidation := false
+
+// === ICT TRADE SIGNALS ===
+
+// Bullish setup
+bullish_setup = false
+bullish_entry = na
+bullish_stop = na
+bullish_target = na
+
+// Bearish setup
+bearish_setup = false
+bearish_entry = na
+bearish_stop = na
+bearish_target = na
+
+// ICT Trade Logic
+if in_consolidation and consolidation_bars >= min_consolidation_bars and consolidation_bars <= max_consolidation_bars
+    
+    // Bullish ICT Setup
+    if daily_bullish and h4_bullish and close > open
+        // ICT Bullish Logic
+        if low < consolidation_low and close > consolidation_low and close > open
+            bullish_setup := true
+            bullish_entry := consolidation_low
+            bullish_stop := use_atr_stop ? low - (atr_value * atr_multiplier) : low - (consolidation_high - consolidation_low) * 0.5
+            bullish_target := bullish_entry + ((bullish_entry - bullish_stop) * 2) // 1:2 R:R
+    
+    // Bearish ICT Setup
+    if not daily_bullish and not h4_bullish and close < open
+        // ICT Bearish Logic
+        if high > consolidation_high and close < consolidation_high and close < open
+            bearish_setup := true
+            bearish_entry := consolidation_high
+            bearish_stop := use_atr_stop ? high + (atr_value * atr_multiplier) : high + (consolidation_high - consolidation_low) * 0.5
+            bearish_target := bearish_entry - ((bearish_stop - bearish_entry) * 2) // 1:2 R:R
+
+// === ICT TRADE VISUALS ===
+
+// Plot consolidation zone
+var line consolidation_high_line = na
+var line consolidation_low_line = na
+
+if in_consolidation and consolidation_bars >= min_consolidation_bars
+    if na(consolidation_high_line)
+        consolidation_high_line := line.new(consolidation_start, consolidation_high, bar_index, consolidation_high, color=color.blue, width=2)
+        consolidation_low_line := line.new(consolidation_start, consolidation_low, bar_index, consolidation_low, color=color.blue, width=2)
+    else
+        line.set_x2(consolidation_high_line, bar_index)
+        line.set_x2(consolidation_low_line, bar_index)
+else
+    if not na(consolidation_high_line)
+        line.delete(consolidation_high_line)
+        line.delete(consolidation_low_line)
+        consolidation_high_line := na
+        consolidation_low_line := na
+
+// Plot ICT trade setups
+if bullish_setup
+    // Entry line
+    line.new(bar_index, bullish_entry, bar_index + 10, bullish_entry, color=color.green, width=3, style=line.style_solid)
+    // Stop loss line
+    line.new(bar_index, bullish_stop, bar_index + 10, bullish_stop, color=color.red, width=2, style=line.style_dashed)
+    // Target line
+    line.new(bar_index, bullish_target, bar_index + 10, bullish_target, color=color.green, width=2, style=line.style_dotted)
+
+if bearish_setup
+    // Entry line
+    line.new(bar_index, bearish_entry, bar_index + 10, bearish_entry, color=color.red, width=3, style=line.style_solid)
+    // Stop loss line
+    line.new(bar_index, bearish_stop, bar_index + 10, bearish_stop, color=color.red, width=2, style=line.style_dashed)
+    // Target line
+    line.new(bar_index, bearish_target, bar_index + 10, bearish_target, color=color.red, width=2, style=line.style_dotted)
+
+// === ICT TRADE PLAN LABELS ===
+
+if show_trade_plan and (bullish_setup or bearish_setup)
+    if bullish_setup
+        label.new(bar_index + 15, bullish_entry, 
+            text="ICT BULLISH TRADE\nEntry: " + str.tostring(bullish_entry, "#.####") + 
+            "\nStop: " + str.tostring(bullish_stop, "#.####") + 
+            "\nTarget: " + str.tostring(bullish_target, "#.####") +
+            "\nR:R = 1:2", 
+            color=color.green, textcolor=color.white, style=label.style_label_up, size=size.normal)
+    
+    if bearish_setup
+        label.new(bar_index + 15, bearish_entry, 
+            text="ICT BEARISH TRADE\nEntry: " + str.tostring(bearish_entry, "#.####") + 
+            "\nStop: " + str.tostring(bearish_stop, "#.####") + 
+            "\nTarget: " + str.tostring(bearish_target, "#.####") +
+            "\nR:R = 1:2", 
+            color=color.red, textcolor=color.white, style=label.style_label_down, size=size.normal)
+
+// === ICT TRADE ALERTS ===
+
+if bullish_setup
+    alert("ICT BULLISH TRADE SETUP\nEntry: " + str.tostring(bullish_entry, "#.####") + "\nStop: " + str.tostring(bullish_stop, "#.####") + "\nTarget: " + str.tostring(bullish_target, "#.####"), alert.freq_once_per_bar_close)
+
+if bearish_setup
+    alert("ICT BEARISH TRADE SETUP\nEntry: " + str.tostring(bearish_entry, "#.####") + "\nStop: " + str.tostring(bearish_stop, "#.####") + "\nTarget: " + str.tostring(bearish_target, "#.####"), alert.freq_once_per_bar_close)
