@@ -1,0 +1,219 @@
+//@version=5
+indicator("ICT Trade Framer (Consolidation + Break & Retest + Plan)", overlay=true, max_lines_count=500, max_labels_count=500, max_bars_back=5000)
+
+// General
+tick = syminfo.mintick
+
+// Groups
+var g_CONS = "Consolidation (Range) Detection"
+var g_ALIGN = "Higher Timeframe Alignment"
+var g_BR = "Break & Retest"
+var g_PLAN = "Trade Plan & Visuals"
+var g_ALERT = "Alerts"
+
+// Consolidation inputs
+rangeLen            = input.int(20, "Range length (bars)", minval=5, group=g_CONS)
+minRangeTicks       = input.int(5, "Min range height (ticks)", minval=0, group=g_CONS)
+maxRangeTicks       = input.int(120, "Max range height (ticks)", minval=1, group=g_CONS)
+minBarsInRange      = input.int(5, "Min bars inside range before break", minval=1, group=g_CONS)
+consColor           = input.color(color.new(color.blue, 0), "Consolidation line color", group=g_CONS)
+
+// Alignment inputs
+useDailyBias        = input.bool(true, "Require Daily bias alignment", group=g_ALIGN)
+useH4Bias           = input.bool(true, "Require 4H bias alignment", group=g_ALIGN)
+biasMethod          = input.string("Open", "Bias method", options=["Open","Midpoint"], group=g_ALIGN)
+
+// Break & Retest gating
+useDisplacement     = input.bool(true, "Require displacement on break (ATR body)", group=g_BR)
+dispAtrLen          = input.int(14, "ATR length", minval=1, group=g_BR)
+dispAtrMult         = input.float(1.0, "ATR x body multiple", step=0.1, minval=0.1, group=g_BR)
+entryToleranceTicks = input.int(2, "Retest tolerance (ticks)", minval=0, group=g_BR)
+
+// Trade plan
+riskReward          = input.float(2.0, "Risk:Reward target", step=0.1, minval=0.5, group=g_PLAN)
+stopMethod          = input.string("Opposite Range", "Stop method", options=["Opposite Range","Retest Swing"], group=g_PLAN)
+showPlanLines       = input.bool(true, "Show entry/SL/TP lines", group=g_PLAN)
+showPlanLabel       = input.bool(true, "Show plan label", group=g_PLAN)
+entryLineColor      = input.color(color.new(color.lime, 0), "Entry line color", group=g_PLAN)
+stopLineColor       = input.color(color.new(color.red, 0), "Stop line color (dashed)", group=g_PLAN)
+tpLineColor         = input.color(color.new(color.lime, 0), "Target line color (dotted)", group=g_PLAN)
+
+// Alerts
+enableAlerts        = input.bool(true, "Enable alerts on setup", group=g_ALERT)
+
+// Higher timeframe bias
+getBias(openTF) =>
+    bOpen = request.security(syminfo.tickerid, openTF, open, barmerge.gaps_off, barmerge.lookahead_off)
+    bHigh = request.security(syminfo.tickerid, openTF, high, barmerge.gaps_off, barmerge.lookahead_off)
+    bLow  = request.security(syminfo.tickerid, openTF, low,  barmerge.gaps_off, barmerge.lookahead_off)
+    ref   = biasMethod == "Midpoint" ? (bHigh + bLow) / 2.0 : bOpen
+    [close > ref, close < ref]
+
+[dBull, dBear] = getBias("D")
+[h4Bull, h4Bear] = getBias("240")
+longAligned  = (not useDailyBias or dBull) and (not useH4Bias or h4Bull)
+shortAligned = (not useDailyBias or dBear) and (not useH4Bias or h4Bear)
+
+// Consolidation (Donchian-style)
+donHigh = ta.highest(high, rangeLen)
+donLow  = ta.lowest(low, rangeLen)
+donHighPrev = donHigh[1]
+donLowPrev  = donLow[1]
+rangeHeightPrev = donHighPrev - donLowPrev
+rangeTicksPrev  = math.round(rangeHeightPrev / tick)
+inRangePrev = rangeTicksPrev >= minRangeTicks and rangeTicksPrev <= maxRangeTicks
+
+// Count bars that were contained inside prev range
+insidePrevRangeNow = high <= donHighPrev and low >= donLowPrev
+var int barsHeld = 0
+barsHeld := insidePrevRangeNow ? nz(barsHeld[1]) + 1 : 0
+maturePrevRange = barsHeld[1] >= minBarsInRange
+
+// Displacement on break
+atr = ta.atr(dispAtrLen)
+body = math.abs(close - open)
+dispOK = not useDisplacement or (body >= atr * dispAtrMult)
+
+// Breakout conditions (from previous matured range)
+bullBreak = maturePrevRange and inRangePrev and close > donHighPrev and dispOK
+bearBreak = maturePrevRange and inRangePrev and close < donLowPrev  and dispOK
+
+// State for active setup
+var bool pendingRetestBull = false
+var bool pendingRetestBear = false
+var float brkHigh = na, brkLow = na
+var int   brkBar  = na
+
+if bullBreak
+    pendingRetestBull := true
+    pendingRetestBear := false
+    brkHigh := donHighPrev
+    brkLow  := donLowPrev
+    brkBar  := bar_index
+
+if bearBreak
+    pendingRetestBear := true
+    pendingRetestBull := false
+    brkHigh := donHighPrev
+    brkLow  := donLowPrev
+    brkBar  := bar_index
+
+// Consolidation visualization (blue lines) for the last valid/matured range
+var line consHighLine = na
+var line consLowLine  = na
+if bullBreak or bearBreak
+    // Freeze lines to the broken range
+    if not na(consHighLine)
+        line.delete(consHighLine), line.delete(consLowLine)
+    consHighLine := line.new(brkBar - 1, brkHigh, bar_index, brkHigh, extend=extend.right, color=consColor, width=2)
+    consLowLine  := line.new(brkBar - 1, brkLow,  bar_index, brkLow,  extend=extend.right, color=consColor, width=2)
+else
+    // Live preview of candidate range
+    if maturePrevRange and inRangePrev
+        if na(consHighLine)
+            consHighLine := line.new(bar_index - 1, donHighPrev, bar_index, donHighPrev, extend=extend.right, color=consColor, width=2)
+            consLowLine  := line.new(bar_index - 1, donLowPrev,  bar_index, donLowPrev,  extend=extend.right, color=consColor, width=2)
+        else
+            line.set_x2(consHighLine, bar_index), line.set_y1(consHighLine, donHighPrev), line.set_y2(consHighLine, donHighPrev)
+            line.set_x2(consLowLine,  bar_index), line.set_y1(consLowLine,  donLowPrev),  line.set_y2(consLowLine,  donLowPrev)
+    else
+        if not na(consHighLine)
+            line.delete(consHighLine), line.delete(consLowLine)
+            consHighLine := na, consLowLine := na
+
+// Retest detection
+tol = entryToleranceTicks * tick
+retestBull = pendingRetestBull and longAligned and low <= (brkHigh + tol)
+retestBear = pendingRetestBear and shortAligned and high >= (brkLow - tol)
+
+// Plan state and visuals
+var float entryPrice = na
+var float stopPrice  = na
+var float targetPrice= na
+var int   setupDir   = 0   // 1 bull, -1 bear
+var int   setupBar   = na
+
+// Lines and label
+var line entryLine = na
+var line stopLine  = na
+var line tpLine    = na
+var label planLabel = na
+
+deletePlan() =>
+    if not na(entryLine)
+        line.delete(entryLine), line.delete(stopLine), line.delete(tpLine)
+    if not na(planLabel)
+        label.delete(planLabel)
+    entryLine := na, stopLine := na, tpLine := na, planLabel := na
+
+mkLine(y, col, style) =>
+    line.new(setupBar, y, bar_index, y, color=col, width=2, style=style)
+
+swingLowRetest() =>
+    // Simple retest swing low for stop (last 5 bars)
+    math.min(low, ta.lowest(low, 5))
+
+swingHighRetest() =>
+    // Simple retest swing high for stop (last 5 bars)
+    math.max(high, ta.highest(high, 5))
+
+// Build plan on retest
+if retestBull
+    setupDir := 1
+    setupBar := bar_index
+    entryPrice := brkHigh
+    stopPrice  := stopMethod == "Retest Swing" ? swingLowRetest() : brkLow
+    risk = math.max(entryPrice - stopPrice, tick)
+    targetPrice := entryPrice + riskReward * risk
+    pendingRetestBull := false
+
+    deletePlan()
+    if showPlanLines
+        entryLine := mkLine(entryPrice, entryLineColor, line.style_solid)
+        stopLine  := mkLine(stopPrice,  stopLineColor,  line.style_dashed)
+        tpLine    := mkLine(targetPrice,tpLineColor,    line.style_dotted)
+    if showPlanLabel
+        txt = "ICT BULLISH TRADE\n" +
+              "Entry: " + str.tostring(entryPrice, format.mintick) + "\n" +
+              "Stop:  " + str.tostring(stopPrice,  format.mintick) + "\n" +
+              "Target:" + str.tostring(targetPrice,format.mintick) + "\n" +
+              "R:R   :" + str.tostring(riskReward, format.mintick)
+        planLabel := label.new(bar_index, entryPrice, txt, style=label.style_label_up, textcolor=color.lime, color=color.new(color.black, 0), size=size.small)
+
+if retestBear
+    setupDir := -1
+    setupBar := bar_index
+    entryPrice := brkLow
+    stopPrice  := stopMethod == "Retest Swing" ? swingHighRetest() : brkHigh
+    risk = math.max(stopPrice - entryPrice, tick)
+    targetPrice := entryPrice - riskReward * risk
+    pendingRetestBear := false
+
+    deletePlan()
+    if showPlanLines
+        entryLine := mkLine(entryPrice, entryLineColor, line.style_solid)
+        stopLine  := mkLine(stopPrice,  stopLineColor,  line.style_dashed)
+        tpLine    := mkLine(targetPrice,tpLineColor,    line.style_dotted)
+    if showPlanLabel
+        txt = "ICT BEARISH TRADE\n" +
+              "Entry: " + str.tostring(entryPrice, format.mintick) + "\n" +
+              "Stop:  " + str.tostring(stopPrice,  format.mintick) + "\n" +
+              "Target:" + str.tostring(targetPrice,format.mintick) + "\n" +
+              "R:R   :" + str.tostring(riskReward, format.mintick)
+        planLabel := label.new(bar_index, entryPrice, txt, style=label.style_label_down, textcolor=color.red, color=color.new(color.black, 0), size=size.small)
+
+// Keep lines extending
+if not na(entryLine)
+    line.set_x2(entryLine, bar_index)
+if not na(stopLine)
+    line.set_x2(stopLine, bar_index)
+if not na(tpLine)
+    line.set_x2(tpLine, bar_index)
+
+// Alerts (static messages; use chart visuals for exact prices)
+longSignal  = retestBull
+shortSignal = retestBear
+if enableAlerts
+    alertcondition(longSignal,  "ICT Bullish Trade", "ICT Bullish Trade setup formed")
+    alertcondition(shortSignal, "ICT Bearish Trade", "ICT Bearish Trade setup formed")
+
