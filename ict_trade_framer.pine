@@ -218,2786 +218,6 @@ if enableAlerts
     alertcondition(shortSignal, "ICT Bearish Trade", "ICT Bearish Trade setup formed")
 
 // --- ICT Reference Notes (extensive) will follow as comments to expand file size per request.
-// ICT reference expansion line 1
-// ICT reference expansion line 2
-// ICT reference expansion line 3
-// ICT reference expansion line 4
-// ICT reference expansion line 5
-// ICT reference expansion line 6
-// ICT reference expansion line 7
-// ICT reference expansion line 8
-// ICT reference expansion line 9
-// ICT reference expansion line 10
-// ICT reference expansion line 11
-// ICT reference expansion line 12
-// ICT reference expansion line 13
-// ICT reference expansion line 14
-// ICT reference expansion line 15
-// ICT reference expansion line 16
-// ICT reference expansion line 17
-// ICT reference expansion line 18
-// ICT reference expansion line 19
-// ICT reference expansion line 20
-// ICT reference expansion line 21
-// ICT reference expansion line 22
-// ICT reference expansion line 23
-// ICT reference expansion line 24
-// ICT reference expansion line 25
-// ICT reference expansion line 26
-// ICT reference expansion line 27
-// ICT reference expansion line 28
-// ICT reference expansion line 29
-// ICT reference expansion line 30
-// ICT reference expansion line 31
-// ICT reference expansion line 32
-// ICT reference expansion line 33
-// ICT reference expansion line 34
-// ICT reference expansion line 35
-// ICT reference expansion line 36
-// ICT reference expansion line 37
-// ICT reference expansion line 38
-// ICT reference expansion line 39
-// ICT reference expansion line 40
-// ICT reference expansion line 41
-// ICT reference expansion line 42
-// ICT reference expansion line 43
-// ICT reference expansion line 44
-// ICT reference expansion line 45
-// ICT reference expansion line 46
-// ICT reference expansion line 47
-// ICT reference expansion line 48
-// ICT reference expansion line 49
-// ICT reference expansion line 50
-// ICT reference expansion line 51
-// ICT reference expansion line 52
-// ICT reference expansion line 53
-// ICT reference expansion line 54
-// ICT reference expansion line 55
-// ICT reference expansion line 56
-// ICT reference expansion line 57
-// ICT reference expansion line 58
-// ICT reference expansion line 59
-// ICT reference expansion line 60
-// ICT reference expansion line 61
-// ICT reference expansion line 62
-// ICT reference expansion line 63
-// ICT reference expansion line 64
-// ICT reference expansion line 65
-// ICT reference expansion line 66
-// ICT reference expansion line 67
-// ICT reference expansion line 68
-// ICT reference expansion line 69
-// ICT reference expansion line 70
-// ICT reference expansion line 71
-// ICT reference expansion line 72
-// ICT reference expansion line 73
-// ICT reference expansion line 74
-// ICT reference expansion line 75
-// ICT reference expansion line 76
-// ICT reference expansion line 77
-// ICT reference expansion line 78
-// ICT reference expansion line 79
-// ICT reference expansion line 80
-// ICT reference expansion line 81
-// ICT reference expansion line 82
-// ICT reference expansion line 83
-// ICT reference expansion line 84
-// ICT reference expansion line 85
-// ICT reference expansion line 86
-// ICT reference expansion line 87
-// ICT reference expansion line 88
-// ICT reference expansion line 89
-// ICT reference expansion line 90
-// ICT reference expansion line 91
-// ICT reference expansion line 92
-// ICT reference expansion line 93
-// ICT reference expansion line 94
-// ICT reference expansion line 95
-// ICT reference expansion line 96
-// ICT reference expansion line 97
-// ICT reference expansion line 98
-// ICT reference expansion line 99
-// ICT reference expansion line 100
-// ICT reference expansion line 101
-// ICT reference expansion line 102
-// ICT reference expansion line 103
-// ICT reference expansion line 104
-// ICT reference expansion line 105
-// ICT reference expansion line 106
-// ICT reference expansion line 107
-// ICT reference expansion line 108
-// ICT reference expansion line 109
-// ICT reference expansion line 110
-// ICT reference expansion line 111
-// ICT reference expansion line 112
-// ICT reference expansion line 113
-// ICT reference expansion line 114
-// ICT reference expansion line 115
-// ICT reference expansion line 116
-// ICT reference expansion line 117
-// ICT reference expansion line 118
-// ICT reference expansion line 119
-// ICT reference expansion line 120
-// ICT reference expansion line 121
-// ICT reference expansion line 122
-// ICT reference expansion line 123
-// ICT reference expansion line 124
-// ICT reference expansion line 125
-// ICT reference expansion line 126
-// ICT reference expansion line 127
-// ICT reference expansion line 128
-// ICT reference expansion line 129
-// ICT reference expansion line 130
-// ICT reference expansion line 131
-// ICT reference expansion line 132
-// ICT reference expansion line 133
-// ICT reference expansion line 134
-// ICT reference expansion line 135
-// ICT reference expansion line 136
-// ICT reference expansion line 137
-// ICT reference expansion line 138
-// ICT reference expansion line 139
-// ICT reference expansion line 140
-// ICT reference expansion line 141
-// ICT reference expansion line 142
-// ICT reference expansion line 143
-// ICT reference expansion line 144
-// ICT reference expansion line 145
-// ICT reference expansion line 146
-// ICT reference expansion line 147
-// ICT reference expansion line 148
-// ICT reference expansion line 149
-// ICT reference expansion line 150
-// ICT reference expansion line 151
-// ICT reference expansion line 152
-// ICT reference expansion line 153
-// ICT reference expansion line 154
-// ICT reference expansion line 155
-// ICT reference expansion line 156
-// ICT reference expansion line 157
-// ICT reference expansion line 158
-// ICT reference expansion line 159
-// ICT reference expansion line 160
-// ICT reference expansion line 161
-// ICT reference expansion line 162
-// ICT reference expansion line 163
-// ICT reference expansion line 164
-// ICT reference expansion line 165
-// ICT reference expansion line 166
-// ICT reference expansion line 167
-// ICT reference expansion line 168
-// ICT reference expansion line 169
-// ICT reference expansion line 170
-// ICT reference expansion line 171
-// ICT reference expansion line 172
-// ICT reference expansion line 173
-// ICT reference expansion line 174
-// ICT reference expansion line 175
-// ICT reference expansion line 176
-// ICT reference expansion line 177
-// ICT reference expansion line 178
-// ICT reference expansion line 179
-// ICT reference expansion line 180
-// ICT reference expansion line 181
-// ICT reference expansion line 182
-// ICT reference expansion line 183
-// ICT reference expansion line 184
-// ICT reference expansion line 185
-// ICT reference expansion line 186
-// ICT reference expansion line 187
-// ICT reference expansion line 188
-// ICT reference expansion line 189
-// ICT reference expansion line 190
-// ICT reference expansion line 191
-// ICT reference expansion line 192
-// ICT reference expansion line 193
-// ICT reference expansion line 194
-// ICT reference expansion line 195
-// ICT reference expansion line 196
-// ICT reference expansion line 197
-// ICT reference expansion line 198
-// ICT reference expansion line 199
-// ICT reference expansion line 200
-// ICT reference expansion line 201
-// ICT reference expansion line 202
-// ICT reference expansion line 203
-// ICT reference expansion line 204
-// ICT reference expansion line 205
-// ICT reference expansion line 206
-// ICT reference expansion line 207
-// ICT reference expansion line 208
-// ICT reference expansion line 209
-// ICT reference expansion line 210
-// ICT reference expansion line 211
-// ICT reference expansion line 212
-// ICT reference expansion line 213
-// ICT reference expansion line 214
-// ICT reference expansion line 215
-// ICT reference expansion line 216
-// ICT reference expansion line 217
-// ICT reference expansion line 218
-// ICT reference expansion line 219
-// ICT reference expansion line 220
-// ICT reference expansion line 221
-// ICT reference expansion line 222
-// ICT reference expansion line 223
-// ICT reference expansion line 224
-// ICT reference expansion line 225
-// ICT reference expansion line 226
-// ICT reference expansion line 227
-// ICT reference expansion line 228
-// ICT reference expansion line 229
-// ICT reference expansion line 230
-// ICT reference expansion line 231
-// ICT reference expansion line 232
-// ICT reference expansion line 233
-// ICT reference expansion line 234
-// ICT reference expansion line 235
-// ICT reference expansion line 236
-// ICT reference expansion line 237
-// ICT reference expansion line 238
-// ICT reference expansion line 239
-// ICT reference expansion line 240
-// ICT reference expansion line 241
-// ICT reference expansion line 242
-// ICT reference expansion line 243
-// ICT reference expansion line 244
-// ICT reference expansion line 245
-// ICT reference expansion line 246
-// ICT reference expansion line 247
-// ICT reference expansion line 248
-// ICT reference expansion line 249
-// ICT reference expansion line 250
-// ICT reference expansion line 251
-// ICT reference expansion line 252
-// ICT reference expansion line 253
-// ICT reference expansion line 254
-// ICT reference expansion line 255
-// ICT reference expansion line 256
-// ICT reference expansion line 257
-// ICT reference expansion line 258
-// ICT reference expansion line 259
-// ICT reference expansion line 260
-// ICT reference expansion line 261
-// ICT reference expansion line 262
-// ICT reference expansion line 263
-// ICT reference expansion line 264
-// ICT reference expansion line 265
-// ICT reference expansion line 266
-// ICT reference expansion line 267
-// ICT reference expansion line 268
-// ICT reference expansion line 269
-// ICT reference expansion line 270
-// ICT reference expansion line 271
-// ICT reference expansion line 272
-// ICT reference expansion line 273
-// ICT reference expansion line 274
-// ICT reference expansion line 275
-// ICT reference expansion line 276
-// ICT reference expansion line 277
-// ICT reference expansion line 278
-// ICT reference expansion line 279
-// ICT reference expansion line 280
-// ICT reference expansion line 281
-// ICT reference expansion line 282
-// ICT reference expansion line 283
-// ICT reference expansion line 284
-// ICT reference expansion line 285
-// ICT reference expansion line 286
-// ICT reference expansion line 287
-// ICT reference expansion line 288
-// ICT reference expansion line 289
-// ICT reference expansion line 290
-// ICT reference expansion line 291
-// ICT reference expansion line 292
-// ICT reference expansion line 293
-// ICT reference expansion line 294
-// ICT reference expansion line 295
-// ICT reference expansion line 296
-// ICT reference expansion line 297
-// ICT reference expansion line 298
-// ICT reference expansion line 299
-// ICT reference expansion line 300
-// ICT reference expansion line 301
-// ICT reference expansion line 302
-// ICT reference expansion line 303
-// ICT reference expansion line 304
-// ICT reference expansion line 305
-// ICT reference expansion line 306
-// ICT reference expansion line 307
-// ICT reference expansion line 308
-// ICT reference expansion line 309
-// ICT reference expansion line 310
-// ICT reference expansion line 311
-// ICT reference expansion line 312
-// ICT reference expansion line 313
-// ICT reference expansion line 314
-// ICT reference expansion line 315
-// ICT reference expansion line 316
-// ICT reference expansion line 317
-// ICT reference expansion line 318
-// ICT reference expansion line 319
-// ICT reference expansion line 320
-// ICT reference expansion line 321
-// ICT reference expansion line 322
-// ICT reference expansion line 323
-// ICT reference expansion line 324
-// ICT reference expansion line 325
-// ICT reference expansion line 326
-// ICT reference expansion line 327
-// ICT reference expansion line 328
-// ICT reference expansion line 329
-// ICT reference expansion line 330
-// ICT reference expansion line 331
-// ICT reference expansion line 332
-// ICT reference expansion line 333
-// ICT reference expansion line 334
-// ICT reference expansion line 335
-// ICT reference expansion line 336
-// ICT reference expansion line 337
-// ICT reference expansion line 338
-// ICT reference expansion line 339
-// ICT reference expansion line 340
-// ICT reference expansion line 341
-// ICT reference expansion line 342
-// ICT reference expansion line 343
-// ICT reference expansion line 344
-// ICT reference expansion line 345
-// ICT reference expansion line 346
-// ICT reference expansion line 347
-// ICT reference expansion line 348
-// ICT reference expansion line 349
-// ICT reference expansion line 350
-// ICT reference expansion line 351
-// ICT reference expansion line 352
-// ICT reference expansion line 353
-// ICT reference expansion line 354
-// ICT reference expansion line 355
-// ICT reference expansion line 356
-// ICT reference expansion line 357
-// ICT reference expansion line 358
-// ICT reference expansion line 359
-// ICT reference expansion line 360
-// ICT reference expansion line 361
-// ICT reference expansion line 362
-// ICT reference expansion line 363
-// ICT reference expansion line 364
-// ICT reference expansion line 365
-// ICT reference expansion line 366
-// ICT reference expansion line 367
-// ICT reference expansion line 368
-// ICT reference expansion line 369
-// ICT reference expansion line 370
-// ICT reference expansion line 371
-// ICT reference expansion line 372
-// ICT reference expansion line 373
-// ICT reference expansion line 374
-// ICT reference expansion line 375
-// ICT reference expansion line 376
-// ICT reference expansion line 377
-// ICT reference expansion line 378
-// ICT reference expansion line 379
-// ICT reference expansion line 380
-// ICT reference expansion line 381
-// ICT reference expansion line 382
-// ICT reference expansion line 383
-// ICT reference expansion line 384
-// ICT reference expansion line 385
-// ICT reference expansion line 386
-// ICT reference expansion line 387
-// ICT reference expansion line 388
-// ICT reference expansion line 389
-// ICT reference expansion line 390
-// ICT reference expansion line 391
-// ICT reference expansion line 392
-// ICT reference expansion line 393
-// ICT reference expansion line 394
-// ICT reference expansion line 395
-// ICT reference expansion line 396
-// ICT reference expansion line 397
-// ICT reference expansion line 398
-// ICT reference expansion line 399
-// ICT reference expansion line 400
-// ICT reference expansion line 401
-// ICT reference expansion line 402
-// ICT reference expansion line 403
-// ICT reference expansion line 404
-// ICT reference expansion line 405
-// ICT reference expansion line 406
-// ICT reference expansion line 407
-// ICT reference expansion line 408
-// ICT reference expansion line 409
-// ICT reference expansion line 410
-// ICT reference expansion line 411
-// ICT reference expansion line 412
-// ICT reference expansion line 413
-// ICT reference expansion line 414
-// ICT reference expansion line 415
-// ICT reference expansion line 416
-// ICT reference expansion line 417
-// ICT reference expansion line 418
-// ICT reference expansion line 419
-// ICT reference expansion line 420
-// ICT reference expansion line 421
-// ICT reference expansion line 422
-// ICT reference expansion line 423
-// ICT reference expansion line 424
-// ICT reference expansion line 425
-// ICT reference expansion line 426
-// ICT reference expansion line 427
-// ICT reference expansion line 428
-// ICT reference expansion line 429
-// ICT reference expansion line 430
-// ICT reference expansion line 431
-// ICT reference expansion line 432
-// ICT reference expansion line 433
-// ICT reference expansion line 434
-// ICT reference expansion line 435
-// ICT reference expansion line 436
-// ICT reference expansion line 437
-// ICT reference expansion line 438
-// ICT reference expansion line 439
-// ICT reference expansion line 440
-// ICT reference expansion line 441
-// ICT reference expansion line 442
-// ICT reference expansion line 443
-// ICT reference expansion line 444
-// ICT reference expansion line 445
-// ICT reference expansion line 446
-// ICT reference expansion line 447
-// ICT reference expansion line 448
-// ICT reference expansion line 449
-// ICT reference expansion line 450
-// ICT reference expansion line 451
-// ICT reference expansion line 452
-// ICT reference expansion line 453
-// ICT reference expansion line 454
-// ICT reference expansion line 455
-// ICT reference expansion line 456
-// ICT reference expansion line 457
-// ICT reference expansion line 458
-// ICT reference expansion line 459
-// ICT reference expansion line 460
-// ICT reference expansion line 461
-// ICT reference expansion line 462
-// ICT reference expansion line 463
-// ICT reference expansion line 464
-// ICT reference expansion line 465
-// ICT reference expansion line 466
-// ICT reference expansion line 467
-// ICT reference expansion line 468
-// ICT reference expansion line 469
-// ICT reference expansion line 470
-// ICT reference expansion line 471
-// ICT reference expansion line 472
-// ICT reference expansion line 473
-// ICT reference expansion line 474
-// ICT reference expansion line 475
-// ICT reference expansion line 476
-// ICT reference expansion line 477
-// ICT reference expansion line 478
-// ICT reference expansion line 479
-// ICT reference expansion line 480
-// ICT reference expansion line 481
-// ICT reference expansion line 482
-// ICT reference expansion line 483
-// ICT reference expansion line 484
-// ICT reference expansion line 485
-// ICT reference expansion line 486
-// ICT reference expansion line 487
-// ICT reference expansion line 488
-// ICT reference expansion line 489
-// ICT reference expansion line 490
-// ICT reference expansion line 491
-// ICT reference expansion line 492
-// ICT reference expansion line 493
-// ICT reference expansion line 494
-// ICT reference expansion line 495
-// ICT reference expansion line 496
-// ICT reference expansion line 497
-// ICT reference expansion line 498
-// ICT reference expansion line 499
-// ICT reference expansion line 500
-// ICT reference expansion line 501
-// ICT reference expansion line 502
-// ICT reference expansion line 503
-// ICT reference expansion line 504
-// ICT reference expansion line 505
-// ICT reference expansion line 506
-// ICT reference expansion line 507
-// ICT reference expansion line 508
-// ICT reference expansion line 509
-// ICT reference expansion line 510
-// ICT reference expansion line 511
-// ICT reference expansion line 512
-// ICT reference expansion line 513
-// ICT reference expansion line 514
-// ICT reference expansion line 515
-// ICT reference expansion line 516
-// ICT reference expansion line 517
-// ICT reference expansion line 518
-// ICT reference expansion line 519
-// ICT reference expansion line 520
-// ICT reference expansion line 521
-// ICT reference expansion line 522
-// ICT reference expansion line 523
-// ICT reference expansion line 524
-// ICT reference expansion line 525
-// ICT reference expansion line 526
-// ICT reference expansion line 527
-// ICT reference expansion line 528
-// ICT reference expansion line 529
-// ICT reference expansion line 530
-// ICT reference expansion line 531
-// ICT reference expansion line 532
-// ICT reference expansion line 533
-// ICT reference expansion line 534
-// ICT reference expansion line 535
-// ICT reference expansion line 536
-// ICT reference expansion line 537
-// ICT reference expansion line 538
-// ICT reference expansion line 539
-// ICT reference expansion line 540
-// ICT reference expansion line 541
-// ICT reference expansion line 542
-// ICT reference expansion line 543
-// ICT reference expansion line 544
-// ICT reference expansion line 545
-// ICT reference expansion line 546
-// ICT reference expansion line 547
-// ICT reference expansion line 548
-// ICT reference expansion line 549
-// ICT reference expansion line 550
-// ICT reference expansion line 551
-// ICT reference expansion line 552
-// ICT reference expansion line 553
-// ICT reference expansion line 554
-// ICT reference expansion line 555
-// ICT reference expansion line 556
-// ICT reference expansion line 557
-// ICT reference expansion line 558
-// ICT reference expansion line 559
-// ICT reference expansion line 560
-// ICT reference expansion line 561
-// ICT reference expansion line 562
-// ICT reference expansion line 563
-// ICT reference expansion line 564
-// ICT reference expansion line 565
-// ICT reference expansion line 566
-// ICT reference expansion line 567
-// ICT reference expansion line 568
-// ICT reference expansion line 569
-// ICT reference expansion line 570
-// ICT reference expansion line 571
-// ICT reference expansion line 572
-// ICT reference expansion line 573
-// ICT reference expansion line 574
-// ICT reference expansion line 575
-// ICT reference expansion line 576
-// ICT reference expansion line 577
-// ICT reference expansion line 578
-// ICT reference expansion line 579
-// ICT reference expansion line 580
-// ICT reference expansion line 581
-// ICT reference expansion line 582
-// ICT reference expansion line 583
-// ICT reference expansion line 584
-// ICT reference expansion line 585
-// ICT reference expansion line 586
-// ICT reference expansion line 587
-// ICT reference expansion line 588
-// ICT reference expansion line 589
-// ICT reference expansion line 590
-// ICT reference expansion line 591
-// ICT reference expansion line 592
-// ICT reference expansion line 593
-// ICT reference expansion line 594
-// ICT reference expansion line 595
-// ICT reference expansion line 596
-// ICT reference expansion line 597
-// ICT reference expansion line 598
-// ICT reference expansion line 599
-// ICT reference expansion line 600
-// ICT reference expansion line 601
-// ICT reference expansion line 602
-// ICT reference expansion line 603
-// ICT reference expansion line 604
-// ICT reference expansion line 605
-// ICT reference expansion line 606
-// ICT reference expansion line 607
-// ICT reference expansion line 608
-// ICT reference expansion line 609
-// ICT reference expansion line 610
-// ICT reference expansion line 611
-// ICT reference expansion line 612
-// ICT reference expansion line 613
-// ICT reference expansion line 614
-// ICT reference expansion line 615
-// ICT reference expansion line 616
-// ICT reference expansion line 617
-// ICT reference expansion line 618
-// ICT reference expansion line 619
-// ICT reference expansion line 620
-// ICT reference expansion line 621
-// ICT reference expansion line 622
-// ICT reference expansion line 623
-// ICT reference expansion line 624
-// ICT reference expansion line 625
-// ICT reference expansion line 626
-// ICT reference expansion line 627
-// ICT reference expansion line 628
-// ICT reference expansion line 629
-// ICT reference expansion line 630
-// ICT reference expansion line 631
-// ICT reference expansion line 632
-// ICT reference expansion line 633
-// ICT reference expansion line 634
-// ICT reference expansion line 635
-// ICT reference expansion line 636
-// ICT reference expansion line 637
-// ICT reference expansion line 638
-// ICT reference expansion line 639
-// ICT reference expansion line 640
-// ICT reference expansion line 641
-// ICT reference expansion line 642
-// ICT reference expansion line 643
-// ICT reference expansion line 644
-// ICT reference expansion line 645
-// ICT reference expansion line 646
-// ICT reference expansion line 647
-// ICT reference expansion line 648
-// ICT reference expansion line 649
-// ICT reference expansion line 650
-// ICT reference expansion line 651
-// ICT reference expansion line 652
-// ICT reference expansion line 653
-// ICT reference expansion line 654
-// ICT reference expansion line 655
-// ICT reference expansion line 656
-// ICT reference expansion line 657
-// ICT reference expansion line 658
-// ICT reference expansion line 659
-// ICT reference expansion line 660
-// ICT reference expansion line 661
-// ICT reference expansion line 662
-// ICT reference expansion line 663
-// ICT reference expansion line 664
-// ICT reference expansion line 665
-// ICT reference expansion line 666
-// ICT reference expansion line 667
-// ICT reference expansion line 668
-// ICT reference expansion line 669
-// ICT reference expansion line 670
-// ICT reference expansion line 671
-// ICT reference expansion line 672
-// ICT reference expansion line 673
-// ICT reference expansion line 674
-// ICT reference expansion line 675
-// ICT reference expansion line 676
-// ICT reference expansion line 677
-// ICT reference expansion line 678
-// ICT reference expansion line 679
-// ICT reference expansion line 680
-// ICT reference expansion line 681
-// ICT reference expansion line 682
-// ICT reference expansion line 683
-// ICT reference expansion line 684
-// ICT reference expansion line 685
-// ICT reference expansion line 686
-// ICT reference expansion line 687
-// ICT reference expansion line 688
-// ICT reference expansion line 689
-// ICT reference expansion line 690
-// ICT reference expansion line 691
-// ICT reference expansion line 692
-// ICT reference expansion line 693
-// ICT reference expansion line 694
-// ICT reference expansion line 695
-// ICT reference expansion line 696
-// ICT reference expansion line 697
-// ICT reference expansion line 698
-// ICT reference expansion line 699
-// ICT reference expansion line 700
-// ICT reference expansion line 701
-// ICT reference expansion line 702
-// ICT reference expansion line 703
-// ICT reference expansion line 704
-// ICT reference expansion line 705
-// ICT reference expansion line 706
-// ICT reference expansion line 707
-// ICT reference expansion line 708
-// ICT reference expansion line 709
-// ICT reference expansion line 710
-// ICT reference expansion line 711
-// ICT reference expansion line 712
-// ICT reference expansion line 713
-// ICT reference expansion line 714
-// ICT reference expansion line 715
-// ICT reference expansion line 716
-// ICT reference expansion line 717
-// ICT reference expansion line 718
-// ICT reference expansion line 719
-// ICT reference expansion line 720
-// ICT reference expansion line 721
-// ICT reference expansion line 722
-// ICT reference expansion line 723
-// ICT reference expansion line 724
-// ICT reference expansion line 725
-// ICT reference expansion line 726
-// ICT reference expansion line 727
-// ICT reference expansion line 728
-// ICT reference expansion line 729
-// ICT reference expansion line 730
-// ICT reference expansion line 731
-// ICT reference expansion line 732
-// ICT reference expansion line 733
-// ICT reference expansion line 734
-// ICT reference expansion line 735
-// ICT reference expansion line 736
-// ICT reference expansion line 737
-// ICT reference expansion line 738
-// ICT reference expansion line 739
-// ICT reference expansion line 740
-// ICT reference expansion line 741
-// ICT reference expansion line 742
-// ICT reference expansion line 743
-// ICT reference expansion line 744
-// ICT reference expansion line 745
-// ICT reference expansion line 746
-// ICT reference expansion line 747
-// ICT reference expansion line 748
-// ICT reference expansion line 749
-// ICT reference expansion line 750
-// ICT reference expansion line 751
-// ICT reference expansion line 752
-// ICT reference expansion line 753
-// ICT reference expansion line 754
-// ICT reference expansion line 755
-// ICT reference expansion line 756
-// ICT reference expansion line 757
-// ICT reference expansion line 758
-// ICT reference expansion line 759
-// ICT reference expansion line 760
-// ICT reference expansion line 761
-// ICT reference expansion line 762
-// ICT reference expansion line 763
-// ICT reference expansion line 764
-// ICT reference expansion line 765
-// ICT reference expansion line 766
-// ICT reference expansion line 767
-// ICT reference expansion line 768
-// ICT reference expansion line 769
-// ICT reference expansion line 770
-// ICT reference expansion line 771
-// ICT reference expansion line 772
-// ICT reference expansion line 773
-// ICT reference expansion line 774
-// ICT reference expansion line 775
-// ICT reference expansion line 776
-// ICT reference expansion line 777
-// ICT reference expansion line 778
-// ICT reference expansion line 779
-// ICT reference expansion line 780
-// ICT reference expansion line 781
-// ICT reference expansion line 782
-// ICT reference expansion line 783
-// ICT reference expansion line 784
-// ICT reference expansion line 785
-// ICT reference expansion line 786
-// ICT reference expansion line 787
-// ICT reference expansion line 788
-// ICT reference expansion line 789
-// ICT reference expansion line 790
-// ICT reference expansion line 791
-// ICT reference expansion line 792
-// ICT reference expansion line 793
-// ICT reference expansion line 794
-// ICT reference expansion line 795
-// ICT reference expansion line 796
-// ICT reference expansion line 797
-// ICT reference expansion line 798
-// ICT reference expansion line 799
-// ICT reference expansion line 800
-// ICT reference expansion line 801
-// ICT reference expansion line 802
-// ICT reference expansion line 803
-// ICT reference expansion line 804
-// ICT reference expansion line 805
-// ICT reference expansion line 806
-// ICT reference expansion line 807
-// ICT reference expansion line 808
-// ICT reference expansion line 809
-// ICT reference expansion line 810
-// ICT reference expansion line 811
-// ICT reference expansion line 812
-// ICT reference expansion line 813
-// ICT reference expansion line 814
-// ICT reference expansion line 815
-// ICT reference expansion line 816
-// ICT reference expansion line 817
-// ICT reference expansion line 818
-// ICT reference expansion line 819
-// ICT reference expansion line 820
-// ICT reference expansion line 821
-// ICT reference expansion line 822
-// ICT reference expansion line 823
-// ICT reference expansion line 824
-// ICT reference expansion line 825
-// ICT reference expansion line 826
-// ICT reference expansion line 827
-// ICT reference expansion line 828
-// ICT reference expansion line 829
-// ICT reference expansion line 830
-// ICT reference expansion line 831
-// ICT reference expansion line 832
-// ICT reference expansion line 833
-// ICT reference expansion line 834
-// ICT reference expansion line 835
-// ICT reference expansion line 836
-// ICT reference expansion line 837
-// ICT reference expansion line 838
-// ICT reference expansion line 839
-// ICT reference expansion line 840
-// ICT reference expansion line 841
-// ICT reference expansion line 842
-// ICT reference expansion line 843
-// ICT reference expansion line 844
-// ICT reference expansion line 845
-// ICT reference expansion line 846
-// ICT reference expansion line 847
-// ICT reference expansion line 848
-// ICT reference expansion line 849
-// ICT reference expansion line 850
-// ICT reference expansion line 851
-// ICT reference expansion line 852
-// ICT reference expansion line 853
-// ICT reference expansion line 854
-// ICT reference expansion line 855
-// ICT reference expansion line 856
-// ICT reference expansion line 857
-// ICT reference expansion line 858
-// ICT reference expansion line 859
-// ICT reference expansion line 860
-// ICT reference expansion line 861
-// ICT reference expansion line 862
-// ICT reference expansion line 863
-// ICT reference expansion line 864
-// ICT reference expansion line 865
-// ICT reference expansion line 866
-// ICT reference expansion line 867
-// ICT reference expansion line 868
-// ICT reference expansion line 869
-// ICT reference expansion line 870
-// ICT reference expansion line 871
-// ICT reference expansion line 872
-// ICT reference expansion line 873
-// ICT reference expansion line 874
-// ICT reference expansion line 875
-// ICT reference expansion line 876
-// ICT reference expansion line 877
-// ICT reference expansion line 878
-// ICT reference expansion line 879
-// ICT reference expansion line 880
-// ICT reference expansion line 881
-// ICT reference expansion line 882
-// ICT reference expansion line 883
-// ICT reference expansion line 884
-// ICT reference expansion line 885
-// ICT reference expansion line 886
-// ICT reference expansion line 887
-// ICT reference expansion line 888
-// ICT reference expansion line 889
-// ICT reference expansion line 890
-// ICT reference expansion line 891
-// ICT reference expansion line 892
-// ICT reference expansion line 893
-// ICT reference expansion line 894
-// ICT reference expansion line 895
-// ICT reference expansion line 896
-// ICT reference expansion line 897
-// ICT reference expansion line 898
-// ICT reference expansion line 899
-// ICT reference expansion line 900
-// ICT reference expansion line 901
-// ICT reference expansion line 902
-// ICT reference expansion line 903
-// ICT reference expansion line 904
-// ICT reference expansion line 905
-// ICT reference expansion line 906
-// ICT reference expansion line 907
-// ICT reference expansion line 908
-// ICT reference expansion line 909
-// ICT reference expansion line 910
-// ICT reference expansion line 911
-// ICT reference expansion line 912
-// ICT reference expansion line 913
-// ICT reference expansion line 914
-// ICT reference expansion line 915
-// ICT reference expansion line 916
-// ICT reference expansion line 917
-// ICT reference expansion line 918
-// ICT reference expansion line 919
-// ICT reference expansion line 920
-// ICT reference expansion line 921
-// ICT reference expansion line 922
-// ICT reference expansion line 923
-// ICT reference expansion line 924
-// ICT reference expansion line 925
-// ICT reference expansion line 926
-// ICT reference expansion line 927
-// ICT reference expansion line 928
-// ICT reference expansion line 929
-// ICT reference expansion line 930
-// ICT reference expansion line 931
-// ICT reference expansion line 932
-// ICT reference expansion line 933
-// ICT reference expansion line 934
-// ICT reference expansion line 935
-// ICT reference expansion line 936
-// ICT reference expansion line 937
-// ICT reference expansion line 938
-// ICT reference expansion line 939
-// ICT reference expansion line 940
-// ICT reference expansion line 941
-// ICT reference expansion line 942
-// ICT reference expansion line 943
-// ICT reference expansion line 944
-// ICT reference expansion line 945
-// ICT reference expansion line 946
-// ICT reference expansion line 947
-// ICT reference expansion line 948
-// ICT reference expansion line 949
-// ICT reference expansion line 950
-// ICT reference expansion line 951
-// ICT reference expansion line 952
-// ICT reference expansion line 953
-// ICT reference expansion line 954
-// ICT reference expansion line 955
-// ICT reference expansion line 956
-// ICT reference expansion line 957
-// ICT reference expansion line 958
-// ICT reference expansion line 959
-// ICT reference expansion line 960
-// ICT reference expansion line 961
-// ICT reference expansion line 962
-// ICT reference expansion line 963
-// ICT reference expansion line 964
-// ICT reference expansion line 965
-// ICT reference expansion line 966
-// ICT reference expansion line 967
-// ICT reference expansion line 968
-// ICT reference expansion line 969
-// ICT reference expansion line 970
-// ICT reference expansion line 971
-// ICT reference expansion line 972
-// ICT reference expansion line 973
-// ICT reference expansion line 974
-// ICT reference expansion line 975
-// ICT reference expansion line 976
-// ICT reference expansion line 977
-// ICT reference expansion line 978
-// ICT reference expansion line 979
-// ICT reference expansion line 980
-// ICT reference expansion line 981
-// ICT reference expansion line 982
-// ICT reference expansion line 983
-// ICT reference expansion line 984
-// ICT reference expansion line 985
-// ICT reference expansion line 986
-// ICT reference expansion line 987
-// ICT reference expansion line 988
-// ICT reference expansion line 989
-// ICT reference expansion line 990
-// ICT reference expansion line 991
-// ICT reference expansion line 992
-// ICT reference expansion line 993
-// ICT reference expansion line 994
-// ICT reference expansion line 995
-// ICT reference expansion line 996
-// ICT reference expansion line 997
-// ICT reference expansion line 998
-// ICT reference expansion line 999
-// ICT reference expansion line 1000
-// ICT reference expansion line 1001
-// ICT reference expansion line 1002
-// ICT reference expansion line 1003
-// ICT reference expansion line 1004
-// ICT reference expansion line 1005
-// ICT reference expansion line 1006
-// ICT reference expansion line 1007
-// ICT reference expansion line 1008
-// ICT reference expansion line 1009
-// ICT reference expansion line 1010
-// ICT reference expansion line 1011
-// ICT reference expansion line 1012
-// ICT reference expansion line 1013
-// ICT reference expansion line 1014
-// ICT reference expansion line 1015
-// ICT reference expansion line 1016
-// ICT reference expansion line 1017
-// ICT reference expansion line 1018
-// ICT reference expansion line 1019
-// ICT reference expansion line 1020
-// ICT reference expansion line 1021
-// ICT reference expansion line 1022
-// ICT reference expansion line 1023
-// ICT reference expansion line 1024
-// ICT reference expansion line 1025
-// ICT reference expansion line 1026
-// ICT reference expansion line 1027
-// ICT reference expansion line 1028
-// ICT reference expansion line 1029
-// ICT reference expansion line 1030
-// ICT reference expansion line 1031
-// ICT reference expansion line 1032
-// ICT reference expansion line 1033
-// ICT reference expansion line 1034
-// ICT reference expansion line 1035
-// ICT reference expansion line 1036
-// ICT reference expansion line 1037
-// ICT reference expansion line 1038
-// ICT reference expansion line 1039
-// ICT reference expansion line 1040
-// ICT reference expansion line 1041
-// ICT reference expansion line 1042
-// ICT reference expansion line 1043
-// ICT reference expansion line 1044
-// ICT reference expansion line 1045
-// ICT reference expansion line 1046
-// ICT reference expansion line 1047
-// ICT reference expansion line 1048
-// ICT reference expansion line 1049
-// ICT reference expansion line 1050
-// ICT reference expansion line 1051
-// ICT reference expansion line 1052
-// ICT reference expansion line 1053
-// ICT reference expansion line 1054
-// ICT reference expansion line 1055
-// ICT reference expansion line 1056
-// ICT reference expansion line 1057
-// ICT reference expansion line 1058
-// ICT reference expansion line 1059
-// ICT reference expansion line 1060
-// ICT reference expansion line 1061
-// ICT reference expansion line 1062
-// ICT reference expansion line 1063
-// ICT reference expansion line 1064
-// ICT reference expansion line 1065
-// ICT reference expansion line 1066
-// ICT reference expansion line 1067
-// ICT reference expansion line 1068
-// ICT reference expansion line 1069
-// ICT reference expansion line 1070
-// ICT reference expansion line 1071
-// ICT reference expansion line 1072
-// ICT reference expansion line 1073
-// ICT reference expansion line 1074
-// ICT reference expansion line 1075
-// ICT reference expansion line 1076
-// ICT reference expansion line 1077
-// ICT reference expansion line 1078
-// ICT reference expansion line 1079
-// ICT reference expansion line 1080
-// ICT reference expansion line 1081
-// ICT reference expansion line 1082
-// ICT reference expansion line 1083
-// ICT reference expansion line 1084
-// ICT reference expansion line 1085
-// ICT reference expansion line 1086
-// ICT reference expansion line 1087
-// ICT reference expansion line 1088
-// ICT reference expansion line 1089
-// ICT reference expansion line 1090
-// ICT reference expansion line 1091
-// ICT reference expansion line 1092
-// ICT reference expansion line 1093
-// ICT reference expansion line 1094
-// ICT reference expansion line 1095
-// ICT reference expansion line 1096
-// ICT reference expansion line 1097
-// ICT reference expansion line 1098
-// ICT reference expansion line 1099
-// ICT reference expansion line 1100
-// ICT reference expansion line 1101
-// ICT reference expansion line 1102
-// ICT reference expansion line 1103
-// ICT reference expansion line 1104
-// ICT reference expansion line 1105
-// ICT reference expansion line 1106
-// ICT reference expansion line 1107
-// ICT reference expansion line 1108
-// ICT reference expansion line 1109
-// ICT reference expansion line 1110
-// ICT reference expansion line 1111
-// ICT reference expansion line 1112
-// ICT reference expansion line 1113
-// ICT reference expansion line 1114
-// ICT reference expansion line 1115
-// ICT reference expansion line 1116
-// ICT reference expansion line 1117
-// ICT reference expansion line 1118
-// ICT reference expansion line 1119
-// ICT reference expansion line 1120
-// ICT reference expansion line 1121
-// ICT reference expansion line 1122
-// ICT reference expansion line 1123
-// ICT reference expansion line 1124
-// ICT reference expansion line 1125
-// ICT reference expansion line 1126
-// ICT reference expansion line 1127
-// ICT reference expansion line 1128
-// ICT reference expansion line 1129
-// ICT reference expansion line 1130
-// ICT reference expansion line 1131
-// ICT reference expansion line 1132
-// ICT reference expansion line 1133
-// ICT reference expansion line 1134
-// ICT reference expansion line 1135
-// ICT reference expansion line 1136
-// ICT reference expansion line 1137
-// ICT reference expansion line 1138
-// ICT reference expansion line 1139
-// ICT reference expansion line 1140
-// ICT reference expansion line 1141
-// ICT reference expansion line 1142
-// ICT reference expansion line 1143
-// ICT reference expansion line 1144
-// ICT reference expansion line 1145
-// ICT reference expansion line 1146
-// ICT reference expansion line 1147
-// ICT reference expansion line 1148
-// ICT reference expansion line 1149
-// ICT reference expansion line 1150
-// ICT reference expansion line 1151
-// ICT reference expansion line 1152
-// ICT reference expansion line 1153
-// ICT reference expansion line 1154
-// ICT reference expansion line 1155
-// ICT reference expansion line 1156
-// ICT reference expansion line 1157
-// ICT reference expansion line 1158
-// ICT reference expansion line 1159
-// ICT reference expansion line 1160
-// ICT reference expansion line 1161
-// ICT reference expansion line 1162
-// ICT reference expansion line 1163
-// ICT reference expansion line 1164
-// ICT reference expansion line 1165
-// ICT reference expansion line 1166
-// ICT reference expansion line 1167
-// ICT reference expansion line 1168
-// ICT reference expansion line 1169
-// ICT reference expansion line 1170
-// ICT reference expansion line 1171
-// ICT reference expansion line 1172
-// ICT reference expansion line 1173
-// ICT reference expansion line 1174
-// ICT reference expansion line 1175
-// ICT reference expansion line 1176
-// ICT reference expansion line 1177
-// ICT reference expansion line 1178
-// ICT reference expansion line 1179
-// ICT reference expansion line 1180
-// ICT reference expansion line 1181
-// ICT reference expansion line 1182
-// ICT reference expansion line 1183
-// ICT reference expansion line 1184
-// ICT reference expansion line 1185
-// ICT reference expansion line 1186
-// ICT reference expansion line 1187
-// ICT reference expansion line 1188
-// ICT reference expansion line 1189
-// ICT reference expansion line 1190
-// ICT reference expansion line 1191
-// ICT reference expansion line 1192
-// ICT reference expansion line 1193
-// ICT reference expansion line 1194
-// ICT reference expansion line 1195
-// ICT reference expansion line 1196
-// ICT reference expansion line 1197
-// ICT reference expansion line 1198
-// ICT reference expansion line 1199
-// ICT reference expansion line 1200
-// ICT reference expansion line 1201
-// ICT reference expansion line 1202
-// ICT reference expansion line 1203
-// ICT reference expansion line 1204
-// ICT reference expansion line 1205
-// ICT reference expansion line 1206
-// ICT reference expansion line 1207
-// ICT reference expansion line 1208
-// ICT reference expansion line 1209
-// ICT reference expansion line 1210
-// ICT reference expansion line 1211
-// ICT reference expansion line 1212
-// ICT reference expansion line 1213
-// ICT reference expansion line 1214
-// ICT reference expansion line 1215
-// ICT reference expansion line 1216
-// ICT reference expansion line 1217
-// ICT reference expansion line 1218
-// ICT reference expansion line 1219
-// ICT reference expansion line 1220
-// ICT reference expansion line 1221
-// ICT reference expansion line 1222
-// ICT reference expansion line 1223
-// ICT reference expansion line 1224
-// ICT reference expansion line 1225
-// ICT reference expansion line 1226
-// ICT reference expansion line 1227
-// ICT reference expansion line 1228
-// ICT reference expansion line 1229
-// ICT reference expansion line 1230
-// ICT reference expansion line 1231
-// ICT reference expansion line 1232
-// ICT reference expansion line 1233
-// ICT reference expansion line 1234
-// ICT reference expansion line 1235
-// ICT reference expansion line 1236
-// ICT reference expansion line 1237
-// ICT reference expansion line 1238
-// ICT reference expansion line 1239
-// ICT reference expansion line 1240
-// ICT reference expansion line 1241
-// ICT reference expansion line 1242
-// ICT reference expansion line 1243
-// ICT reference expansion line 1244
-// ICT reference expansion line 1245
-// ICT reference expansion line 1246
-// ICT reference expansion line 1247
-// ICT reference expansion line 1248
-// ICT reference expansion line 1249
-// ICT reference expansion line 1250
-// ICT reference expansion line 1251
-// ICT reference expansion line 1252
-// ICT reference expansion line 1253
-// ICT reference expansion line 1254
-// ICT reference expansion line 1255
-// ICT reference expansion line 1256
-// ICT reference expansion line 1257
-// ICT reference expansion line 1258
-// ICT reference expansion line 1259
-// ICT reference expansion line 1260
-// ICT reference expansion line 1261
-// ICT reference expansion line 1262
-// ICT reference expansion line 1263
-// ICT reference expansion line 1264
-// ICT reference expansion line 1265
-// ICT reference expansion line 1266
-// ICT reference expansion line 1267
-// ICT reference expansion line 1268
-// ICT reference expansion line 1269
-// ICT reference expansion line 1270
-// ICT reference expansion line 1271
-// ICT reference expansion line 1272
-// ICT reference expansion line 1273
-// ICT reference expansion line 1274
-// ICT reference expansion line 1275
-// ICT reference expansion line 1276
-// ICT reference expansion line 1277
-// ICT reference expansion line 1278
-// ICT reference expansion line 1279
-// ICT reference expansion line 1280
-// ICT reference expansion line 1281
-// ICT reference expansion line 1282
-// ICT reference expansion line 1283
-// ICT reference expansion line 1284
-// ICT reference expansion line 1285
-// ICT reference expansion line 1286
-// ICT reference expansion line 1287
-// ICT reference expansion line 1288
-// ICT reference expansion line 1289
-// ICT reference expansion line 1290
-// ICT reference expansion line 1291
-// ICT reference expansion line 1292
-// ICT reference expansion line 1293
-// ICT reference expansion line 1294
-// ICT reference expansion line 1295
-// ICT reference expansion line 1296
-// ICT reference expansion line 1297
-// ICT reference expansion line 1298
-// ICT reference expansion line 1299
-// ICT reference expansion line 1300
-// ICT reference expansion line 1301
-// ICT reference expansion line 1302
-// ICT reference expansion line 1303
-// ICT reference expansion line 1304
-// ICT reference expansion line 1305
-// ICT reference expansion line 1306
-// ICT reference expansion line 1307
-// ICT reference expansion line 1308
-// ICT reference expansion line 1309
-// ICT reference expansion line 1310
-// ICT reference expansion line 1311
-// ICT reference expansion line 1312
-// ICT reference expansion line 1313
-// ICT reference expansion line 1314
-// ICT reference expansion line 1315
-// ICT reference expansion line 1316
-// ICT reference expansion line 1317
-// ICT reference expansion line 1318
-// ICT reference expansion line 1319
-// ICT reference expansion line 1320
-// ICT reference expansion line 1321
-// ICT reference expansion line 1322
-// ICT reference expansion line 1323
-// ICT reference expansion line 1324
-// ICT reference expansion line 1325
-// ICT reference expansion line 1326
-// ICT reference expansion line 1327
-// ICT reference expansion line 1328
-// ICT reference expansion line 1329
-// ICT reference expansion line 1330
-// ICT reference expansion line 1331
-// ICT reference expansion line 1332
-// ICT reference expansion line 1333
-// ICT reference expansion line 1334
-// ICT reference expansion line 1335
-// ICT reference expansion line 1336
-// ICT reference expansion line 1337
-// ICT reference expansion line 1338
-// ICT reference expansion line 1339
-// ICT reference expansion line 1340
-// ICT reference expansion line 1341
-// ICT reference expansion line 1342
-// ICT reference expansion line 1343
-// ICT reference expansion line 1344
-// ICT reference expansion line 1345
-// ICT reference expansion line 1346
-// ICT reference expansion line 1347
-// ICT reference expansion line 1348
-// ICT reference expansion line 1349
-// ICT reference expansion line 1350
-// ICT reference expansion line 1351
-// ICT reference expansion line 1352
-// ICT reference expansion line 1353
-// ICT reference expansion line 1354
-// ICT reference expansion line 1355
-// ICT reference expansion line 1356
-// ICT reference expansion line 1357
-// ICT reference expansion line 1358
-// ICT reference expansion line 1359
-// ICT reference expansion line 1360
-// ICT reference expansion line 1361
-// ICT reference expansion line 1362
-// ICT reference expansion line 1363
-// ICT reference expansion line 1364
-// ICT reference expansion line 1365
-// ICT reference expansion line 1366
-// ICT reference expansion line 1367
-// ICT reference expansion line 1368
-// ICT reference expansion line 1369
-// ICT reference expansion line 1370
-// ICT reference expansion line 1371
-// ICT reference expansion line 1372
-// ICT reference expansion line 1373
-// ICT reference expansion line 1374
-// ICT reference expansion line 1375
-// ICT reference expansion line 1376
-// ICT reference expansion line 1377
-// ICT reference expansion line 1378
-// ICT reference expansion line 1379
-// ICT reference expansion line 1380
-// ICT reference expansion line 1381
-// ICT reference expansion line 1382
-// ICT reference expansion line 1383
-// ICT reference expansion line 1384
-// ICT reference expansion line 1385
-// ICT reference expansion line 1386
-// ICT reference expansion line 1387
-// ICT reference expansion line 1388
-// ICT reference expansion line 1389
-// ICT reference expansion line 1390
-// ICT reference expansion line 1391
-// ICT reference expansion line 1392
-// ICT reference expansion line 1393
-// ICT reference expansion line 1394
-// ICT reference expansion line 1395
-// ICT reference expansion line 1396
-// ICT reference expansion line 1397
-// ICT reference expansion line 1398
-// ICT reference expansion line 1399
-// ICT reference expansion line 1400
-// ICT reference expansion line 1401
-// ICT reference expansion line 1402
-// ICT reference expansion line 1403
-// ICT reference expansion line 1404
-// ICT reference expansion line 1405
-// ICT reference expansion line 1406
-// ICT reference expansion line 1407
-// ICT reference expansion line 1408
-// ICT reference expansion line 1409
-// ICT reference expansion line 1410
-// ICT reference expansion line 1411
-// ICT reference expansion line 1412
-// ICT reference expansion line 1413
-// ICT reference expansion line 1414
-// ICT reference expansion line 1415
-// ICT reference expansion line 1416
-// ICT reference expansion line 1417
-// ICT reference expansion line 1418
-// ICT reference expansion line 1419
-// ICT reference expansion line 1420
-// ICT reference expansion line 1421
-// ICT reference expansion line 1422
-// ICT reference expansion line 1423
-// ICT reference expansion line 1424
-// ICT reference expansion line 1425
-// ICT reference expansion line 1426
-// ICT reference expansion line 1427
-// ICT reference expansion line 1428
-// ICT reference expansion line 1429
-// ICT reference expansion line 1430
-// ICT reference expansion line 1431
-// ICT reference expansion line 1432
-// ICT reference expansion line 1433
-// ICT reference expansion line 1434
-// ICT reference expansion line 1435
-// ICT reference expansion line 1436
-// ICT reference expansion line 1437
-// ICT reference expansion line 1438
-// ICT reference expansion line 1439
-// ICT reference expansion line 1440
-// ICT reference expansion line 1441
-// ICT reference expansion line 1442
-// ICT reference expansion line 1443
-// ICT reference expansion line 1444
-// ICT reference expansion line 1445
-// ICT reference expansion line 1446
-// ICT reference expansion line 1447
-// ICT reference expansion line 1448
-// ICT reference expansion line 1449
-// ICT reference expansion line 1450
-// ICT reference expansion line 1451
-// ICT reference expansion line 1452
-// ICT reference expansion line 1453
-// ICT reference expansion line 1454
-// ICT reference expansion line 1455
-// ICT reference expansion line 1456
-// ICT reference expansion line 1457
-// ICT reference expansion line 1458
-// ICT reference expansion line 1459
-// ICT reference expansion line 1460
-// ICT reference expansion line 1461
-// ICT reference expansion line 1462
-// ICT reference expansion line 1463
-// ICT reference expansion line 1464
-// ICT reference expansion line 1465
-// ICT reference expansion line 1466
-// ICT reference expansion line 1467
-// ICT reference expansion line 1468
-// ICT reference expansion line 1469
-// ICT reference expansion line 1470
-// ICT reference expansion line 1471
-// ICT reference expansion line 1472
-// ICT reference expansion line 1473
-// ICT reference expansion line 1474
-// ICT reference expansion line 1475
-// ICT reference expansion line 1476
-// ICT reference expansion line 1477
-// ICT reference expansion line 1478
-// ICT reference expansion line 1479
-// ICT reference expansion line 1480
-// ICT reference expansion line 1481
-// ICT reference expansion line 1482
-// ICT reference expansion line 1483
-// ICT reference expansion line 1484
-// ICT reference expansion line 1485
-// ICT reference expansion line 1486
-// ICT reference expansion line 1487
-// ICT reference expansion line 1488
-// ICT reference expansion line 1489
-// ICT reference expansion line 1490
-// ICT reference expansion line 1491
-// ICT reference expansion line 1492
-// ICT reference expansion line 1493
-// ICT reference expansion line 1494
-// ICT reference expansion line 1495
-// ICT reference expansion line 1496
-// ICT reference expansion line 1497
-// ICT reference expansion line 1498
-// ICT reference expansion line 1499
-// ICT reference expansion line 1500
-// ICT reference expansion line 1501
-// ICT reference expansion line 1502
-// ICT reference expansion line 1503
-// ICT reference expansion line 1504
-// ICT reference expansion line 1505
-// ICT reference expansion line 1506
-// ICT reference expansion line 1507
-// ICT reference expansion line 1508
-// ICT reference expansion line 1509
-// ICT reference expansion line 1510
-// ICT reference expansion line 1511
-// ICT reference expansion line 1512
-// ICT reference expansion line 1513
-// ICT reference expansion line 1514
-// ICT reference expansion line 1515
-// ICT reference expansion line 1516
-// ICT reference expansion line 1517
-// ICT reference expansion line 1518
-// ICT reference expansion line 1519
-// ICT reference expansion line 1520
-// ICT reference expansion line 1521
-// ICT reference expansion line 1522
-// ICT reference expansion line 1523
-// ICT reference expansion line 1524
-// ICT reference expansion line 1525
-// ICT reference expansion line 1526
-// ICT reference expansion line 1527
-// ICT reference expansion line 1528
-// ICT reference expansion line 1529
-// ICT reference expansion line 1530
-// ICT reference expansion line 1531
-// ICT reference expansion line 1532
-// ICT reference expansion line 1533
-// ICT reference expansion line 1534
-// ICT reference expansion line 1535
-// ICT reference expansion line 1536
-// ICT reference expansion line 1537
-// ICT reference expansion line 1538
-// ICT reference expansion line 1539
-// ICT reference expansion line 1540
-// ICT reference expansion line 1541
-// ICT reference expansion line 1542
-// ICT reference expansion line 1543
-// ICT reference expansion line 1544
-// ICT reference expansion line 1545
-// ICT reference expansion line 1546
-// ICT reference expansion line 1547
-// ICT reference expansion line 1548
-// ICT reference expansion line 1549
-// ICT reference expansion line 1550
-// ICT reference expansion line 1551
-// ICT reference expansion line 1552
-// ICT reference expansion line 1553
-// ICT reference expansion line 1554
-// ICT reference expansion line 1555
-// ICT reference expansion line 1556
-// ICT reference expansion line 1557
-// ICT reference expansion line 1558
-// ICT reference expansion line 1559
-// ICT reference expansion line 1560
-// ICT reference expansion line 1561
-// ICT reference expansion line 1562
-// ICT reference expansion line 1563
-// ICT reference expansion line 1564
-// ICT reference expansion line 1565
-// ICT reference expansion line 1566
-// ICT reference expansion line 1567
-// ICT reference expansion line 1568
-// ICT reference expansion line 1569
-// ICT reference expansion line 1570
-// ICT reference expansion line 1571
-// ICT reference expansion line 1572
-// ICT reference expansion line 1573
-// ICT reference expansion line 1574
-// ICT reference expansion line 1575
-// ICT reference expansion line 1576
-// ICT reference expansion line 1577
-// ICT reference expansion line 1578
-// ICT reference expansion line 1579
-// ICT reference expansion line 1580
-// ICT reference expansion line 1581
-// ICT reference expansion line 1582
-// ICT reference expansion line 1583
-// ICT reference expansion line 1584
-// ICT reference expansion line 1585
-// ICT reference expansion line 1586
-// ICT reference expansion line 1587
-// ICT reference expansion line 1588
-// ICT reference expansion line 1589
-// ICT reference expansion line 1590
-// ICT reference expansion line 1591
-// ICT reference expansion line 1592
-// ICT reference expansion line 1593
-// ICT reference expansion line 1594
-// ICT reference expansion line 1595
-// ICT reference expansion line 1596
-// ICT reference expansion line 1597
-// ICT reference expansion line 1598
-// ICT reference expansion line 1599
-// ICT reference expansion line 1600
-// ICT reference expansion line 1601
-// ICT reference expansion line 1602
-// ICT reference expansion line 1603
-// ICT reference expansion line 1604
-// ICT reference expansion line 1605
-// ICT reference expansion line 1606
-// ICT reference expansion line 1607
-// ICT reference expansion line 1608
-// ICT reference expansion line 1609
-// ICT reference expansion line 1610
-// ICT reference expansion line 1611
-// ICT reference expansion line 1612
-// ICT reference expansion line 1613
-// ICT reference expansion line 1614
-// ICT reference expansion line 1615
-// ICT reference expansion line 1616
-// ICT reference expansion line 1617
-// ICT reference expansion line 1618
-// ICT reference expansion line 1619
-// ICT reference expansion line 1620
-// ICT reference expansion line 1621
-// ICT reference expansion line 1622
-// ICT reference expansion line 1623
-// ICT reference expansion line 1624
-// ICT reference expansion line 1625
-// ICT reference expansion line 1626
-// ICT reference expansion line 1627
-// ICT reference expansion line 1628
-// ICT reference expansion line 1629
-// ICT reference expansion line 1630
-// ICT reference expansion line 1631
-// ICT reference expansion line 1632
-// ICT reference expansion line 1633
-// ICT reference expansion line 1634
-// ICT reference expansion line 1635
-// ICT reference expansion line 1636
-// ICT reference expansion line 1637
-// ICT reference expansion line 1638
-// ICT reference expansion line 1639
-// ICT reference expansion line 1640
-// ICT reference expansion line 1641
-// ICT reference expansion line 1642
-// ICT reference expansion line 1643
-// ICT reference expansion line 1644
-// ICT reference expansion line 1645
-// ICT reference expansion line 1646
-// ICT reference expansion line 1647
-// ICT reference expansion line 1648
-// ICT reference expansion line 1649
-// ICT reference expansion line 1650
-// ICT reference expansion line 1651
-// ICT reference expansion line 1652
-// ICT reference expansion line 1653
-// ICT reference expansion line 1654
-// ICT reference expansion line 1655
-// ICT reference expansion line 1656
-// ICT reference expansion line 1657
-// ICT reference expansion line 1658
-// ICT reference expansion line 1659
-// ICT reference expansion line 1660
-// ICT reference expansion line 1661
-// ICT reference expansion line 1662
-// ICT reference expansion line 1663
-// ICT reference expansion line 1664
-// ICT reference expansion line 1665
-// ICT reference expansion line 1666
-// ICT reference expansion line 1667
-// ICT reference expansion line 1668
-// ICT reference expansion line 1669
-// ICT reference expansion line 1670
-// ICT reference expansion line 1671
-// ICT reference expansion line 1672
-// ICT reference expansion line 1673
-// ICT reference expansion line 1674
-// ICT reference expansion line 1675
-// ICT reference expansion line 1676
-// ICT reference expansion line 1677
-// ICT reference expansion line 1678
-// ICT reference expansion line 1679
-// ICT reference expansion line 1680
-// ICT reference expansion line 1681
-// ICT reference expansion line 1682
-// ICT reference expansion line 1683
-// ICT reference expansion line 1684
-// ICT reference expansion line 1685
-// ICT reference expansion line 1686
-// ICT reference expansion line 1687
-// ICT reference expansion line 1688
-// ICT reference expansion line 1689
-// ICT reference expansion line 1690
-// ICT reference expansion line 1691
-// ICT reference expansion line 1692
-// ICT reference expansion line 1693
-// ICT reference expansion line 1694
-// ICT reference expansion line 1695
-// ICT reference expansion line 1696
-// ICT reference expansion line 1697
-// ICT reference expansion line 1698
-// ICT reference expansion line 1699
-// ICT reference expansion line 1700
-// ICT reference expansion line 1701
-// ICT reference expansion line 1702
-// ICT reference expansion line 1703
-// ICT reference expansion line 1704
-// ICT reference expansion line 1705
-// ICT reference expansion line 1706
-// ICT reference expansion line 1707
-// ICT reference expansion line 1708
-// ICT reference expansion line 1709
-// ICT reference expansion line 1710
-// ICT reference expansion line 1711
-// ICT reference expansion line 1712
-// ICT reference expansion line 1713
-// ICT reference expansion line 1714
-// ICT reference expansion line 1715
-// ICT reference expansion line 1716
-// ICT reference expansion line 1717
-// ICT reference expansion line 1718
-// ICT reference expansion line 1719
-// ICT reference expansion line 1720
-// ICT reference expansion line 1721
-// ICT reference expansion line 1722
-// ICT reference expansion line 1723
-// ICT reference expansion line 1724
-// ICT reference expansion line 1725
-// ICT reference expansion line 1726
-// ICT reference expansion line 1727
-// ICT reference expansion line 1728
-// ICT reference expansion line 1729
-// ICT reference expansion line 1730
-// ICT reference expansion line 1731
-// ICT reference expansion line 1732
-// ICT reference expansion line 1733
-// ICT reference expansion line 1734
-// ICT reference expansion line 1735
-// ICT reference expansion line 1736
-// ICT reference expansion line 1737
-// ICT reference expansion line 1738
-// ICT reference expansion line 1739
-// ICT reference expansion line 1740
-// ICT reference expansion line 1741
-// ICT reference expansion line 1742
-// ICT reference expansion line 1743
-// ICT reference expansion line 1744
-// ICT reference expansion line 1745
-// ICT reference expansion line 1746
-// ICT reference expansion line 1747
-// ICT reference expansion line 1748
-// ICT reference expansion line 1749
-// ICT reference expansion line 1750
-// ICT reference expansion line 1751
-// ICT reference expansion line 1752
-// ICT reference expansion line 1753
-// ICT reference expansion line 1754
-// ICT reference expansion line 1755
-// ICT reference expansion line 1756
-// ICT reference expansion line 1757
-// ICT reference expansion line 1758
-// ICT reference expansion line 1759
-// ICT reference expansion line 1760
-// ICT reference expansion line 1761
-// ICT reference expansion line 1762
-// ICT reference expansion line 1763
-// ICT reference expansion line 1764
-// ICT reference expansion line 1765
-// ICT reference expansion line 1766
-// ICT reference expansion line 1767
-// ICT reference expansion line 1768
-// ICT reference expansion line 1769
-// ICT reference expansion line 1770
-// ICT reference expansion line 1771
-// ICT reference expansion line 1772
-// ICT reference expansion line 1773
-// ICT reference expansion line 1774
-// ICT reference expansion line 1775
-// ICT reference expansion line 1776
-// ICT reference expansion line 1777
-// ICT reference expansion line 1778
-// ICT reference expansion line 1779
-// ICT reference expansion line 1780
-// ICT reference expansion line 1781
-// ICT reference expansion line 1782
-// ICT reference expansion line 1783
-// ICT reference expansion line 1784
-// ICT reference expansion line 1785
-// ICT reference expansion line 1786
-// ICT reference expansion line 1787
-// ICT reference expansion line 1788
-// ICT reference expansion line 1789
-// ICT reference expansion line 1790
-// ICT reference expansion line 1791
-// ICT reference expansion line 1792
-// ICT reference expansion line 1793
-// ICT reference expansion line 1794
-// ICT reference expansion line 1795
-// ICT reference expansion line 1796
-// ICT reference expansion line 1797
-// ICT reference expansion line 1798
-// ICT reference expansion line 1799
-// ICT reference expansion line 1800
-// ICT reference expansion line 1801
-// ICT reference expansion line 1802
-// ICT reference expansion line 1803
-// ICT reference expansion line 1804
-// ICT reference expansion line 1805
-// ICT reference expansion line 1806
-// ICT reference expansion line 1807
-// ICT reference expansion line 1808
-// ICT reference expansion line 1809
-// ICT reference expansion line 1810
-// ICT reference expansion line 1811
-// ICT reference expansion line 1812
-// ICT reference expansion line 1813
-// ICT reference expansion line 1814
-// ICT reference expansion line 1815
-// ICT reference expansion line 1816
-// ICT reference expansion line 1817
-// ICT reference expansion line 1818
-// ICT reference expansion line 1819
-// ICT reference expansion line 1820
-// ICT reference expansion line 1821
-// ICT reference expansion line 1822
-// ICT reference expansion line 1823
-// ICT reference expansion line 1824
-// ICT reference expansion line 1825
-// ICT reference expansion line 1826
-// ICT reference expansion line 1827
-// ICT reference expansion line 1828
-// ICT reference expansion line 1829
-// ICT reference expansion line 1830
-// ICT reference expansion line 1831
-// ICT reference expansion line 1832
-// ICT reference expansion line 1833
-// ICT reference expansion line 1834
-// ICT reference expansion line 1835
-// ICT reference expansion line 1836
-// ICT reference expansion line 1837
-// ICT reference expansion line 1838
-// ICT reference expansion line 1839
-// ICT reference expansion line 1840
-// ICT reference expansion line 1841
-// ICT reference expansion line 1842
-// ICT reference expansion line 1843
-// ICT reference expansion line 1844
-// ICT reference expansion line 1845
-// ICT reference expansion line 1846
-// ICT reference expansion line 1847
-// ICT reference expansion line 1848
-// ICT reference expansion line 1849
-// ICT reference expansion line 1850
-// ICT reference expansion line 1851
-// ICT reference expansion line 1852
-// ICT reference expansion line 1853
-// ICT reference expansion line 1854
-// ICT reference expansion line 1855
-// ICT reference expansion line 1856
-// ICT reference expansion line 1857
-// ICT reference expansion line 1858
-// ICT reference expansion line 1859
-// ICT reference expansion line 1860
-// ICT reference expansion line 1861
-// ICT reference expansion line 1862
-// ICT reference expansion line 1863
-// ICT reference expansion line 1864
-// ICT reference expansion line 1865
-// ICT reference expansion line 1866
-// ICT reference expansion line 1867
-// ICT reference expansion line 1868
-// ICT reference expansion line 1869
-// ICT reference expansion line 1870
-// ICT reference expansion line 1871
-// ICT reference expansion line 1872
-// ICT reference expansion line 1873
-// ICT reference expansion line 1874
-// ICT reference expansion line 1875
-// ICT reference expansion line 1876
-// ICT reference expansion line 1877
-// ICT reference expansion line 1878
-// ICT reference expansion line 1879
-// ICT reference expansion line 1880
-// ICT reference expansion line 1881
-// ICT reference expansion line 1882
-// ICT reference expansion line 1883
-// ICT reference expansion line 1884
-// ICT reference expansion line 1885
-// ICT reference expansion line 1886
-// ICT reference expansion line 1887
-// ICT reference expansion line 1888
-// ICT reference expansion line 1889
-// ICT reference expansion line 1890
-// ICT reference expansion line 1891
-// ICT reference expansion line 1892
-// ICT reference expansion line 1893
-// ICT reference expansion line 1894
-// ICT reference expansion line 1895
-// ICT reference expansion line 1896
-// ICT reference expansion line 1897
-// ICT reference expansion line 1898
-// ICT reference expansion line 1899
-// ICT reference expansion line 1900
-// ICT reference expansion line 1901
-// ICT reference expansion line 1902
-// ICT reference expansion line 1903
-// ICT reference expansion line 1904
-// ICT reference expansion line 1905
-// ICT reference expansion line 1906
-// ICT reference expansion line 1907
-// ICT reference expansion line 1908
-// ICT reference expansion line 1909
-// ICT reference expansion line 1910
-// ICT reference expansion line 1911
-// ICT reference expansion line 1912
-// ICT reference expansion line 1913
-// ICT reference expansion line 1914
-// ICT reference expansion line 1915
-// ICT reference expansion line 1916
-// ICT reference expansion line 1917
-// ICT reference expansion line 1918
-// ICT reference expansion line 1919
-// ICT reference expansion line 1920
-// ICT reference expansion line 1921
-// ICT reference expansion line 1922
-// ICT reference expansion line 1923
-// ICT reference expansion line 1924
-// ICT reference expansion line 1925
-// ICT reference expansion line 1926
-// ICT reference expansion line 1927
-// ICT reference expansion line 1928
-// ICT reference expansion line 1929
-// ICT reference expansion line 1930
-// ICT reference expansion line 1931
-// ICT reference expansion line 1932
-// ICT reference expansion line 1933
-// ICT reference expansion line 1934
-// ICT reference expansion line 1935
-// ICT reference expansion line 1936
-// ICT reference expansion line 1937
-// ICT reference expansion line 1938
-// ICT reference expansion line 1939
-// ICT reference expansion line 1940
-// ICT reference expansion line 1941
-// ICT reference expansion line 1942
-// ICT reference expansion line 1943
-// ICT reference expansion line 1944
-// ICT reference expansion line 1945
-// ICT reference expansion line 1946
-// ICT reference expansion line 1947
-// ICT reference expansion line 1948
-// ICT reference expansion line 1949
-// ICT reference expansion line 1950
-// ICT reference expansion line 1951
-// ICT reference expansion line 1952
-// ICT reference expansion line 1953
-// ICT reference expansion line 1954
-// ICT reference expansion line 1955
-// ICT reference expansion line 1956
-// ICT reference expansion line 1957
-// ICT reference expansion line 1958
-// ICT reference expansion line 1959
-// ICT reference expansion line 1960
-// ICT reference expansion line 1961
-// ICT reference expansion line 1962
-// ICT reference expansion line 1963
-// ICT reference expansion line 1964
-// ICT reference expansion line 1965
-// ICT reference expansion line 1966
-// ICT reference expansion line 1967
-// ICT reference expansion line 1968
-// ICT reference expansion line 1969
-// ICT reference expansion line 1970
-// ICT reference expansion line 1971
-// ICT reference expansion line 1972
-// ICT reference expansion line 1973
-// ICT reference expansion line 1974
-// ICT reference expansion line 1975
-// ICT reference expansion line 1976
-// ICT reference expansion line 1977
-// ICT reference expansion line 1978
-// ICT reference expansion line 1979
-// ICT reference expansion line 1980
-// ICT reference expansion line 1981
-// ICT reference expansion line 1982
-// ICT reference expansion line 1983
-// ICT reference expansion line 1984
-// ICT reference expansion line 1985
-// ICT reference expansion line 1986
-// ICT reference expansion line 1987
-// ICT reference expansion line 1988
-// ICT reference expansion line 1989
-// ICT reference expansion line 1990
-// ICT reference expansion line 1991
-// ICT reference expansion line 1992
-// ICT reference expansion line 1993
-// ICT reference expansion line 1994
-// ICT reference expansion line 1995
-// ICT reference expansion line 1996
-// ICT reference expansion line 1997
-// ICT reference expansion line 1998
-// ICT reference expansion line 1999
-// ICT reference expansion line 2000
-// ICT reference expansion line 2001
-// ICT reference expansion line 2002
-// ICT reference expansion line 2003
-// ICT reference expansion line 2004
-// ICT reference expansion line 2005
-// ICT reference expansion line 2006
-// ICT reference expansion line 2007
-// ICT reference expansion line 2008
-// ICT reference expansion line 2009
-// ICT reference expansion line 2010
-// ICT reference expansion line 2011
-// ICT reference expansion line 2012
-// ICT reference expansion line 2013
-// ICT reference expansion line 2014
-// ICT reference expansion line 2015
-// ICT reference expansion line 2016
-// ICT reference expansion line 2017
-// ICT reference expansion line 2018
-// ICT reference expansion line 2019
-// ICT reference expansion line 2020
-// ICT reference expansion line 2021
-// ICT reference expansion line 2022
-// ICT reference expansion line 2023
-// ICT reference expansion line 2024
-// ICT reference expansion line 2025
-// ICT reference expansion line 2026
-// ICT reference expansion line 2027
-// ICT reference expansion line 2028
-// ICT reference expansion line 2029
-// ICT reference expansion line 2030
-// ICT reference expansion line 2031
-// ICT reference expansion line 2032
-// ICT reference expansion line 2033
-// ICT reference expansion line 2034
-// ICT reference expansion line 2035
-// ICT reference expansion line 2036
-// ICT reference expansion line 2037
-// ICT reference expansion line 2038
-// ICT reference expansion line 2039
-// ICT reference expansion line 2040
-// ICT reference expansion line 2041
-// ICT reference expansion line 2042
-// ICT reference expansion line 2043
-// ICT reference expansion line 2044
-// ICT reference expansion line 2045
-// ICT reference expansion line 2046
-// ICT reference expansion line 2047
-// ICT reference expansion line 2048
-// ICT reference expansion line 2049
-// ICT reference expansion line 2050
-// ICT reference expansion line 2051
-// ICT reference expansion line 2052
-// ICT reference expansion line 2053
-// ICT reference expansion line 2054
-// ICT reference expansion line 2055
-// ICT reference expansion line 2056
-// ICT reference expansion line 2057
-// ICT reference expansion line 2058
-// ICT reference expansion line 2059
-// ICT reference expansion line 2060
-// ICT reference expansion line 2061
-// ICT reference expansion line 2062
-// ICT reference expansion line 2063
-// ICT reference expansion line 2064
-// ICT reference expansion line 2065
-// ICT reference expansion line 2066
-// ICT reference expansion line 2067
-// ICT reference expansion line 2068
-// ICT reference expansion line 2069
-// ICT reference expansion line 2070
-// ICT reference expansion line 2071
-// ICT reference expansion line 2072
-// ICT reference expansion line 2073
-// ICT reference expansion line 2074
-// ICT reference expansion line 2075
-// ICT reference expansion line 2076
-// ICT reference expansion line 2077
-// ICT reference expansion line 2078
-// ICT reference expansion line 2079
-// ICT reference expansion line 2080
-// ICT reference expansion line 2081
-// ICT reference expansion line 2082
-// ICT reference expansion line 2083
-// ICT reference expansion line 2084
-// ICT reference expansion line 2085
-// ICT reference expansion line 2086
-// ICT reference expansion line 2087
-// ICT reference expansion line 2088
-// ICT reference expansion line 2089
-// ICT reference expansion line 2090
-// ICT reference expansion line 2091
-// ICT reference expansion line 2092
-// ICT reference expansion line 2093
-// ICT reference expansion line 2094
-// ICT reference expansion line 2095
-// ICT reference expansion line 2096
-// ICT reference expansion line 2097
-// ICT reference expansion line 2098
-// ICT reference expansion line 2099
-// ICT reference expansion line 2100
-// ICT reference expansion line 2101
-// ICT reference expansion line 2102
-// ICT reference expansion line 2103
-// ICT reference expansion line 2104
-// ICT reference expansion line 2105
-// ICT reference expansion line 2106
-// ICT reference expansion line 2107
-// ICT reference expansion line 2108
-// ICT reference expansion line 2109
-// ICT reference expansion line 2110
-// ICT reference expansion line 2111
-// ICT reference expansion line 2112
-// ICT reference expansion line 2113
-// ICT reference expansion line 2114
-// ICT reference expansion line 2115
-// ICT reference expansion line 2116
-// ICT reference expansion line 2117
-// ICT reference expansion line 2118
-// ICT reference expansion line 2119
-// ICT reference expansion line 2120
-// ICT reference expansion line 2121
-// ICT reference expansion line 2122
-// ICT reference expansion line 2123
-// ICT reference expansion line 2124
-// ICT reference expansion line 2125
-// ICT reference expansion line 2126
-// ICT reference expansion line 2127
-// ICT reference expansion line 2128
-// ICT reference expansion line 2129
-// ICT reference expansion line 2130
-// ICT reference expansion line 2131
-// ICT reference expansion line 2132
-// ICT reference expansion line 2133
-// ICT reference expansion line 2134
-// ICT reference expansion line 2135
-// ICT reference expansion line 2136
-// ICT reference expansion line 2137
-// ICT reference expansion line 2138
-// ICT reference expansion line 2139
-// ICT reference expansion line 2140
-// ICT reference expansion line 2141
-// ICT reference expansion line 2142
-// ICT reference expansion line 2143
-// ICT reference expansion line 2144
-// ICT reference expansion line 2145
-// ICT reference expansion line 2146
-// ICT reference expansion line 2147
-// ICT reference expansion line 2148
-// ICT reference expansion line 2149
-// ICT reference expansion line 2150
-// ICT reference expansion line 2151
-// ICT reference expansion line 2152
-// ICT reference expansion line 2153
-// ICT reference expansion line 2154
-// ICT reference expansion line 2155
-// ICT reference expansion line 2156
-// ICT reference expansion line 2157
-// ICT reference expansion line 2158
-// ICT reference expansion line 2159
-// ICT reference expansion line 2160
-// ICT reference expansion line 2161
-// ICT reference expansion line 2162
-// ICT reference expansion line 2163
-// ICT reference expansion line 2164
-// ICT reference expansion line 2165
-// ICT reference expansion line 2166
-// ICT reference expansion line 2167
-// ICT reference expansion line 2168
-// ICT reference expansion line 2169
-// ICT reference expansion line 2170
-// ICT reference expansion line 2171
-// ICT reference expansion line 2172
-// ICT reference expansion line 2173
-// ICT reference expansion line 2174
-// ICT reference expansion line 2175
-// ICT reference expansion line 2176
-// ICT reference expansion line 2177
-// ICT reference expansion line 2178
-// ICT reference expansion line 2179
-// ICT reference expansion line 2180
-// ICT reference expansion line 2181
-// ICT reference expansion line 2182
-// ICT reference expansion line 2183
-// ICT reference expansion line 2184
-// ICT reference expansion line 2185
-// ICT reference expansion line 2186
-// ICT reference expansion line 2187
-// ICT reference expansion line 2188
-// ICT reference expansion line 2189
-// ICT reference expansion line 2190
-// ICT reference expansion line 2191
-// ICT reference expansion line 2192
-// ICT reference expansion line 2193
-// ICT reference expansion line 2194
-// ICT reference expansion line 2195
-// ICT reference expansion line 2196
-// ICT reference expansion line 2197
-// ICT reference expansion line 2198
-// ICT reference expansion line 2199
-// ICT reference expansion line 2200
-// ICT reference expansion line 2201
-// ICT reference expansion line 2202
-// ICT reference expansion line 2203
-// ICT reference expansion line 2204
-// ICT reference expansion line 2205
-// ICT reference expansion line 2206
-// ICT reference expansion line 2207
-// ICT reference expansion line 2208
-// ICT reference expansion line 2209
-// ICT reference expansion line 2210
-// ICT reference expansion line 2211
-// ICT reference expansion line 2212
-// ICT reference expansion line 2213
-// ICT reference expansion line 2214
-// ICT reference expansion line 2215
-// ICT reference expansion line 2216
-// ICT reference expansion line 2217
-// ICT reference expansion line 2218
-// ICT reference expansion line 2219
-// ICT reference expansion line 2220
-// ICT reference expansion line 2221
-// ICT reference expansion line 2222
-// ICT reference expansion line 2223
-// ICT reference expansion line 2224
-// ICT reference expansion line 2225
-// ICT reference expansion line 2226
-// ICT reference expansion line 2227
-// ICT reference expansion line 2228
-// ICT reference expansion line 2229
-// ICT reference expansion line 2230
-// ICT reference expansion line 2231
-// ICT reference expansion line 2232
-// ICT reference expansion line 2233
-// ICT reference expansion line 2234
-// ICT reference expansion line 2235
-// ICT reference expansion line 2236
-// ICT reference expansion line 2237
-// ICT reference expansion line 2238
-// ICT reference expansion line 2239
-// ICT reference expansion line 2240
-// ICT reference expansion line 2241
-// ICT reference expansion line 2242
-// ICT reference expansion line 2243
-// ICT reference expansion line 2244
-// ICT reference expansion line 2245
-// ICT reference expansion line 2246
-// ICT reference expansion line 2247
-// ICT reference expansion line 2248
-// ICT reference expansion line 2249
-// ICT reference expansion line 2250
-// ICT reference expansion line 2251
-// ICT reference expansion line 2252
-// ICT reference expansion line 2253
-// ICT reference expansion line 2254
-// ICT reference expansion line 2255
-// ICT reference expansion line 2256
-// ICT reference expansion line 2257
-// ICT reference expansion line 2258
-// ICT reference expansion line 2259
-// ICT reference expansion line 2260
-// ICT reference expansion line 2261
-// ICT reference expansion line 2262
-// ICT reference expansion line 2263
-// ICT reference expansion line 2264
-// ICT reference expansion line 2265
-// ICT reference expansion line 2266
-// ICT reference expansion line 2267
-// ICT reference expansion line 2268
-// ICT reference expansion line 2269
-// ICT reference expansion line 2270
-// ICT reference expansion line 2271
-// ICT reference expansion line 2272
-// ICT reference expansion line 2273
-// ICT reference expansion line 2274
-// ICT reference expansion line 2275
-// ICT reference expansion line 2276
-// ICT reference expansion line 2277
-// ICT reference expansion line 2278
-// ICT reference expansion line 2279
-// ICT reference expansion line 2280
-// ICT reference expansion line 2281
-// ICT reference expansion line 2282
-// ICT reference expansion line 2283
-// ICT reference expansion line 2284
-// ICT reference expansion line 2285
-// ICT reference expansion line 2286
-// ICT reference expansion line 2287
-// ICT reference expansion line 2288
-// ICT reference expansion line 2289
-// ICT reference expansion line 2290
-// ICT reference expansion line 2291
-// ICT reference expansion line 2292
-// ICT reference expansion line 2293
-// ICT reference expansion line 2294
-// ICT reference expansion line 2295
-// ICT reference expansion line 2296
-// ICT reference expansion line 2297
-// ICT reference expansion line 2298
-// ICT reference expansion line 2299
-// ICT reference expansion line 2300
-// ICT reference expansion line 2301
-// ICT reference expansion line 2302
-// ICT reference expansion line 2303
-// ICT reference expansion line 2304
-// ICT reference expansion line 2305
-// ICT reference expansion line 2306
-// ICT reference expansion line 2307
-// ICT reference expansion line 2308
-// ICT reference expansion line 2309
-// ICT reference expansion line 2310
-// ICT reference expansion line 2311
-// ICT reference expansion line 2312
-// ICT reference expansion line 2313
-// ICT reference expansion line 2314
-// ICT reference expansion line 2315
-// ICT reference expansion line 2316
-// ICT reference expansion line 2317
-// ICT reference expansion line 2318
-// ICT reference expansion line 2319
-// ICT reference expansion line 2320
-// ICT reference expansion line 2321
-// ICT reference expansion line 2322
-// ICT reference expansion line 2323
-// ICT reference expansion line 2324
-// ICT reference expansion line 2325
-// ICT reference expansion line 2326
-// ICT reference expansion line 2327
-// ICT reference expansion line 2328
-// ICT reference expansion line 2329
-// ICT reference expansion line 2330
-// ICT reference expansion line 2331
-// ICT reference expansion line 2332
-// ICT reference expansion line 2333
-// ICT reference expansion line 2334
-// ICT reference expansion line 2335
-// ICT reference expansion line 2336
-// ICT reference expansion line 2337
-// ICT reference expansion line 2338
-// ICT reference expansion line 2339
-// ICT reference expansion line 2340
-// ICT reference expansion line 2341
-// ICT reference expansion line 2342
-// ICT reference expansion line 2343
-// ICT reference expansion line 2344
-// ICT reference expansion line 2345
-// ICT reference expansion line 2346
-// ICT reference expansion line 2347
-// ICT reference expansion line 2348
-// ICT reference expansion line 2349
-// ICT reference expansion line 2350
-// ICT reference expansion line 2351
-// ICT reference expansion line 2352
-// ICT reference expansion line 2353
-// ICT reference expansion line 2354
-// ICT reference expansion line 2355
-// ICT reference expansion line 2356
-// ICT reference expansion line 2357
-// ICT reference expansion line 2358
-// ICT reference expansion line 2359
-// ICT reference expansion line 2360
-// ICT reference expansion line 2361
-// ICT reference expansion line 2362
-// ICT reference expansion line 2363
-// ICT reference expansion line 2364
-// ICT reference expansion line 2365
-// ICT reference expansion line 2366
-// ICT reference expansion line 2367
-// ICT reference expansion line 2368
-// ICT reference expansion line 2369
-// ICT reference expansion line 2370
-// ICT reference expansion line 2371
-// ICT reference expansion line 2372
-// ICT reference expansion line 2373
-// ICT reference expansion line 2374
-// ICT reference expansion line 2375
-// ICT reference expansion line 2376
-// ICT reference expansion line 2377
-// ICT reference expansion line 2378
-// ICT reference expansion line 2379
-// ICT reference expansion line 2380
-// ICT reference expansion line 2381
-// ICT reference expansion line 2382
-// ICT reference expansion line 2383
-// ICT reference expansion line 2384
-// ICT reference expansion line 2385
-// ICT reference expansion line 2386
-// ICT reference expansion line 2387
-// ICT reference expansion line 2388
-// ICT reference expansion line 2389
-// ICT reference expansion line 2390
-// ICT reference expansion line 2391
-// ICT reference expansion line 2392
-// ICT reference expansion line 2393
-// ICT reference expansion line 2394
-// ICT reference expansion line 2395
-// ICT reference expansion line 2396
-// ICT reference expansion line 2397
-// ICT reference expansion line 2398
-// ICT reference expansion line 2399
-// ICT reference expansion line 2400
-// ICT reference expansion line 2401
-// ICT reference expansion line 2402
-// ICT reference expansion line 2403
-// ICT reference expansion line 2404
-// ICT reference expansion line 2405
-// ICT reference expansion line 2406
-// ICT reference expansion line 2407
-// ICT reference expansion line 2408
-// ICT reference expansion line 2409
-// ICT reference expansion line 2410
-// ICT reference expansion line 2411
-// ICT reference expansion line 2412
-// ICT reference expansion line 2413
-// ICT reference expansion line 2414
-// ICT reference expansion line 2415
-// ICT reference expansion line 2416
-// ICT reference expansion line 2417
-// ICT reference expansion line 2418
-// ICT reference expansion line 2419
-// ICT reference expansion line 2420
-// ICT reference expansion line 2421
-// ICT reference expansion line 2422
-// ICT reference expansion line 2423
-// ICT reference expansion line 2424
-// ICT reference expansion line 2425
-// ICT reference expansion line 2426
-// ICT reference expansion line 2427
-// ICT reference expansion line 2428
-// ICT reference expansion line 2429
-// ICT reference expansion line 2430
-// ICT reference expansion line 2431
-// ICT reference expansion line 2432
-// ICT reference expansion line 2433
-// ICT reference expansion line 2434
-// ICT reference expansion line 2435
-// ICT reference expansion line 2436
-// ICT reference expansion line 2437
-// ICT reference expansion line 2438
-// ICT reference expansion line 2439
-// ICT reference expansion line 2440
-// ICT reference expansion line 2441
-// ICT reference expansion line 2442
-// ICT reference expansion line 2443
-// ICT reference expansion line 2444
-// ICT reference expansion line 2445
-// ICT reference expansion line 2446
-// ICT reference expansion line 2447
-// ICT reference expansion line 2448
-// ICT reference expansion line 2449
-// ICT reference expansion line 2450
-// ICT reference expansion line 2451
-// ICT reference expansion line 2452
-// ICT reference expansion line 2453
-// ICT reference expansion line 2454
-// ICT reference expansion line 2455
-// ICT reference expansion line 2456
-// ICT reference expansion line 2457
-// ICT reference expansion line 2458
-// ICT reference expansion line 2459
-// ICT reference expansion line 2460
-// ICT reference expansion line 2461
-// ICT reference expansion line 2462
-// ICT reference expansion line 2463
-// ICT reference expansion line 2464
-// ICT reference expansion line 2465
-// ICT reference expansion line 2466
-// ICT reference expansion line 2467
-// ICT reference expansion line 2468
-// ICT reference expansion line 2469
-// ICT reference expansion line 2470
-// ICT reference expansion line 2471
-// ICT reference expansion line 2472
-// ICT reference expansion line 2473
-// ICT reference expansion line 2474
-// ICT reference expansion line 2475
-// ICT reference expansion line 2476
-// ICT reference expansion line 2477
-// ICT reference expansion line 2478
-// ICT reference expansion line 2479
-// ICT reference expansion line 2480
-// ICT reference expansion line 2481
-// ICT reference expansion line 2482
-// ICT reference expansion line 2483
-// ICT reference expansion line 2484
-// ICT reference expansion line 2485
-// ICT reference expansion line 2486
-// ICT reference expansion line 2487
-// ICT reference expansion line 2488
-// ICT reference expansion line 2489
-// ICT reference expansion line 2490
-// ICT reference expansion line 2491
-// ICT reference expansion line 2492
-// ICT reference expansion line 2493
-// ICT reference expansion line 2494
-// ICT reference expansion line 2495
-// ICT reference expansion line 2496
-// ICT reference expansion line 2497
-// ICT reference expansion line 2498
-// ICT reference expansion line 2499
-// ICT reference expansion line 2500
-// ICT reference expansion line 2501
-// ICT reference expansion line 2502
-// ICT reference expansion line 2503
-// ICT reference expansion line 2504
-// ICT reference expansion line 2505
-// ICT reference expansion line 2506
-// ICT reference expansion line 2507
-// ICT reference expansion line 2508
-// ICT reference expansion line 2509
-// ICT reference expansion line 2510
-// ICT reference expansion line 2511
-// ICT reference expansion line 2512
-// ICT reference expansion line 2513
-// ICT reference expansion line 2514
-// ICT reference expansion line 2515
-// ICT reference expansion line 2516
-// ICT reference expansion line 2517
-// ICT reference expansion line 2518
-// ICT reference expansion line 2519
-// ICT reference expansion line 2520
-// ICT reference expansion line 2521
-// ICT reference expansion line 2522
-// ICT reference expansion line 2523
-// ICT reference expansion line 2524
-// ICT reference expansion line 2525
-// ICT reference expansion line 2526
-// ICT reference expansion line 2527
-// ICT reference expansion line 2528
-// ICT reference expansion line 2529
-// ICT reference expansion line 2530
-// ICT reference expansion line 2531
-// ICT reference expansion line 2532
-// ICT reference expansion line 2533
-// ICT reference expansion line 2534
-// ICT reference expansion line 2535
-// ICT reference expansion line 2536
-// ICT reference expansion line 2537
-// ICT reference expansion line 2538
-// ICT reference expansion line 2539
-// ICT reference expansion line 2540
-// ICT reference expansion line 2541
-// ICT reference expansion line 2542
-// ICT reference expansion line 2543
-// ICT reference expansion line 2544
-// ICT reference expansion line 2545
-// ICT reference expansion line 2546
-// ICT reference expansion line 2547
-// ICT reference expansion line 2548
-// ICT reference expansion line 2549
-// ICT reference expansion line 2550
-// ICT reference expansion line 2551
-// ICT reference expansion line 2552
-// ICT reference expansion line 2553
-// ICT reference expansion line 2554
-// ICT reference expansion line 2555
-// ICT reference expansion line 2556
-// ICT reference expansion line 2557
-// ICT reference expansion line 2558
-// ICT reference expansion line 2559
-// ICT reference expansion line 2560
-// ICT reference expansion line 2561
-// ICT reference expansion line 2562
-// ICT reference expansion line 2563
-// ICT reference expansion line 2564
-// ICT reference expansion line 2565
-// ICT reference expansion line 2566
-// ICT reference expansion line 2567
-// ICT reference expansion line 2568
-// ICT reference expansion line 2569
-// ICT reference expansion line 2570
-// ICT reference expansion line 2571
-// ICT reference expansion line 2572
-// ICT reference expansion line 2573
-// ICT reference expansion line 2574
-// ICT reference expansion line 2575
-// ICT reference expansion line 2576
-// ICT reference expansion line 2577
-// ICT reference expansion line 2578
-// ICT reference expansion line 2579
-// ICT reference expansion line 2580
-// ICT reference expansion line 2581
-// ICT reference expansion line 2582
-// ICT reference expansion line 2583
-// ICT reference expansion line 2584
-// ICT reference expansion line 2585
-// ICT reference expansion line 2586
-// ICT reference expansion line 2587
-// ICT reference expansion line 2588
-// ICT reference expansion line 2589
-// ICT reference expansion line 2590
-// ICT reference expansion line 2591
-// ICT reference expansion line 2592
-// ICT reference expansion line 2593
-// ICT reference expansion line 2594
-// ICT reference expansion line 2595
-// ICT reference expansion line 2596
-// ICT reference expansion line 2597
-// ICT reference expansion line 2598
-// ICT reference expansion line 2599
-// ICT reference expansion line 2600
-// ICT reference expansion line 2601
-// ICT reference expansion line 2602
-// ICT reference expansion line 2603
-// ICT reference expansion line 2604
-// ICT reference expansion line 2605
-// ICT reference expansion line 2606
-// ICT reference expansion line 2607
-// ICT reference expansion line 2608
-// ICT reference expansion line 2609
-// ICT reference expansion line 2610
-// ICT reference expansion line 2611
-// ICT reference expansion line 2612
-// ICT reference expansion line 2613
-// ICT reference expansion line 2614
-// ICT reference expansion line 2615
-// ICT reference expansion line 2616
-// ICT reference expansion line 2617
-// ICT reference expansion line 2618
-// ICT reference expansion line 2619
-// ICT reference expansion line 2620
-// ICT reference expansion line 2621
-// ICT reference expansion line 2622
-// ICT reference expansion line 2623
-// ICT reference expansion line 2624
-// ICT reference expansion line 2625
-// ICT reference expansion line 2626
-// ICT reference expansion line 2627
-// ICT reference expansion line 2628
-// ICT reference expansion line 2629
-// ICT reference expansion line 2630
-// ICT reference expansion line 2631
-// ICT reference expansion line 2632
-// ICT reference expansion line 2633
-// ICT reference expansion line 2634
-// ICT reference expansion line 2635
-// ICT reference expansion line 2636
-// ICT reference expansion line 2637
-// ICT reference expansion line 2638
-// ICT reference expansion line 2639
-// ICT reference expansion line 2640
-// ICT reference expansion line 2641
-// ICT reference expansion line 2642
-// ICT reference expansion line 2643
-// ICT reference expansion line 2644
-// ICT reference expansion line 2645
-// ICT reference expansion line 2646
-// ICT reference expansion line 2647
-// ICT reference expansion line 2648
-// ICT reference expansion line 2649
-// ICT reference expansion line 2650
-// ICT reference expansion line 2651
-// ICT reference expansion line 2652
-// ICT reference expansion line 2653
-// ICT reference expansion line 2654
-// ICT reference expansion line 2655
-// ICT reference expansion line 2656
-// ICT reference expansion line 2657
-// ICT reference expansion line 2658
-// ICT reference expansion line 2659
-// ICT reference expansion line 2660
-// ICT reference expansion line 2661
-// ICT reference expansion line 2662
-// ICT reference expansion line 2663
-// ICT reference expansion line 2664
-// ICT reference expansion line 2665
-// ICT reference expansion line 2666
-// ICT reference expansion line 2667
-// ICT reference expansion line 2668
-// ICT reference expansion line 2669
-// ICT reference expansion line 2670
-// ICT reference expansion line 2671
-// ICT reference expansion line 2672
-// ICT reference expansion line 2673
-// ICT reference expansion line 2674
-// ICT reference expansion line 2675
-// ICT reference expansion line 2676
-// ICT reference expansion line 2677
-// ICT reference expansion line 2678
-// ICT reference expansion line 2679
-// ICT reference expansion line 2680
-// ICT reference expansion line 2681
-// ICT reference expansion line 2682
-// ICT reference expansion line 2683
-// ICT reference expansion line 2684
-// ICT reference expansion line 2685
-// ICT reference expansion line 2686
-// ICT reference expansion line 2687
-// ICT reference expansion line 2688
-// ICT reference expansion line 2689
-// ICT reference expansion line 2690
-// ICT reference expansion line 2691
-// ICT reference expansion line 2692
-// ICT reference expansion line 2693
-// ICT reference expansion line 2694
-// ICT reference expansion line 2695
-// ICT reference expansion line 2696
-// ICT reference expansion line 2697
-// ICT reference expansion line 2698
-// ICT reference expansion line 2699
-// ICT reference expansion line 2700
-// ICT reference expansion line 2701
-// ICT reference expansion line 2702
-// ICT reference expansion line 2703
-// ICT reference expansion line 2704
-// ICT reference expansion line 2705
-// ICT reference expansion line 2706
-// ICT reference expansion line 2707
-// ICT reference expansion line 2708
-// ICT reference expansion line 2709
-// ICT reference expansion line 2710
-// ICT reference expansion line 2711
-// ICT reference expansion line 2712
-// ICT reference expansion line 2713
-// ICT reference expansion line 2714
-// ICT reference expansion line 2715
-// ICT reference expansion line 2716
-// ICT reference expansion line 2717
-// ICT reference expansion line 2718
-// ICT reference expansion line 2719
-// ICT reference expansion line 2720
-// ICT reference expansion line 2721
-// ICT reference expansion line 2722
-// ICT reference expansion line 2723
-// ICT reference expansion line 2724
-// ICT reference expansion line 2725
-// ICT reference expansion line 2726
-// ICT reference expansion line 2727
-// ICT reference expansion line 2728
-// ICT reference expansion line 2729
-// ICT reference expansion line 2730
-// ICT reference expansion line 2731
-// ICT reference expansion line 2732
-// ICT reference expansion line 2733
-// ICT reference expansion line 2734
-// ICT reference expansion line 2735
-// ICT reference expansion line 2736
-// ICT reference expansion line 2737
-// ICT reference expansion line 2738
-// ICT reference expansion line 2739
-// ICT reference expansion line 2740
-// ICT reference expansion line 2741
-// ICT reference expansion line 2742
-// ICT reference expansion line 2743
-// ICT reference expansion line 2744
-// ICT reference expansion line 2745
-// ICT reference expansion line 2746
-// ICT reference expansion line 2747
-// ICT reference expansion line 2748
-// ICT reference expansion line 2749
-// ICT reference expansion line 2750
-// ICT reference expansion line 2751
-// ICT reference expansion line 2752
-// ICT reference expansion line 2753
-// ICT reference expansion line 2754
-// ICT reference expansion line 2755
-// ICT reference expansion line 2756
-// ICT reference expansion line 2757
-// ICT reference expansion line 2758
-// ICT reference expansion line 2759
-// ICT reference expansion line 2760
-// ICT reference expansion line 2761
-// ICT reference expansion line 2762
-// ICT reference expansion line 2763
-// ICT reference expansion line 2764
-// ICT reference expansion line 2765
-// ICT reference expansion line 2766
-// ICT reference expansion line 2767
-// ICT reference expansion line 2768
-// ICT reference expansion line 2769
-// ICT reference expansion line 2770
-// ICT reference expansion line 2771
-// ICT reference expansion line 2772
-// ICT reference expansion line 2773
-// ICT reference expansion line 2774
-// ICT reference expansion line 2775
-// ICT reference expansion line 2776
-// ICT reference expansion line 2777
-// ICT reference expansion line 2778
-// ICT reference expansion line 2779
-// ICT reference expansion line 2780
 
 // ============== ICT Extended Modules (Sessions & PD Arrays) ==============
 
@@ -3055,4 +275,385 @@ if show_pd_levels and barstate.islast
         updLevel(pdhLine, pdh), updLevel(pdlLine, pdl), updLevel(dOpenLine, dopenCur)
         updLevel(pwhLine, pwh), updLevel(pwlLine, pwl), updLevel(wOpenLine, wopenCur)
         updLevel(pmhLine, pmh), updLevel(pmlLine, pml), updLevel(mOpenLine, mopenCur)
+
+
+// ============== ICT Extended Modules (Structure, Liquidity, Displacement, FVG/OB/Breaker/BPR, OTE, SMT, Risk, Trade Mgmt, Confluence) ==============
+
+// ---------------------- Structure (BOS / CHOCH) ----------------------
+var g_STRUCT = "Structure (BOS / CHOCH)"
+struct_pivot_len        = input.int(3, "Pivot L/R length", minval=1, group=g_STRUCT)
+struct_lookback         = input.int(50, "Structure lookback bars", minval=5, group=g_STRUCT)
+show_structure_labels   = input.bool(true, "Show BOS/CHOCH labels", group=g_STRUCT)
+struct_color_bos        = input.color(color.new(color.green, 0), "BOS color", group=g_STRUCT)
+struct_color_choch      = input.color(color.new(color.orange, 0), "CHOCH color", group=g_STRUCT)
+
+ph = ta.pivothigh(high, struct_pivot_len, struct_pivot_len)
+pl = ta.pivotlow(low, struct_pivot_len, struct_pivot_len)
+var float lastSwingHigh = na
+var float lastSwingLow  = na
+if not na(ph)
+    lastSwingHigh := ph
+if not na(pl)
+    lastSwingLow := pl
+
+bosUpNow   = not na(lastSwingHigh) and close > lastSwingHigh
+bosDnNow   = not na(lastSwingLow)  and close < lastSwingLow
+bosUpRecent = ta.barssince(bosUpNow) <= struct_lookback
+bosDnRecent = ta.barssince(bosDnNow) <= struct_lookback
+
+var int lastUpBOSBar = na, lastDnBOSBar = na
+if bosUpNow
+    lastUpBOSBar := bar_index
+if bosDnNow
+    lastDnBOSBar := bar_index
+
+chochDownNow = not na(lastUpBOSBar) and bosDnNow and (bar_index - lastUpBOSBar > 0)
+chochUpNow   = not na(lastDnBOSBar) and bosUpNow and (bar_index - lastDnBOSBar > 0)
+
+if show_structure_labels and (bosUpNow or bosDnNow or chochDownNow or chochUpNow)
+    lbltxt = bosUpNow ? "BOS↑" : bosDnNow ? "BOS↓" : chochUpNow ? "CHOCH↑" : "CHOCH↓"
+    lblcol = bosUpNow or chochUpNow ? struct_color_bos : struct_color_choch
+    label.new(bar_index, close, lbltxt, style=label.style_label_center, textcolor=lblcol, color=color.new(color.black, 100), size=size.tiny)
+
+// ---------------------- Liquidity Sweeps ----------------------
+var g_LIQ = "Liquidity Sweeps"
+use_sweep_pd           = input.bool(true, "Include PDH/PDL sweeps", group=g_LIQ)
+use_sweep_local        = input.bool(true, "Include local swing sweeps", group=g_LIQ)
+liq_lookback           = input.int(50, "Sweep lookback bars", minval=5, group=g_LIQ)
+
+sweptPDL = use_sweep_pd and low < pdl and close > pdl
+sweptPDH = use_sweep_pd and high > pdh and close < pdh
+sweptSwingLow  = use_sweep_local and not na(lastSwingLow)  and low < lastSwingLow and close > lastSwingLow
+sweptSwingHigh = use_sweep_local and not na(lastSwingHigh) and high > lastSwingHigh and close < lastSwingHigh
+
+sweptBullRecent = ta.barssince(sweptPDL or sweptSwingLow)  <= liq_lookback
+sweptBearRecent = ta.barssince(sweptPDH or sweptSwingHigh) <= liq_lookback
+
+// ---------------------- Displacement ----------------------
+var g_DISP = "Displacement"
+disp_atr_len2           = input.int(14, "ATR length", group=g_DISP)
+disp_atr_mult2          = input.float(1.0, "ATR x body", step=0.1, group=g_DISP)
+atrv2 = ta.atr(disp_atr_len2)
+body2 = math.abs(close - open)
+dispBullNow = close > open and body2 >= atrv2 * disp_atr_mult2
+dispBearNow = close < open and body2 >= atrv2 * disp_atr_mult2
+
+// ---------------------- FVG (Fair Value Gaps) ----------------------
+var g_FVG = "Fair Value Gaps"
+show_fvg               = input.bool(true, "Show FVGs", group=g_FVG)
+fvg_look               = input.int(60, "FVG lookback bars", minval=1, group=g_FVG)
+fvg_col_bull           = input.color(color.new(color.aqua, 80), "Bull FVG color", group=g_FVG)
+fvg_col_bear           = input.color(color.new(color.fuchsia, 80), "Bear FVG color", group=g_FVG)
+fvg_tolerance_ticks    = input.int(2, "FVG touch tolerance (ticks)", minval=0, group=g_FVG)
+
+fvgBullForm = low > high[2]
+fvgBearForm = high < low[2]
+
+var float lastBullFvgTop = na, lastBullFvgBot = na
+var int   lastBullFvgBar = na
+if fvgBullForm
+    lastBullFvgTop := low
+    lastBullFvgBot := high[2]
+    lastBullFvgBar := bar_index
+
+var float lastBearFvgTop = na, lastBearFvgBot = na
+var int   lastBearFvgBar = na
+if fvgBearForm
+    lastBearFvgTop := low[2]
+    lastBearFvgBot := high
+    lastBearFvgBar := bar_index
+
+tickSize = syminfo.mintick
+fvgTol = fvg_tolerance_ticks * tickSize
+
+bullFvgRecent = not na(lastBullFvgBar) and (bar_index - lastBullFvgBar <= fvg_look)
+bearFvgRecent = not na(lastBearFvgBar) and (bar_index - lastBearFvgBar <= fvg_look)
+bullFvgTouched = bullFvgRecent and low <= (lastBullFvgTop + fvgTol) and high >= (lastBullFvgBot - fvgTol)
+bearFvgTouched = bearFvgRecent and high >= (lastBearFvgBot - fvgTol) and low <= (lastBearFvgTop + fvgTol)
+
+if show_fvg and barstate.islast
+    if bullFvgRecent
+        line.new(bar_index - 1, lastBullFvgTop, bar_index, lastBullFvgTop, extend=extend.right, color=fvg_col_bull)
+        line.new(bar_index - 1, lastBullFvgBot, bar_index, lastBullFvgBot, extend=extend.right, color=fvg_col_bull)
+    if bearFvgRecent
+        line.new(bar_index - 1, lastBearFvgTop, bar_index, lastBearFvgTop, extend=extend.right, color=fvg_col_bear)
+        line.new(bar_index - 1, lastBearFvgBot, bar_index, lastBearFvgBot, extend=extend.right, color=fvg_col_bear)
+
+// ---------------------- Order Blocks & Breakers ----------------------
+var g_OB = "Order Blocks & Breakers"
+show_ob                = input.bool(true, "Show Order Blocks", group=g_OB)
+show_breaker           = input.bool(true, "Show Breakers", group=g_OB)
+ob_lb                  = input.int(60, "OB lookback", minval=1, group=g_OB)
+ob_col_bull            = input.color(color.new(color.green, 80), "Bull OB color", group=g_OB)
+ob_col_bear            = input.color(color.new(color.red, 80), "Bear OB color", group=g_OB)
+br_col                 = input.color(color.new(color.orange, 70), "Breaker color", group=g_OB)
+
+var float bullObHigh = na, bullObLow = na
+var float bearObHigh = na, bearObLow = na
+var int   bullObBar  = na, bearObBar  = na
+
+if dispBullNow and bosUpNow
+    preBear = close[1] < open[1]
+    if preBear
+        bullObHigh := high[1]
+        bullObLow  := low[1]
+        bullObBar  := bar_index
+
+if dispBearNow and bosDnNow
+    preBull = close[1] > open[1]
+    if preBull
+        bearObHigh := high[1]
+        bearObLow  := low[1]
+        bearObBar  := bar_index
+
+breakerBull = not na(bearObBar) and close > bearObHigh
+breakerBear = not na(bullObBar) and close < bullObLow
+
+if show_ob and barstate.islast
+    if not na(bullObBar)
+        line.new(bullObBar - 1, bullObHigh, bar_index, bullObHigh, extend=extend.right, color=ob_col_bull)
+        line.new(bullObBar - 1, bullObLow,  bar_index, bullObLow,  extend=extend.right, color=ob_col_bull)
+    if not na(bearObBar)
+        line.new(bearObBar - 1, bearObHigh, bar_index, bearObHigh, extend=extend.right, color=ob_col_bear)
+        line.new(bearObBar - 1, bearObLow,  bar_index, bearObLow,  extend=extend.right, color=ob_col_bear)
+    if show_breaker and breakerBull
+        line.new(bar_index - 1, bearObHigh, bar_index, bearObLow, extend=extend.right, color=br_col, style=line.style_dotted)
+    if show_breaker and breakerBear
+        line.new(bar_index - 1, bullObHigh, bar_index, bullObLow, extend=extend.right, color=br_col, style=line.style_dotted)
+
+// ---------------------- BPR (Balanced Price Range) ----------------------
+var g_BPR = "Balanced Price Range"
+show_bpr               = input.bool(true, "Show BPR (overlap of opposite FVGs)", group=g_BPR)
+bpr_col                = input.color(color.new(color.yellow, 70), "BPR color", group=g_BPR)
+
+haveBothFvg = bullFvgRecent and bearFvgRecent
+bprTop = na
+bprBot = na
+if haveBothFvg
+    bprTop := math.min(lastBullFvgTop, lastBearFvgTop)
+    bprBot := math.max(lastBullFvgBot, lastBearFvgBot)
+    if bprTop > bprBot and show_bpr and barstate.islast
+        line.new(bar_index - 1, bprTop, bar_index, bprTop, extend=extend.right, color=bpr_col)
+        line.new(bar_index - 1, bprBot, bar_index, bprBot, extend=extend.right, color=bpr_col)
+
+// ---------------------- OTE (Optimal Trade Entry) ----------------------
+var g_OTE = "OTE"
+show_ote               = input.bool(true, "Show 62%–79% OTE zone (last swing)", group=g_OTE)
+ote_col                = input.color(color.new(color.blue, 70), "OTE zone color", group=g_OTE)
+
+refLow  = na( lastSwingLow)  ? low  : lastSwingLow
+refHigh = na( lastSwingHigh) ? high : lastSwingHigh
+
+ote62 = refLow + 0.62 * (refHigh - refLow)
+note79 = refLow + 0.79 * (refHigh - refLow)
+if show_ote and barstate.islast
+    line.new(bar_index - 1, note62, bar_index, note62, extend=extend.right, color=ote_col)
+    line.new(bar_index - 1, note79, bar_index, note79, extend=extend.right, color=ote_col)
+
+// ---------------------- SMT (Divergence) ----------------------
+var g_SMT = "SMT Divergence"
+use_smt                = input.bool(false, "Use SMT vs peer symbol", group=g_SMT)
+smt_symbol             = input.symbol("NASDAQ:QQQ", "Peer symbol for SMT", group=g_SMT)
+smt_tf                 = input.timeframe("", "SMT timeframe (optional)", group=g_SMT)
+peerH = use_smt ? request.security(smt_symbol, smt_tf == "" ? timeframe.period : smt_tf, high, barmerge.gaps_off, barmerge.lookahead_off) : na
+peerL = use_smt ? request.security(smt_symbol, smt_tf == "" ? timeframe.period : smt_tf, low,  barmerge.gaps_off, barmerge.lookahead_off) : na
+
+hh_cur   = high > ta.highest(high[1], 5)
+hh_peer  = use_smt and peerH > ta.highest(peerH[1], 5)
+smt_bearish = use_smt and hh_cur and not hh_peer
+
+ll_cur   = low < ta.lowest(low[1], 5)
+ll_peer  = use_smt and peerL < ta.lowest(peerL[1], 5)
+smt_bullish = use_smt and ll_cur and not ll_peer
+
+// ---------------------- Position Sizing ----------------------
+var g_RISK = "Risk & Position Sizing"
+use_pos_sizing         = input.bool(true, "Compute position size", group=g_RISK)
+account_balance        = input.float(10000.0, "Account balance", step=1.0, group=g_RISK)
+risk_percent           = input.float(1.0, "Risk % per trade", step=0.1, group=g_RISK)
+tick_value             = input.float(1.0, "Tick value (quote per tick)", step=0.01, group=g_RISK)
+min_contract_size      = input.float(0.01, "Min contract/lot size", step=0.01, group=g_RISK)
+contract_step          = input.float(0.01, "Contract step", step=0.01, group=g_RISK)
+
+computeSize(entry, stop) =>
+    stopDist = math.max(math.abs(entry - stop), tickSize)
+    riskAmt  = account_balance * (risk_percent / 100.0)
+    rawSize  = riskAmt / (stopDist / tickSize * tick_value)
+    math.max(min_contract_size, math.round(rawSize / contract_step) * contract_step)
+
+// ---------------------- Trade Management ----------------------
+var g_TM = "Trade Management"
+use_partials           = input.bool(true, "Use partials at 1R/2R", group=g_TM)
+move_be_at_1r          = input.bool(true, "Move SL to BE at 1R", group=g_TM)
+use_trailing           = input.bool(false, "Use ATR trailing stop", group=g_TM)
+trail_atr_len          = input.int(14, "ATR len (trail)", group=g_TM)
+trail_atr_mult         = input.float(2.0, "ATR x for trail", step=0.1, group=g_TM)
+
+var bool inPosition = false
+var float activeEntry = na, activeStop = na, activeTP = na, activeSize = na
+
+if retestBull and not inPosition
+    inPosition := true
+    activeEntry := entryPrice
+    activeStop  := stopPrice
+    activeTP    := targetPrice
+    activeSize  := use_pos_sizing ? computeSize(activeEntry, activeStop) : na
+if retestBear and not inPosition
+    inPosition := true
+    activeEntry := entryPrice
+    activeStop  := stopPrice
+    activeTP    := targetPrice
+    activeSize  := use_pos_sizing ? computeSize(activeEntry, activeStop) : na
+
+updateTrailing() =>
+    if inPosition and use_trailing
+        trAtr = ta.atr(trail_atr_len)
+        if setupDir == 1
+            newSL = close - trAtr * trail_atr_mult
+            activeStop := math.max(activeStop, newSL)
+        if setupDir == -1
+            newSL = close + trAtr * trail_atr_mult
+            activeStop := math.min(activeStop, newSL)
+
+managePartials() =>
+    if inPosition and use_partials
+        riskPerUnit = math.max(math.abs(activeEntry - activeStop), tickSize)
+        oneRTarget  = setupDir == 1 ? activeEntry + riskPerUnit : activeEntry - riskPerUnit
+        twoRTarget  = setupDir == 1 ? activeEntry + 2.0 * riskPerUnit : activeEntry - 2.0 * riskPerUnit
+        hit1R = (setupDir == 1 and high >= oneRTarget) or (setupDir == -1 and low <= oneRTarget)
+        hit2R = (setupDir == 1 and high >= twoRTarget) or (setupDir == -1 and low <= twoRTarget)
+        if move_be_at_1r and hit1R
+            activeStop := activeEntry
+        if hit2R
+            activeTP := twoRTarget
+
+updateTrailing()
+managePartials()
+
+// ---------------------- Confluence & Priority Signals ----------------------
+var g_CONF = "Confluence & Signals"
+use_confluence          = input.bool(true, "Require confluence for PRIORITY signal", group=g_CONF)
+min_conf_score          = input.int(5, "Min confluence score", minval=1, maxval=12, group=g_CONF)
+
+conf_sess    = ictSessionsOk() ? 1 : 0
+conf_bias    = (longAligned or shortAligned) ? 1 : 0
+conf_sweep_b = sweptBullRecent ? 1 : 0
+conf_sweep_s = sweptBearRecent ? 1 : 0
+conf_bos_b   = bosUpRecent ? 1 : 0
+conf_bos_s   = bosDnRecent ? 1 : 0
+conf_disp_b  = dispBullNow ? 1 : 0
+conf_disp_s  = dispBearNow ? 1 : 0
+conf_fvg_b   = bullFvgTouched ? 1 : 0
+conf_fvg_s   = bearFvgTouched ? 1 : 0
+conf_ote     = (close >= math.min(note62, note79) and close <= math.max(note62, note79)) ? 1 : 0
+conf_smt_b   = smt_bullish ? 1 : 0
+conf_smt_s   = smt_bearish ? 1 : 0
+
+confLong  = conf_sess + conf_bias + conf_sweep_b + conf_bos_b + conf_disp_b + conf_fvg_b + conf_ote + conf_smt_b
+confShort = conf_sess + conf_bias + conf_sweep_s + conf_bos_s + conf_disp_s + conf_fvg_s + conf_ote + conf_smt_s
+
+priorityLong  = (retestBull or (setupDir == 1 and inPosition)) and (not use_confluence or confLong >= min_conf_score)
+priorityShort = (retestBear or (setupDir == -1 and inPosition)) and (not use_confluence or confShort >= min_conf_score)
+
+if priorityLong
+    label.new(bar_index, low, "ICT PRIORITY LONG\nConf=" + str.tostring(confLong), style=label.style_label_up, textcolor=color.lime, color=color.new(color.black, 0), size=size.small)
+if priorityShort
+    label.new(bar_index, high, "ICT PRIORITY SHORT\nConf=" + str.tostring(confShort), style=label.style_label_down, textcolor=color.red, color=color.new(color.black, 0), size=size.small)
+
+alertcondition(priorityLong,  "ICT Priority Long",  "ICT Priority Long (confluence)")
+alertcondition(priorityShort, "ICT Priority Short", "ICT Priority Short (confluence)")
+
+// ---------------------- Extended Plan Label ----------------------
+if inPosition and showPlanLabel
+    rrNow = math.abs(activeEntry - activeTP) / math.max(math.abs(activeEntry - activeStop), tickSize)
+    sizeTxt = use_pos_sizing and not na(activeSize) ? "\nSize: " + str.tostring(activeSize) : ""
+    txt2 = (setupDir == 1 ? "ICT BULLISH TRADE" : "ICT BEARISH TRADE") + "\n" +
+           "Entry: " + str.tostring(activeEntry, format.mintick) + "\n" +
+           "Stop:  " + str.tostring(activeStop,  format.mintick) + "\n" +
+           "Target:" + str.tostring(activeTP,    format.mintick) + "\n" +
+           "R:R   :" + str.tostring(rrNow, format.mintick) + sizeTxt + "\nConf: " + (setupDir == 1 ? str.tostring(confLong) : str.tostring(confShort))
+    if not na(planLabel)
+        label.delete(planLabel)
+    planLabel := label.new(bar_index, activeEntry, txt2, style=label.style_label_left, textcolor=color.white, color=color.new(color.black, 0), size=size.small)
+
+
+// ---------------------- Opening Range (Daily/Weekly) ----------------------
+var g_OR = "Opening Range"
+show_daily_or           = input.bool(true,  "Show Daily Opening Range", group=g_OR)
+daily_or_minutes        = input.int(30,     "Daily OR minutes", minval=1, maxval=240, group=g_OR)
+show_weekly_or          = input.bool(false, "Show Weekly Opening Range (Mon)", group=g_OR)
+weekly_or_minutes       = input.int(60,     "Weekly OR minutes (first session)", minval=1, maxval=240, group=g_OR)
+or_line_color           = input.color(color.new(color.yellow, 0), "OR line color", group=g_OR)
+or_fill_color           = input.color(color.new(color.yellow, 90), "OR fill color", group=g_OR)
+
+calcOR(tfOpen, tfTime, minutes) =>
+    // captures high/low from session start to start+minutes
+    inWin = (time - tfTime) <= minutes * 60 * 1000 and (time - tfTime) >= 0
+    sessionStarted = ta.change(tfTime) != 0
+    var float orHigh = na
+    var float orLow  = na
+    if sessionStarted
+        orHigh := high
+        orLow  := low
+    if inWin
+        orHigh := math.max(orHigh, high)
+        orLow  := math.min(orLow,  low)
+    [orHigh, orLow, inWin]
+
+[dayOpen, dayTime] = request.security(syminfo.tickerid, "D", [open, time], barmerge.gaps_off, barmerge.lookahead_off)
+[weekOpen, weekTime] = request.security(syminfo.tickerid, "W", [open, time], barmerge.gaps_off, barmerge.lookahead_off)
+
+var line dORhi = na, dORlo = na
+var line wORhi = na, wORlo = na
+
+if show_daily_or
+    [dHi, dLo, dWin] = calcOR(dayOpen, dayTime, daily_or_minutes)
+    if dWin
+        if na(dORhi)
+            dORhi := line.new(bar_index-1, dHi, bar_index, dHi, extend=extend.right, color=or_line_color)
+            dORlo := line.new(bar_index-1, dLo, bar_index, dLo, extend=extend.right, color=or_line_color)
+        else
+            line.set_y1(dORhi, dHi), line.set_y2(dORhi, dHi), line.set_x2(dORhi, bar_index)
+            line.set_y1(dORlo, dLo), line.set_y2(dORlo, dLo), line.set_x2(dORlo, bar_index)
+
+if show_weekly_or
+    [wHi, wLo, wWin] = calcOR(weekOpen, weekTime, weekly_or_minutes)
+    if wWin
+        if na(wORhi)
+            wORhi := line.new(bar_index-1, wHi, bar_index, wHi, extend=extend.right, color=color.new(or_line_color, 30))
+            wORlo := line.new(bar_index-1, wLo, bar_index, wLo, extend=extend.right, color=color.new(or_line_color, 30))
+        else
+            line.set_y1(wORhi, wHi), line.set_y2(wORhi, wHi), line.set_x2(wORhi, bar_index)
+            line.set_y1(wORlo, wLo), line.set_y2(wORlo, wLo), line.set_x2(wORlo, bar_index)
+
+// ---------------------- Premium/Discount Grid (Fib) ----------------------
+var g_PDGRID = "Premium/Discount Grid"
+show_pd_grid           = input.bool(true, "Show Fib 0/50/62/70.5/79/100 on active range", group=g_PDGRID)
+pdgrid_color           = input.color(color.new(color.gray, 50), "Grid color", group=g_PDGRID)
+pdgrid_mid_color       = input.color(color.new(color.orange, 0), "Mid (50%) color", group=g_PDGRID)
+
+var line grid0 = na, grid50 = na, grid62 = na, grid705 = na, grid79 = na, grid100 = na
+
+drawGrid(rLow, rHigh) =>
+    if na(grid0)
+        grid0   := line.new(bar_index-1, rLow,  bar_index, rLow,  extend=extend.right, color=pdgrid_color)
+        grid50  := line.new(bar_index-1, (rLow+rHigh)/2, bar_index, (rLow+rHigh)/2, extend=extend.right, color=pdgrid_mid_color)
+        grid62  := line.new(bar_index-1, rLow + 0.62*(rHigh-rLow), bar_index, rLow + 0.62*(rHigh-rLow), extend=extend.right, color=pdgrid_color)
+        grid705 := line.new(bar_index-1, rLow + 0.705*(rHigh-rLow), bar_index, rLow + 0.705*(rHigh-rLow), extend=extend.right, color=pdgrid_color)
+        grid79  := line.new(bar_index-1, rLow + 0.79*(rHigh-rLow), bar_index, rLow + 0.79*(rHigh-rLow), extend=extend.right, color=pdgrid_color)
+        grid100 := line.new(bar_index-1, rHigh, bar_index, rHigh, extend=extend.right, color=pdgrid_color)
+    else
+        line.set_y1(grid0, rLow),  line.set_y2(grid0, rLow),  line.set_x2(grid0,  bar_index)
+        line.set_y1(grid50,(rLow+rHigh)/2), line.set_y2(grid50,(rLow+rHigh)/2), line.set_x2(grid50, bar_index)
+        line.set_y1(grid62, rLow + 0.62*(rHigh-rLow)),  line.set_y2(grid62, rLow + 0.62*(rHigh-rLow)),  line.set_x2(grid62,  bar_index)
+        line.set_y1(grid705,rLow + 0.705*(rHigh-rLow)), line.set_y2(grid705,rLow + 0.705*(rHigh-rLow)), line.set_x2(grid705, bar_index)
+        line.set_y1(grid79, rLow + 0.79*(rHigh-rLow)),  line.set_y2(grid79, rLow + 0.79*(rHigh-rLow)),  line.set_x2(grid79,  bar_index)
+        line.set_y1(grid100,rHigh), line.set_y2(grid100,rHigh), line.set_x2(grid100, bar_index)
+
+if show_pd_grid
+    // use latest consolidated range from Donchian preview
+    rLow = donLowPrev
+    rHigh= donHighPrev
+    if rHigh > rLow
+        drawGrid(rLow, rHigh)
 
