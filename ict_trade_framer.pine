@@ -2998,3 +2998,61 @@ if enableAlerts
 // ICT reference expansion line 2778
 // ICT reference expansion line 2779
 // ICT reference expansion line 2780
+
+// ============== ICT Extended Modules (Sessions & PD Arrays) ==============
+
+// ---------------------- Sessions & Killzones ----------------------
+var g_SESS = "Sessions & Killzones"
+sess_tz                 = input.string("America/New_York", "Session timezone", group=g_SESS)
+use_session_gate        = input.bool(true, "Gate signals by sessions", group=g_SESS)
+use_london_sess         = input.bool(true, "London 02:00–05:00 NY", group=g_SESS)
+sess_london             = input.session("0200-0500:12345", "", inline="L", group=g_SESS)
+use_nyam_sess           = input.bool(true, "NY AM 09:30–11:30 NY", group=g_SESS)
+sess_nyam               = input.session("0930-1130:12345", "", inline="NYAM", group=g_SESS)
+use_sb_sess             = input.bool(true, "Silver Bullet 10:00–11:00 NY", group=g_SESS)
+sess_sb                 = input.session("1000-1100:12345", "", inline="SB", group=g_SESS)
+use_nypm_sess           = input.bool(false, "NY PM 13:30–15:30 NY", group=g_SESS)
+sess_nypm               = input.session("1330-1530:12345", "", inline="NYPM", group=g_SESS)
+
+inSess(sess) =>
+    not na(time(timeframe.period, sess, sess_tz))
+
+ictSessionsOk() =>
+    not use_session_gate or ((not use_london_sess or inSess(sess_london)) and (not use_nyam_sess or inSess(sess_nyam)) and (not use_sb_sess or inSess(sess_sb)) and (not use_nypm_sess or inSess(sess_nypm)))
+
+// ---------------------- PD Arrays (Daily/Weekly/Monthly) ----------------------
+var g_PD = "PD Arrays"
+show_pd_levels          = input.bool(true, "Show PDH/PDL/PWH/PWL & opens", group=g_PD)
+pd_color_d              = input.color(color.new(color.gray, 0), "Daily levels color", group=g_PD)
+pd_color_w              = input.color(color.new(color.teal, 0), "Weekly levels color", group=g_PD)
+pd_color_m              = input.color(color.new(color.purple, 0), "Monthly levels color", group=g_PD)
+pd_line_w               = input.int(1, "PD line width", group=g_PD)
+
+[dOpen, dHigh, dLow, dClose] = request.security(syminfo.tickerid, "D", [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+[wOpen, wHigh, wLow, wClose] = request.security(syminfo.tickerid, "W", [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+[mOpen, mHigh, mLow, mClose] = request.security(syminfo.tickerid, "M", [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+
+pdh = dHigh[1], pdl = dLow[1], dopenCur = dOpen
+pwh = wHigh[1], pwl = wLow[1], wopenCur = wOpen
+pmh = mHigh[1], pml = mLow[1], mopenCur = mOpen
+
+var line pdhLine = na, pdlLine = na, pwhLine = na, pwlLine = na, pmhLine = na, pmlLine = na, dOpenLine = na, wOpenLine = na, mOpenLine = na
+drawLevel(ref, col, w) => line.new(bar_index - 1, ref, bar_index, ref, extend=extend.right, color=col, width=w)
+updLevel(ln, ref) => line.set_x2(ln, bar_index), line.set_y1(ln, ref), line.set_y2(ln, ref)
+
+if show_pd_levels and barstate.islast
+    if na(pdhLine)
+        pdhLine := drawLevel(pdh, pd_color_d, pd_line_w)
+        pdlLine := drawLevel(pdl, pd_color_d, pd_line_w)
+        dOpenLine := drawLevel(dopenCur, color.new(pd_color_d, 40), pd_line_w)
+        pwhLine := drawLevel(pwh, pd_color_w, pd_line_w)
+        pwlLine := drawLevel(pwl, pd_color_w, pd_line_w)
+        wOpenLine := drawLevel(wopenCur, color.new(pd_color_w, 40), pd_line_w)
+        pmhLine := drawLevel(pmh, pd_color_m, pd_line_w)
+        pmlLine := drawLevel(pml, pd_color_m, pd_line_w)
+        mOpenLine := drawLevel(mopenCur, color.new(pd_color_m, 40), pd_line_w)
+    else
+        updLevel(pdhLine, pdh), updLevel(pdlLine, pdl), updLevel(dOpenLine, dopenCur)
+        updLevel(pwhLine, pwh), updLevel(pwlLine, pwl), updLevel(wOpenLine, wopenCur)
+        updLevel(pmhLine, pmh), updLevel(pmlLine, pml), updLevel(mOpenLine, mopenCur)
+
