@@ -3,8 +3,21 @@
 // thanks to Rashid
 //@version=5
 indicator("cd_sweep&cisd_Cx",overlay=true,max_boxes_count = 500,max_lines_count = 100)
-htf      = input.timeframe(defval= "60", title = "HTF",group ="HTF",inline="htf")
-autoMap  = input.bool(defval = true, title = "Auto TF mapping", group="HTF", inline="htf", tooltip="Map HTF from current chart TF: 1m→15m, 5m→1h, 15m→4h, 1h→1D, 4h→1W, 1D→1M, 1W→3M")
+htf      = input.timeframe(defval= "60", title = "HTF (Fixed)",group ="HTF",inline="htf")
+autoMap  = input.bool(defval = true, title = "Auto", group="HTF", inline="htf", tooltip="Auto map HTF from chart TF: 1m→15m, 5m→1h, 15m→4h, 1h→1D, 4h→1W, 1D→1M, 1W→3M")
+manualMode = input.string(defval="Mapping", title="Manual Options", options=["Mapping","Fixed TF"], group="HTF", inline="man")
+
+// Manual Mapping rows (primary choices)
+map_lt_1m   = input.timeframe(defval="5",   title="If current TF < 1m", group="HTF", inline="m1")
+map_lt_3m   = input.timeframe(defval="15",  title="If current TF < 3m", group="HTF", inline="m2")
+map_lt_5m   = input.timeframe(defval="30",  title="If current TF < 5m", group="HTF", inline="m3")
+map_lt_15m  = input.timeframe(defval="60",  title="If current TF < 15m", group="HTF", inline="m4")
+map_lt_30m  = input.timeframe(defval="240", title="If current TF < 30m", group="HTF", inline="m5")
+map_lt_1h   = input.timeframe(defval="D",   title="If current TF < 1H", group="HTF", inline="m6")
+map_lt_4h   = input.timeframe(defval="D",   title="If current TF < 4H", group="HTF", inline="m7")
+map_lt_1d   = input.timeframe(defval="W",   title="If current TF < 1D", group="HTF", inline="m8")
+map_lt_1w   = input.timeframe(defval="M",   title="If current TF < 1W", group="HTF", inline="m9")
+map_lt_1mth = input.timeframe(defval="3M",  title="If current TF < 1M", group="HTF", inline="m10")
 showhtf  = input.bool(defval = true,title = "Show HTF boxes",group="HTF",inline="htf")
 width_box = input.int(defval=1,title="Border Width :",group="HTF",inline= "htf1")
 style_box = input.string(defval=line.style_dotted,title= "Style:",options=[line.style_solid,line.style_dotted,line.style_dashed ],group="HTF",inline= "htf1")
@@ -56,7 +69,36 @@ f_map_htf_from_chart_tf(_chartTf) =>
         "W"   => "3M"   // 1W  -> 3M
         => htf         // fallback to manual HTF
 
-htf_used = autoMap ? f_map_htf_from_chart_tf(tf) : htf
+// Manual Mapping evaluator (uses the rows above)
+f_map_manual(_chartTf) =>
+    _sec = timeframe.in_seconds(_chartTf)
+    _res = map_lt_1m
+    if _sec < timeframe.in_seconds("1")
+        _res := map_lt_1m
+    else if _sec < timeframe.in_seconds("3")
+        _res := map_lt_3m
+    else if _sec < timeframe.in_seconds("5")
+        _res := map_lt_5m
+    else if _sec < timeframe.in_seconds("15")
+        _res := map_lt_15m
+    else if _sec < timeframe.in_seconds("30")
+        _res := map_lt_30m
+    else if _sec < timeframe.in_seconds("60")
+        _res := map_lt_1h
+    else if _sec < timeframe.in_seconds("240")
+        _res := map_lt_4h
+    else if _sec < timeframe.in_seconds("D")
+        _res := map_lt_1d
+    else if _sec < timeframe.in_seconds("W")
+        _res := map_lt_1w
+    else if _sec < timeframe.in_seconds("M")
+        _res := map_lt_1mth
+    else
+        _res := map_lt_1mth
+    _res
+
+// Determine which HTF to use
+htf_used = autoMap ? f_map_htf_from_chart_tf(tf) : manualMode == "Fixed TF" ? htf : f_map_manual(tf)
 
 var o0 = open
 var h0 = high
