@@ -762,21 +762,37 @@ f_key_auto_from_chart_tf(_chartTf) =>
 // Manual mapping using configurable presets per chart TF bucket
 f_key_manual_from_chart_tf(_chartTf) =>
     _sec = timeframe.in_seconds(_chartTf)
-    _r1 = kmap_1m_1, _r2 = kmap_1m_2, _r3 = kmap_1m_3
+    _r1 = kmap_1m_1
+    _r2 = kmap_1m_2
+    _r3 = kmap_1m_3
     if _sec <= timeframe.in_seconds("1")
-        [_r1,_r2,_r3] := [kmap_1m_1, kmap_1m_2, kmap_1m_3]
+        _r1 := kmap_1m_1
+        _r2 := kmap_1m_2
+        _r3 := kmap_1m_3
     else if _sec <= timeframe.in_seconds("5")
-        [_r1,_r2,_r3] := [kmap_5m_1, kmap_5m_2, kmap_5m_3]
+        _r1 := kmap_5m_1
+        _r2 := kmap_5m_2
+        _r3 := kmap_5m_3
     else if _sec <= timeframe.in_seconds("15")
-        [_r1,_r2,_r3] := [kmap_15m_1, kmap_15m_2, kmap_15m_3]
+        _r1 := kmap_15m_1
+        _r2 := kmap_15m_2
+        _r3 := kmap_15m_3
     else if _sec <= timeframe.in_seconds("30")
-        [_r1,_r2,_r3] := [kmap_30m_1, kmap_30m_2, kmap_30m_3]
+        _r1 := kmap_30m_1
+        _r2 := kmap_30m_2
+        _r3 := kmap_30m_3
     else if _sec <= timeframe.in_seconds("60")
-        [_r1,_r2,_r3] := [kmap_1h_1,  kmap_1h_2,  kmap_1h_3]
+        _r1 := kmap_1h_1
+        _r2 := kmap_1h_2
+        _r3 := kmap_1h_3
     else if _sec <= timeframe.in_seconds("D")
-        [_r1,_r2,_r3] := [kmap_1d_1,  kmap_1d_2,  kmap_1d_3]
+        _r1 := kmap_1d_1
+        _r2 := kmap_1d_2
+        _r3 := kmap_1d_3
     else
-        [_r1,_r2,_r3] := [keytf1, keytf2, keytf3]
+        _r1 := keytf1
+        _r2 := keytf2
+        _r3 := keytf3
     [_r1,_r2,_r3]
 
 [auto_k1, auto_k2, auto_k3]   = f_key_auto_from_chart_tf(tf)
