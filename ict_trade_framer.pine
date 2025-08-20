@@ -40,7 +40,7 @@ atr_value = ta.atr(14)
 // Daily structure
 var float daily_swing_high = na
 var float daily_swing_low = na
-var bool daily_bullish = na
+var bool daily_bullish = false
 
 if ta.change(time("D")) != 0
     if daily_close > daily_open
@@ -55,7 +55,7 @@ if ta.change(time("D")) != 0
 // 4H structure
 var float h4_swing_high = na
 var float h4_swing_low = na
-var bool h4_bullish = na
+var bool h4_bullish = false
 
 if ta.change(time("240")) != 0
     if h4_close > h4_open
@@ -98,16 +98,16 @@ else
 // === ICT TRADE SIGNALS ===
 
 // Bullish setup
-bullish_setup = false
-bullish_entry = na
-bullish_stop = na
-bullish_target = na
+var bool bullish_setup = false
+var float bullish_entry = na
+var float bullish_stop = na
+var float bullish_target = na
 
 // Bearish setup
-bearish_setup = false
-bearish_entry = na
-bearish_stop = na
-bearish_target = na
+var bool bearish_setup = false
+var float bearish_entry = na
+var float bearish_stop = na
+var float bearish_target = na
 
 // ICT Trade Logic
 if in_consolidation and consolidation_bars >= min_consolidation_bars and consolidation_bars <= max_consolidation_bars
@@ -120,6 +120,8 @@ if in_consolidation and consolidation_bars >= min_consolidation_bars and consoli
             bullish_entry := consolidation_low
             bullish_stop := use_atr_stop ? low - (atr_value * atr_multiplier) : low - (consolidation_high - consolidation_low) * 0.5
             bullish_target := bullish_entry + ((bullish_entry - bullish_stop) * 2) // 1:2 R:R
+        else
+            bullish_setup := false
     
     // Bearish ICT Setup
     if not daily_bullish and not h4_bullish and close < open
@@ -129,6 +131,13 @@ if in_consolidation and consolidation_bars >= min_consolidation_bars and consoli
             bearish_entry := consolidation_high
             bearish_stop := use_atr_stop ? high + (atr_value * atr_multiplier) : high + (consolidation_high - consolidation_low) * 0.5
             bearish_target := bearish_entry - ((bearish_stop - bearish_entry) * 2) // 1:2 R:R
+        else
+            bearish_setup := false
+
+// Reset setups when not in consolidation
+if not in_consolidation
+    bullish_setup := false
+    bearish_setup := false
 
 // === ICT TRADE VISUALS ===
 
