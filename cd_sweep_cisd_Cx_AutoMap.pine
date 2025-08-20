@@ -56,6 +56,35 @@ keytf3_clr  = input.color(defval = color.gray, title="",group ="Time Frames => K
 sym = syminfo.tickerid 
 tf = timeframe.period
 
+// Key Levels Mapping mode (Auto / Manual Mapping / Fixed TFs)
+keyAutoMap   = input.bool(defval=true,  title="Auto",           group="Time Frames => Key Levels", inline="keymode")
+keyManualMode= input.string(defval="Mapping", title="Manual Options", options=["Mapping","Fixed TFs"], group="Time Frames => Key Levels", inline="keymode")
+
+// Manual Mapping presets for specific chart TF categories (primary choices)
+// 1m → 15m, 1h
+kmap_1m_1 = input.timeframe(defval="15",  title="1m → #1", group="Time Frames => Key Levels", inline="km1")
+kmap_1m_2 = input.timeframe(defval="60",  title="#2",      group="Time Frames => Key Levels", inline="km1")
+kmap_1m_3 = input.timeframe(defval="240", title="#3",      group="Time Frames => Key Levels", inline="km1")
+// 5m → 30m, 1h, 4h
+kmap_5m_1 = input.timeframe(defval="30",  title="5m → #1", group="Time Frames => Key Levels", inline="km5")
+kmap_5m_2 = input.timeframe(defval="60",  title="#2",      group="Time Frames => Key Levels", inline="km5")
+kmap_5m_3 = input.timeframe(defval="240", title="#3",      group="Time Frames => Key Levels", inline="km5")
+// 15m → 1h, 4h, 1D
+kmap_15m_1 = input.timeframe(defval="60",  title="15m → #1", group="Time Frames => Key Levels", inline="km15")
+kmap_15m_2 = input.timeframe(defval="240", title="#2",       group="Time Frames => Key Levels", inline="km15")
+kmap_15m_3 = input.timeframe(defval="D",   title="#3",       group="Time Frames => Key Levels", inline="km15")
+// 30m & 1h → 4h, 1D
+kmap_30m_1 = input.timeframe(defval="240", title="30m → #1", group="Time Frames => Key Levels", inline="km30")
+kmap_30m_2 = input.timeframe(defval="D",   title="#2",       group="Time Frames => Key Levels", inline="km30")
+kmap_30m_3 = input.timeframe(defval="W",   title="#3",       group="Time Frames => Key Levels", inline="km30")
+kmap_1h_1  = input.timeframe(defval="240", title="1h  → #1", group="Time Frames => Key Levels", inline="km60")
+kmap_1h_2  = input.timeframe(defval="D",   title="#2",       group="Time Frames => Key Levels", inline="km60")
+kmap_1h_3  = input.timeframe(defval="W",   title="#3",       group="Time Frames => Key Levels", inline="km60")
+// 1D → 1W, 1M, 3M
+kmap_1d_1  = input.timeframe(defval="W",   title="1D  → #1", group="Time Frames => Key Levels", inline="kmD")
+kmap_1d_2  = input.timeframe(defval="M",   title="#2",       group="Time Frames => Key Levels", inline="kmD")
+kmap_1d_3  = input.timeframe(defval="3M",  title="#3",       group="Time Frames => Key Levels", inline="kmD")
+
 // Auto mapping: current chart TF -> HTF
 f_map_htf_from_chart_tf(_chartTf) =>
     // Returns a constant string based on the chart TF
@@ -715,38 +744,80 @@ f_live_mini(_htf)=>
     _c0:= close
     [_h1,_l1,_c1,_o1,_t1,_h0,_l0,_c0,_o0,_t0]
 ///////////////////////////////////////////////////////key levels
-[tf1h1,tf1l1,tf1c1,tf1o1,tf1t1,wh0,wl0,wc0,wo0,wt0] = f_live_mini(keytf1)
-[tf2h1,tf2l1,tf2c1,tf2o1,tf2t1,dh0,dl0,dc0,do0,dt0] = f_live_mini(keytf2)
-[tf3h1,tf3l1,tf3c1,tf3o1,tf3t1,h40,l40,c40,o40,t40] = f_live_mini(keytf3)
+
+// Auto key-levels mapping by chart TF
+f_key_auto_from_chart_tf(_chartTf) =>
+    switch _chartTf
+        "1"   => ["15","60","240"]       // 1m → 15m, 1h, 4h
+        "3"   => ["15","60","240"]
+        "5"   => ["30","60","240"]       // 5m → 30m, 1h, 4h
+        "15"  => ["60","240","D"]        // 15m → 1h, 4h, 1D
+        "30"  => ["240","D","D"]        // 30m → 4h, 1D
+        "60"  => ["240","D","D"]        // 1h  → 4h, 1D
+        "240" => ["D","W","M"]          // fallback for 4h chart
+        "D"   => ["W","M","3M"]         // 1D → 1W, 1M, 3M
+        "W"   => ["M","3M","3M"]        // weekly fallback
+        => [keytf1,keytf2,keytf3]
+
+// Manual mapping using configurable presets per chart TF bucket
+f_key_manual_from_chart_tf(_chartTf) =>
+    _sec = timeframe.in_seconds(_chartTf)
+    _r1 = kmap_1m_1, _r2 = kmap_1m_2, _r3 = kmap_1m_3
+    if _sec <= timeframe.in_seconds("1")
+        [_r1,_r2,_r3] := [kmap_1m_1, kmap_1m_2, kmap_1m_3]
+    else if _sec <= timeframe.in_seconds("5")
+        [_r1,_r2,_r3] := [kmap_5m_1, kmap_5m_2, kmap_5m_3]
+    else if _sec <= timeframe.in_seconds("15")
+        [_r1,_r2,_r3] := [kmap_15m_1, kmap_15m_2, kmap_15m_3]
+    else if _sec <= timeframe.in_seconds("30")
+        [_r1,_r2,_r3] := [kmap_30m_1, kmap_30m_2, kmap_30m_3]
+    else if _sec <= timeframe.in_seconds("60")
+        [_r1,_r2,_r3] := [kmap_1h_1,  kmap_1h_2,  kmap_1h_3]
+    else if _sec <= timeframe.in_seconds("D")
+        [_r1,_r2,_r3] := [kmap_1d_1,  kmap_1d_2,  kmap_1d_3]
+    else
+        [_r1,_r2,_r3] := [keytf1, keytf2, keytf3]
+    [_r1,_r2,_r3]
+
+[auto_k1, auto_k2, auto_k3]   = f_key_auto_from_chart_tf(tf)
+[map_k1,  map_k2,  map_k3]    = f_key_manual_from_chart_tf(tf)
+
+key1_used = keyAutoMap ? auto_k1 : keyManualMode == "Fixed TFs" ? keytf1 : map_k1
+key2_used = keyAutoMap ? auto_k2 : keyManualMode == "Fixed TFs" ? keytf2 : map_k2
+key3_used = keyAutoMap ? auto_k3 : keyManualMode == "Fixed TFs" ? keytf3 : map_k3
+
+[tf1h1,tf1l1,tf1c1,tf1o1,tf1t1,wh0,wl0,wc0,wo0,wt0] = f_live_mini(key1_used)
+[tf2h1,tf2l1,tf2c1,tf2o1,tf2t1,dh0,dl0,dc0,do0,dt0] = f_live_mini(key2_used)
+[tf3h1,tf3l1,tf3c1,tf3o1,tf3t1,h40,l40,c40,o40,t40] = f_live_mini(key3_used)
 nx=8
 dt = timeframe.in_seconds(tf)*1000
 if show_keylvl and barstate.islast
-    if tf_ok(keytf1) and showkeytf1
+    if tf_ok(key1_used) and showkeytf1
         add1h = wh0 >= tf1h1 ? "(-)" : ""
         add1l = wl0 <= tf1l1 ? "(-)" : ""  
-        wbox1 = box.new(left = t0, top = tf1h1 , right = time + nx * dt,bottom = tf1h1,xloc= xloc.bar_time, border_color = keytf1_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(keytf1)+" h "+ add1h, text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
-        wbox2 = box.new(left = t0, top = tf1l1 , right = time + nx * dt,bottom = tf1l1,xloc= xloc.bar_time, border_color = keytf1_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(keytf1)+" l "+ add1l, text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
-        wbox3 = box.new(left = t0, top = wo0   , right = time + nx * dt,bottom = wo0  ,xloc= xloc.bar_time, border_color = keytf1_clr,bgcolor = color.new(color.gray,100),text = f_text(keytf1)+" open ", text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        wbox1 = box.new(left = t0, top = tf1h1 , right = time + nx * dt,bottom = tf1h1,xloc= xloc.bar_time, border_color = keytf1_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(key1_used)+" h "+ add1h, text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        wbox2 = box.new(left = t0, top = tf1l1 , right = time + nx * dt,bottom = tf1l1,xloc= xloc.bar_time, border_color = keytf1_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(key1_used)+" l "+ add1l, text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        wbox3 = box.new(left = t0, top = wo0   , right = time + nx * dt,bottom = wo0  ,xloc= xloc.bar_time, border_color = keytf1_clr,bgcolor = color.new(color.gray,100),text = f_text(key1_used)+" open ", text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
         box.delete(wbox1[1])
         box.delete(wbox2[1])
         box.delete(wbox3[1])
 
-    if tf_ok(keytf2) and showkeytf2
+    if tf_ok(key2_used) and showkeytf2
         add2h = dh0 >= tf2h1 ? "(-)" : ""
         add2l = dl0 <= tf2l1 ? "(-)" : ""         
-        dbox1 = box.new(left = t0, top = tf2h1 , right = time + nx * dt,bottom = tf2h1,xloc= xloc.bar_time, border_color = keytf2_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(keytf2)+" h "+ add2h, text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
-        dbox2 = box.new(left = t0, top = tf2l1 , right = time + nx * dt,bottom = tf2l1,xloc= xloc.bar_time, border_color = keytf2_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(keytf2)+" l "+ add2l, text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
-        dbox3 = box.new(left = t0, top = do0   , right = time + nx * dt,bottom = do0  ,xloc= xloc.bar_time, border_color = keytf2_clr,bgcolor = color.new(color.gray,100),text = f_text(keytf2)+" open ", text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        dbox1 = box.new(left = t0, top = tf2h1 , right = time + nx * dt,bottom = tf2h1,xloc= xloc.bar_time, border_color = keytf2_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(key2_used)+" h "+ add2h, text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        dbox2 = box.new(left = t0, top = tf2l1 , right = time + nx * dt,bottom = tf2l1,xloc= xloc.bar_time, border_color = keytf2_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(key2_used)+" l "+ add2l, text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        dbox3 = box.new(left = t0, top = do0   , right = time + nx * dt,bottom = do0  ,xloc= xloc.bar_time, border_color = keytf2_clr,bgcolor = color.new(color.gray,100),text = f_text(key2_used)+" open ", text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
         box.delete(dbox1[1])
         box.delete(dbox2[1]) 
         box.delete(dbox3[1])
 
-    if tf_ok(keytf3) and showkeytf3
+    if tf_ok(key3_used) and showkeytf3
         add3h = h40 >= tf3h1 ? "(-)" : ""
         add3l = l40 <= tf3l1 ? "(-)" : ""         
-        h4box1 = box.new(left = t0, top = tf3h1 , right = time + nx * dt,bottom = tf3h1,xloc= xloc.bar_time, border_color = keytf3_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(keytf3)+" h "+ add3h, text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
-        h4box2 = box.new(left = t0, top = tf3l1 , right = time + nx * dt,bottom = tf3l1,xloc= xloc.bar_time, border_color = keytf3_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(keytf3)+" l "+ add3l, text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
-        h4box3 = box.new(left = t0, top = o40   , right = time + nx * dt,bottom = o40  ,xloc= xloc.bar_time, border_color = keytf3_clr,bgcolor = color.new(color.gray,100),text = f_text(keytf3)+" open ", text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        h4box1 = box.new(left = t0, top = tf3h1 , right = time + nx * dt,bottom = tf3h1,xloc= xloc.bar_time, border_color = keytf3_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(key3_used)+" h "+ add3h, text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        h4box2 = box.new(left = t0, top = tf3l1 , right = time + nx * dt,bottom = tf3l1,xloc= xloc.bar_time, border_color = keytf3_clr,bgcolor = color.new(color.gray,100),text = "p "+f_text(key3_used)+" l "+ add3l, text_color = key_txtcolor,text_valign = text.align_top,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
+        h4box3 = box.new(left = t0, top = o40   , right = time + nx * dt,bottom = o40  ,xloc= xloc.bar_time, border_color = keytf3_clr,bgcolor = color.new(color.gray,100),text = f_text(key3_used)+" open ", text_color = key_txtcolor,text_valign = text.align_bottom,text_halign = text.align_right,text_size = size.tiny,border_style = line.style_dotted)
         box.delete(h4box1[1])
         box.delete(h4box2[1])
         box.delete(h4box3[1])
