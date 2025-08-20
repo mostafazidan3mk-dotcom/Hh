@@ -1,0 +1,659 @@
+//@version=5
+indicator("ICT Trade Framer (Consolidation + Break & Retest + Plan)", overlay=true, max_lines_count=500, max_labels_count=500, max_bars_back=5000)
+
+// General
+tick = syminfo.mintick
+
+// Groups
+var g_CONS = "Consolidation (Range) Detection"
+var g_ALIGN = "Higher Timeframe Alignment"
+var g_BR = "Break & Retest"
+var g_PLAN = "Trade Plan & Visuals"
+var g_ALERT = "Alerts"
+
+// Consolidation inputs
+rangeLen            = input.int(20, "Range length (bars)", minval=5, group=g_CONS)
+minRangeTicks       = input.int(5, "Min range height (ticks)", minval=0, group=g_CONS)
+maxRangeTicks       = input.int(120, "Max range height (ticks)", minval=1, group=g_CONS)
+minBarsInRange      = input.int(5, "Min bars inside range before break", minval=1, group=g_CONS)
+consColor           = input.color(color.new(color.blue, 0), "Consolidation line color", group=g_CONS)
+
+// Alignment inputs
+useDailyBias        = input.bool(true, "Require Daily bias alignment", group=g_ALIGN)
+useH4Bias           = input.bool(true, "Require 4H bias alignment", group=g_ALIGN)
+biasMethod          = input.string("Open", "Bias method", options=["Open","Midpoint"], group=g_ALIGN)
+
+// Break & Retest gating
+useDisplacement     = input.bool(true, "Require displacement on break (ATR body)", group=g_BR)
+dispAtrLen          = input.int(14, "ATR length", minval=1, group=g_BR)
+dispAtrMult         = input.float(1.0, "ATR x body multiple", step=0.1, minval=0.1, group=g_BR)
+entryToleranceTicks = input.int(2, "Retest tolerance (ticks)", minval=0, group=g_BR)
+
+// Trade plan
+riskReward          = input.float(2.0, "Risk:Reward target", step=0.1, minval=0.5, group=g_PLAN)
+stopMethod          = input.string("Opposite Range", "Stop method", options=["Opposite Range","Retest Swing"], group=g_PLAN)
+showPlanLines       = input.bool(true, "Show entry/SL/TP lines", group=g_PLAN)
+showPlanLabel       = input.bool(true, "Show plan label", group=g_PLAN)
+entryLineColor      = input.color(color.new(color.lime, 0), "Entry line color", group=g_PLAN)
+stopLineColor       = input.color(color.new(color.red, 0), "Stop line color (dashed)", group=g_PLAN)
+tpLineColor         = input.color(color.new(color.lime, 0), "Target line color (dotted)", group=g_PLAN)
+
+// Alerts
+enableAlerts        = input.bool(true, "Enable alerts on setup", group=g_ALERT)
+
+// Higher timeframe bias
+getBias(openTF) =>
+    bOpen = request.security(syminfo.tickerid, openTF, open, barmerge.gaps_off, barmerge.lookahead_off)
+    bHigh = request.security(syminfo.tickerid, openTF, high, barmerge.gaps_off, barmerge.lookahead_off)
+    bLow  = request.security(syminfo.tickerid, openTF, low,  barmerge.gaps_off, barmerge.lookahead_off)
+    ref   = biasMethod == "Midpoint" ? (bHigh + bLow) / 2.0 : bOpen
+    [close > ref, close < ref]
+
+[dBull, dBear] = getBias("D")
+[h4Bull, h4Bear] = getBias("240")
+longAligned  = (not useDailyBias or dBull) and (not useH4Bias or h4Bull)
+shortAligned = (not useDailyBias or dBear) and (not useH4Bias or h4Bear)
+
+// Consolidation (Donchian-style)
+donHigh = ta.highest(high, rangeLen)
+donLow  = ta.lowest(low, rangeLen)
+donHighPrev = donHigh[1]
+donLowPrev  = donLow[1]
+rangeHeightPrev = donHighPrev - donLowPrev
+rangeTicksPrev  = math.round(rangeHeightPrev / tick)
+inRangePrev = rangeTicksPrev >= minRangeTicks and rangeTicksPrev <= maxRangeTicks
+
+// Count bars that were contained inside prev range
+insidePrevRangeNow = high <= donHighPrev and low >= donLowPrev
+var int barsHeld = 0
+barsHeld := insidePrevRangeNow ? nz(barsHeld[1]) + 1 : 0
+maturePrevRange = barsHeld[1] >= minBarsInRange
+
+// Displacement on break
+atr = ta.atr(dispAtrLen)
+body = math.abs(close - open)
+dispOK = not useDisplacement or (body >= atr * dispAtrMult)
+
+// Breakout conditions (from previous matured range)
+bullBreak = maturePrevRange and inRangePrev and close > donHighPrev and dispOK
+bearBreak = maturePrevRange and inRangePrev and close < donLowPrev  and dispOK
+
+// State for active setup
+var bool pendingRetestBull = false
+var bool pendingRetestBear = false
+var float brkHigh = na, brkLow = na
+var int   brkBar  = na
+
+if bullBreak
+    pendingRetestBull := true
+    pendingRetestBear := false
+    brkHigh := donHighPrev
+    brkLow  := donLowPrev
+    brkBar  := bar_index
+
+if bearBreak
+    pendingRetestBear := true
+    pendingRetestBull := false
+    brkHigh := donHighPrev
+    brkLow  := donLowPrev
+    brkBar  := bar_index
+
+// Consolidation visualization (blue lines) for the last valid/matured range
+var line consHighLine = na
+var line consLowLine  = na
+if bullBreak or bearBreak
+    // Freeze lines to the broken range
+    if not na(consHighLine)
+        line.delete(consHighLine), line.delete(consLowLine)
+    consHighLine := line.new(brkBar - 1, brkHigh, bar_index, brkHigh, extend=extend.right, color=consColor, width=2)
+    consLowLine  := line.new(brkBar - 1, brkLow,  bar_index, brkLow,  extend=extend.right, color=consColor, width=2)
+else
+    // Live preview of candidate range
+    if maturePrevRange and inRangePrev
+        if na(consHighLine)
+            consHighLine := line.new(bar_index - 1, donHighPrev, bar_index, donHighPrev, extend=extend.right, color=consColor, width=2)
+            consLowLine  := line.new(bar_index - 1, donLowPrev,  bar_index, donLowPrev,  extend=extend.right, color=consColor, width=2)
+        else
+            line.set_x2(consHighLine, bar_index), line.set_y1(consHighLine, donHighPrev), line.set_y2(consHighLine, donHighPrev)
+            line.set_x2(consLowLine,  bar_index), line.set_y1(consLowLine,  donLowPrev),  line.set_y2(consLowLine,  donLowPrev)
+    else
+        if not na(consHighLine)
+            line.delete(consHighLine), line.delete(consLowLine)
+            consHighLine := na, consLowLine := na
+
+// Retest detection
+tol = entryToleranceTicks * tick
+retestBull = pendingRetestBull and longAligned and low <= (brkHigh + tol)
+retestBear = pendingRetestBear and shortAligned and high >= (brkLow - tol)
+
+// Plan state and visuals
+var float entryPrice = na
+var float stopPrice  = na
+var float targetPrice= na
+var int   setupDir   = 0   // 1 bull, -1 bear
+var int   setupBar   = na
+
+// Lines and label
+var line entryLine = na
+var line stopLine  = na
+var line tpLine    = na
+var label planLabel = na
+
+deletePlan() =>
+    if not na(entryLine)
+        line.delete(entryLine), line.delete(stopLine), line.delete(tpLine)
+    if not na(planLabel)
+        label.delete(planLabel)
+    entryLine := na, stopLine := na, tpLine := na, planLabel := na
+
+mkLine(y, col, style) =>
+    line.new(setupBar, y, bar_index, y, color=col, width=2, style=style)
+
+swingLowRetest() =>
+    // Simple retest swing low for stop (last 5 bars)
+    math.min(low, ta.lowest(low, 5))
+
+swingHighRetest() =>
+    // Simple retest swing high for stop (last 5 bars)
+    math.max(high, ta.highest(high, 5))
+
+// Build plan on retest
+if retestBull
+    setupDir := 1
+    setupBar := bar_index
+    entryPrice := brkHigh
+    stopPrice  := stopMethod == "Retest Swing" ? swingLowRetest() : brkLow
+    risk = math.max(entryPrice - stopPrice, tick)
+    targetPrice := entryPrice + riskReward * risk
+    pendingRetestBull := false
+
+    deletePlan()
+    if showPlanLines
+        entryLine := mkLine(entryPrice, entryLineColor, line.style_solid)
+        stopLine  := mkLine(stopPrice,  stopLineColor,  line.style_dashed)
+        tpLine    := mkLine(targetPrice,tpLineColor,    line.style_dotted)
+    if showPlanLabel
+        txt = "ICT BULLISH TRADE\n" +
+              "Entry: " + str.tostring(entryPrice, format.mintick) + "\n" +
+              "Stop:  " + str.tostring(stopPrice,  format.mintick) + "\n" +
+              "Target:" + str.tostring(targetPrice,format.mintick) + "\n" +
+              "R:R   :" + str.tostring(riskReward, format.mintick)
+        planLabel := label.new(bar_index, entryPrice, txt, style=label.style_label_up, textcolor=color.lime, color=color.new(color.black, 0), size=size.small)
+
+if retestBear
+    setupDir := -1
+    setupBar := bar_index
+    entryPrice := brkLow
+    stopPrice  := stopMethod == "Retest Swing" ? swingHighRetest() : brkHigh
+    risk = math.max(stopPrice - entryPrice, tick)
+    targetPrice := entryPrice - riskReward * risk
+    pendingRetestBear := false
+
+    deletePlan()
+    if showPlanLines
+        entryLine := mkLine(entryPrice, entryLineColor, line.style_solid)
+        stopLine  := mkLine(stopPrice,  stopLineColor,  line.style_dashed)
+        tpLine    := mkLine(targetPrice,tpLineColor,    line.style_dotted)
+    if showPlanLabel
+        txt = "ICT BEARISH TRADE\n" +
+              "Entry: " + str.tostring(entryPrice, format.mintick) + "\n" +
+              "Stop:  " + str.tostring(stopPrice,  format.mintick) + "\n" +
+              "Target:" + str.tostring(targetPrice,format.mintick) + "\n" +
+              "R:R   :" + str.tostring(riskReward, format.mintick)
+        planLabel := label.new(bar_index, entryPrice, txt, style=label.style_label_down, textcolor=color.red, color=color.new(color.black, 0), size=size.small)
+
+// Keep lines extending
+if not na(entryLine)
+    line.set_x2(entryLine, bar_index)
+if not na(stopLine)
+    line.set_x2(stopLine, bar_index)
+if not na(tpLine)
+    line.set_x2(tpLine, bar_index)
+
+// Alerts (static messages; use chart visuals for exact prices)
+longSignal  = retestBull
+shortSignal = retestBear
+if enableAlerts
+    alertcondition(longSignal,  "ICT Bullish Trade", "ICT Bullish Trade setup formed")
+    alertcondition(shortSignal, "ICT Bearish Trade", "ICT Bearish Trade setup formed")
+
+// --- ICT Reference Notes (extensive) will follow as comments to expand file size per request.
+
+// ============== ICT Extended Modules (Sessions & PD Arrays) ==============
+
+// ---------------------- Sessions & Killzones ----------------------
+var g_SESS = "Sessions & Killzones"
+sess_tz                 = input.string("America/New_York", "Session timezone", group=g_SESS)
+use_session_gate        = input.bool(true, "Gate signals by sessions", group=g_SESS)
+use_london_sess         = input.bool(true, "London 02:00–05:00 NY", group=g_SESS)
+sess_london             = input.session("0200-0500:12345", "", inline="L", group=g_SESS)
+use_nyam_sess           = input.bool(true, "NY AM 09:30–11:30 NY", group=g_SESS)
+sess_nyam               = input.session("0930-1130:12345", "", inline="NYAM", group=g_SESS)
+use_sb_sess             = input.bool(true, "Silver Bullet 10:00–11:00 NY", group=g_SESS)
+sess_sb                 = input.session("1000-1100:12345", "", inline="SB", group=g_SESS)
+use_nypm_sess           = input.bool(false, "NY PM 13:30–15:30 NY", group=g_SESS)
+sess_nypm               = input.session("1330-1530:12345", "", inline="NYPM", group=g_SESS)
+
+inSess(sess) =>
+    not na(time(timeframe.period, sess, sess_tz))
+
+ictSessionsOk() =>
+    not use_session_gate or ((not use_london_sess or inSess(sess_london)) and (not use_nyam_sess or inSess(sess_nyam)) and (not use_sb_sess or inSess(sess_sb)) and (not use_nypm_sess or inSess(sess_nypm)))
+
+// ---------------------- PD Arrays (Daily/Weekly/Monthly) ----------------------
+var g_PD = "PD Arrays"
+show_pd_levels          = input.bool(true, "Show PDH/PDL/PWH/PWL & opens", group=g_PD)
+pd_color_d              = input.color(color.new(color.gray, 0), "Daily levels color", group=g_PD)
+pd_color_w              = input.color(color.new(color.teal, 0), "Weekly levels color", group=g_PD)
+pd_color_m              = input.color(color.new(color.purple, 0), "Monthly levels color", group=g_PD)
+pd_line_w               = input.int(1, "PD line width", group=g_PD)
+
+[dOpen, dHigh, dLow, dClose] = request.security(syminfo.tickerid, "D", [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+[wOpen, wHigh, wLow, wClose] = request.security(syminfo.tickerid, "W", [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+[mOpen, mHigh, mLow, mClose] = request.security(syminfo.tickerid, "M", [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+
+pdh = dHigh[1], pdl = dLow[1], dopenCur = dOpen
+pwh = wHigh[1], pwl = wLow[1], wopenCur = wOpen
+pmh = mHigh[1], pml = mLow[1], mopenCur = mOpen
+
+var line pdhLine = na, pdlLine = na, pwhLine = na, pwlLine = na, pmhLine = na, pmlLine = na, dOpenLine = na, wOpenLine = na, mOpenLine = na
+drawLevel(ref, col, w) => line.new(bar_index - 1, ref, bar_index, ref, extend=extend.right, color=col, width=w)
+updLevel(ln, ref) => line.set_x2(ln, bar_index), line.set_y1(ln, ref), line.set_y2(ln, ref)
+
+if show_pd_levels and barstate.islast
+    if na(pdhLine)
+        pdhLine := drawLevel(pdh, pd_color_d, pd_line_w)
+        pdlLine := drawLevel(pdl, pd_color_d, pd_line_w)
+        dOpenLine := drawLevel(dopenCur, color.new(pd_color_d, 40), pd_line_w)
+        pwhLine := drawLevel(pwh, pd_color_w, pd_line_w)
+        pwlLine := drawLevel(pwl, pd_color_w, pd_line_w)
+        wOpenLine := drawLevel(wopenCur, color.new(pd_color_w, 40), pd_line_w)
+        pmhLine := drawLevel(pmh, pd_color_m, pd_line_w)
+        pmlLine := drawLevel(pml, pd_color_m, pd_line_w)
+        mOpenLine := drawLevel(mopenCur, color.new(pd_color_m, 40), pd_line_w)
+    else
+        updLevel(pdhLine, pdh), updLevel(pdlLine, pdl), updLevel(dOpenLine, dopenCur)
+        updLevel(pwhLine, pwh), updLevel(pwlLine, pwl), updLevel(wOpenLine, wopenCur)
+        updLevel(pmhLine, pmh), updLevel(pmlLine, pml), updLevel(mOpenLine, mopenCur)
+
+
+// ============== ICT Extended Modules (Structure, Liquidity, Displacement, FVG/OB/Breaker/BPR, OTE, SMT, Risk, Trade Mgmt, Confluence) ==============
+
+// ---------------------- Structure (BOS / CHOCH) ----------------------
+var g_STRUCT = "Structure (BOS / CHOCH)"
+struct_pivot_len        = input.int(3, "Pivot L/R length", minval=1, group=g_STRUCT)
+struct_lookback         = input.int(50, "Structure lookback bars", minval=5, group=g_STRUCT)
+show_structure_labels   = input.bool(true, "Show BOS/CHOCH labels", group=g_STRUCT)
+struct_color_bos        = input.color(color.new(color.green, 0), "BOS color", group=g_STRUCT)
+struct_color_choch      = input.color(color.new(color.orange, 0), "CHOCH color", group=g_STRUCT)
+
+ph = ta.pivothigh(high, struct_pivot_len, struct_pivot_len)
+pl = ta.pivotlow(low, struct_pivot_len, struct_pivot_len)
+var float lastSwingHigh = na
+var float lastSwingLow  = na
+if not na(ph)
+    lastSwingHigh := ph
+if not na(pl)
+    lastSwingLow := pl
+
+bosUpNow   = not na(lastSwingHigh) and close > lastSwingHigh
+bosDnNow   = not na(lastSwingLow)  and close < lastSwingLow
+bosUpRecent = ta.barssince(bosUpNow) <= struct_lookback
+bosDnRecent = ta.barssince(bosDnNow) <= struct_lookback
+
+var int lastUpBOSBar = na, lastDnBOSBar = na
+if bosUpNow
+    lastUpBOSBar := bar_index
+if bosDnNow
+    lastDnBOSBar := bar_index
+
+chochDownNow = not na(lastUpBOSBar) and bosDnNow and (bar_index - lastUpBOSBar > 0)
+chochUpNow   = not na(lastDnBOSBar) and bosUpNow and (bar_index - lastDnBOSBar > 0)
+
+if show_structure_labels and (bosUpNow or bosDnNow or chochDownNow or chochUpNow)
+    lbltxt = bosUpNow ? "BOS↑" : bosDnNow ? "BOS↓" : chochUpNow ? "CHOCH↑" : "CHOCH↓"
+    lblcol = bosUpNow or chochUpNow ? struct_color_bos : struct_color_choch
+    label.new(bar_index, close, lbltxt, style=label.style_label_center, textcolor=lblcol, color=color.new(color.black, 100), size=size.tiny)
+
+// ---------------------- Liquidity Sweeps ----------------------
+var g_LIQ = "Liquidity Sweeps"
+use_sweep_pd           = input.bool(true, "Include PDH/PDL sweeps", group=g_LIQ)
+use_sweep_local        = input.bool(true, "Include local swing sweeps", group=g_LIQ)
+liq_lookback           = input.int(50, "Sweep lookback bars", minval=5, group=g_LIQ)
+
+sweptPDL = use_sweep_pd and low < pdl and close > pdl
+sweptPDH = use_sweep_pd and high > pdh and close < pdh
+sweptSwingLow  = use_sweep_local and not na(lastSwingLow)  and low < lastSwingLow and close > lastSwingLow
+sweptSwingHigh = use_sweep_local and not na(lastSwingHigh) and high > lastSwingHigh and close < lastSwingHigh
+
+sweptBullRecent = ta.barssince(sweptPDL or sweptSwingLow)  <= liq_lookback
+sweptBearRecent = ta.barssince(sweptPDH or sweptSwingHigh) <= liq_lookback
+
+// ---------------------- Displacement ----------------------
+var g_DISP = "Displacement"
+disp_atr_len2           = input.int(14, "ATR length", group=g_DISP)
+disp_atr_mult2          = input.float(1.0, "ATR x body", step=0.1, group=g_DISP)
+atrv2 = ta.atr(disp_atr_len2)
+body2 = math.abs(close - open)
+dispBullNow = close > open and body2 >= atrv2 * disp_atr_mult2
+dispBearNow = close < open and body2 >= atrv2 * disp_atr_mult2
+
+// ---------------------- FVG (Fair Value Gaps) ----------------------
+var g_FVG = "Fair Value Gaps"
+show_fvg               = input.bool(true, "Show FVGs", group=g_FVG)
+fvg_look               = input.int(60, "FVG lookback bars", minval=1, group=g_FVG)
+fvg_col_bull           = input.color(color.new(color.aqua, 80), "Bull FVG color", group=g_FVG)
+fvg_col_bear           = input.color(color.new(color.fuchsia, 80), "Bear FVG color", group=g_FVG)
+fvg_tolerance_ticks    = input.int(2, "FVG touch tolerance (ticks)", minval=0, group=g_FVG)
+
+fvgBullForm = low > high[2]
+fvgBearForm = high < low[2]
+
+var float lastBullFvgTop = na, lastBullFvgBot = na
+var int   lastBullFvgBar = na
+if fvgBullForm
+    lastBullFvgTop := low
+    lastBullFvgBot := high[2]
+    lastBullFvgBar := bar_index
+
+var float lastBearFvgTop = na, lastBearFvgBot = na
+var int   lastBearFvgBar = na
+if fvgBearForm
+    lastBearFvgTop := low[2]
+    lastBearFvgBot := high
+    lastBearFvgBar := bar_index
+
+tickSize = syminfo.mintick
+fvgTol = fvg_tolerance_ticks * tickSize
+
+bullFvgRecent = not na(lastBullFvgBar) and (bar_index - lastBullFvgBar <= fvg_look)
+bearFvgRecent = not na(lastBearFvgBar) and (bar_index - lastBearFvgBar <= fvg_look)
+bullFvgTouched = bullFvgRecent and low <= (lastBullFvgTop + fvgTol) and high >= (lastBullFvgBot - fvgTol)
+bearFvgTouched = bearFvgRecent and high >= (lastBearFvgBot - fvgTol) and low <= (lastBearFvgTop + fvgTol)
+
+if show_fvg and barstate.islast
+    if bullFvgRecent
+        line.new(bar_index - 1, lastBullFvgTop, bar_index, lastBullFvgTop, extend=extend.right, color=fvg_col_bull)
+        line.new(bar_index - 1, lastBullFvgBot, bar_index, lastBullFvgBot, extend=extend.right, color=fvg_col_bull)
+    if bearFvgRecent
+        line.new(bar_index - 1, lastBearFvgTop, bar_index, lastBearFvgTop, extend=extend.right, color=fvg_col_bear)
+        line.new(bar_index - 1, lastBearFvgBot, bar_index, lastBearFvgBot, extend=extend.right, color=fvg_col_bear)
+
+// ---------------------- Order Blocks & Breakers ----------------------
+var g_OB = "Order Blocks & Breakers"
+show_ob                = input.bool(true, "Show Order Blocks", group=g_OB)
+show_breaker           = input.bool(true, "Show Breakers", group=g_OB)
+ob_lb                  = input.int(60, "OB lookback", minval=1, group=g_OB)
+ob_col_bull            = input.color(color.new(color.green, 80), "Bull OB color", group=g_OB)
+ob_col_bear            = input.color(color.new(color.red, 80), "Bear OB color", group=g_OB)
+br_col                 = input.color(color.new(color.orange, 70), "Breaker color", group=g_OB)
+
+var float bullObHigh = na, bullObLow = na
+var float bearObHigh = na, bearObLow = na
+var int   bullObBar  = na, bearObBar  = na
+
+if dispBullNow and bosUpNow
+    preBear = close[1] < open[1]
+    if preBear
+        bullObHigh := high[1]
+        bullObLow  := low[1]
+        bullObBar  := bar_index
+
+if dispBearNow and bosDnNow
+    preBull = close[1] > open[1]
+    if preBull
+        bearObHigh := high[1]
+        bearObLow  := low[1]
+        bearObBar  := bar_index
+
+breakerBull = not na(bearObBar) and close > bearObHigh
+breakerBear = not na(bullObBar) and close < bullObLow
+
+if show_ob and barstate.islast
+    if not na(bullObBar)
+        line.new(bullObBar - 1, bullObHigh, bar_index, bullObHigh, extend=extend.right, color=ob_col_bull)
+        line.new(bullObBar - 1, bullObLow,  bar_index, bullObLow,  extend=extend.right, color=ob_col_bull)
+    if not na(bearObBar)
+        line.new(bearObBar - 1, bearObHigh, bar_index, bearObHigh, extend=extend.right, color=ob_col_bear)
+        line.new(bearObBar - 1, bearObLow,  bar_index, bearObLow,  extend=extend.right, color=ob_col_bear)
+    if show_breaker and breakerBull
+        line.new(bar_index - 1, bearObHigh, bar_index, bearObLow, extend=extend.right, color=br_col, style=line.style_dotted)
+    if show_breaker and breakerBear
+        line.new(bar_index - 1, bullObHigh, bar_index, bullObLow, extend=extend.right, color=br_col, style=line.style_dotted)
+
+// ---------------------- BPR (Balanced Price Range) ----------------------
+var g_BPR = "Balanced Price Range"
+show_bpr               = input.bool(true, "Show BPR (overlap of opposite FVGs)", group=g_BPR)
+bpr_col                = input.color(color.new(color.yellow, 70), "BPR color", group=g_BPR)
+
+haveBothFvg = bullFvgRecent and bearFvgRecent
+bprTop = na
+bprBot = na
+if haveBothFvg
+    bprTop := math.min(lastBullFvgTop, lastBearFvgTop)
+    bprBot := math.max(lastBullFvgBot, lastBearFvgBot)
+    if bprTop > bprBot and show_bpr and barstate.islast
+        line.new(bar_index - 1, bprTop, bar_index, bprTop, extend=extend.right, color=bpr_col)
+        line.new(bar_index - 1, bprBot, bar_index, bprBot, extend=extend.right, color=bpr_col)
+
+// ---------------------- OTE (Optimal Trade Entry) ----------------------
+var g_OTE = "OTE"
+show_ote               = input.bool(true, "Show 62%–79% OTE zone (last swing)", group=g_OTE)
+ote_col                = input.color(color.new(color.blue, 70), "OTE zone color", group=g_OTE)
+
+refLow  = na( lastSwingLow)  ? low  : lastSwingLow
+refHigh = na( lastSwingHigh) ? high : lastSwingHigh
+
+ote62 = refLow + 0.62 * (refHigh - refLow)
+note79 = refLow + 0.79 * (refHigh - refLow)
+if show_ote and barstate.islast
+    line.new(bar_index - 1, note62, bar_index, note62, extend=extend.right, color=ote_col)
+    line.new(bar_index - 1, note79, bar_index, note79, extend=extend.right, color=ote_col)
+
+// ---------------------- SMT (Divergence) ----------------------
+var g_SMT = "SMT Divergence"
+use_smt                = input.bool(false, "Use SMT vs peer symbol", group=g_SMT)
+smt_symbol             = input.symbol("NASDAQ:QQQ", "Peer symbol for SMT", group=g_SMT)
+smt_tf                 = input.timeframe("", "SMT timeframe (optional)", group=g_SMT)
+peerH = use_smt ? request.security(smt_symbol, smt_tf == "" ? timeframe.period : smt_tf, high, barmerge.gaps_off, barmerge.lookahead_off) : na
+peerL = use_smt ? request.security(smt_symbol, smt_tf == "" ? timeframe.period : smt_tf, low,  barmerge.gaps_off, barmerge.lookahead_off) : na
+
+hh_cur   = high > ta.highest(high[1], 5)
+hh_peer  = use_smt and peerH > ta.highest(peerH[1], 5)
+smt_bearish = use_smt and hh_cur and not hh_peer
+
+ll_cur   = low < ta.lowest(low[1], 5)
+ll_peer  = use_smt and peerL < ta.lowest(peerL[1], 5)
+smt_bullish = use_smt and ll_cur and not ll_peer
+
+// ---------------------- Position Sizing ----------------------
+var g_RISK = "Risk & Position Sizing"
+use_pos_sizing         = input.bool(true, "Compute position size", group=g_RISK)
+account_balance        = input.float(10000.0, "Account balance", step=1.0, group=g_RISK)
+risk_percent           = input.float(1.0, "Risk % per trade", step=0.1, group=g_RISK)
+tick_value             = input.float(1.0, "Tick value (quote per tick)", step=0.01, group=g_RISK)
+min_contract_size      = input.float(0.01, "Min contract/lot size", step=0.01, group=g_RISK)
+contract_step          = input.float(0.01, "Contract step", step=0.01, group=g_RISK)
+
+computeSize(entry, stop) =>
+    stopDist = math.max(math.abs(entry - stop), tickSize)
+    riskAmt  = account_balance * (risk_percent / 100.0)
+    rawSize  = riskAmt / (stopDist / tickSize * tick_value)
+    math.max(min_contract_size, math.round(rawSize / contract_step) * contract_step)
+
+// ---------------------- Trade Management ----------------------
+var g_TM = "Trade Management"
+use_partials           = input.bool(true, "Use partials at 1R/2R", group=g_TM)
+move_be_at_1r          = input.bool(true, "Move SL to BE at 1R", group=g_TM)
+use_trailing           = input.bool(false, "Use ATR trailing stop", group=g_TM)
+trail_atr_len          = input.int(14, "ATR len (trail)", group=g_TM)
+trail_atr_mult         = input.float(2.0, "ATR x for trail", step=0.1, group=g_TM)
+
+var bool inPosition = false
+var float activeEntry = na, activeStop = na, activeTP = na, activeSize = na
+
+if retestBull and not inPosition
+    inPosition := true
+    activeEntry := entryPrice
+    activeStop  := stopPrice
+    activeTP    := targetPrice
+    activeSize  := use_pos_sizing ? computeSize(activeEntry, activeStop) : na
+if retestBear and not inPosition
+    inPosition := true
+    activeEntry := entryPrice
+    activeStop  := stopPrice
+    activeTP    := targetPrice
+    activeSize  := use_pos_sizing ? computeSize(activeEntry, activeStop) : na
+
+updateTrailing() =>
+    if inPosition and use_trailing
+        trAtr = ta.atr(trail_atr_len)
+        if setupDir == 1
+            newSL = close - trAtr * trail_atr_mult
+            activeStop := math.max(activeStop, newSL)
+        if setupDir == -1
+            newSL = close + trAtr * trail_atr_mult
+            activeStop := math.min(activeStop, newSL)
+
+managePartials() =>
+    if inPosition and use_partials
+        riskPerUnit = math.max(math.abs(activeEntry - activeStop), tickSize)
+        oneRTarget  = setupDir == 1 ? activeEntry + riskPerUnit : activeEntry - riskPerUnit
+        twoRTarget  = setupDir == 1 ? activeEntry + 2.0 * riskPerUnit : activeEntry - 2.0 * riskPerUnit
+        hit1R = (setupDir == 1 and high >= oneRTarget) or (setupDir == -1 and low <= oneRTarget)
+        hit2R = (setupDir == 1 and high >= twoRTarget) or (setupDir == -1 and low <= twoRTarget)
+        if move_be_at_1r and hit1R
+            activeStop := activeEntry
+        if hit2R
+            activeTP := twoRTarget
+
+updateTrailing()
+managePartials()
+
+// ---------------------- Confluence & Priority Signals ----------------------
+var g_CONF = "Confluence & Signals"
+use_confluence          = input.bool(true, "Require confluence for PRIORITY signal", group=g_CONF)
+min_conf_score          = input.int(5, "Min confluence score", minval=1, maxval=12, group=g_CONF)
+
+conf_sess    = ictSessionsOk() ? 1 : 0
+conf_bias    = (longAligned or shortAligned) ? 1 : 0
+conf_sweep_b = sweptBullRecent ? 1 : 0
+conf_sweep_s = sweptBearRecent ? 1 : 0
+conf_bos_b   = bosUpRecent ? 1 : 0
+conf_bos_s   = bosDnRecent ? 1 : 0
+conf_disp_b  = dispBullNow ? 1 : 0
+conf_disp_s  = dispBearNow ? 1 : 0
+conf_fvg_b   = bullFvgTouched ? 1 : 0
+conf_fvg_s   = bearFvgTouched ? 1 : 0
+conf_ote     = (close >= math.min(note62, note79) and close <= math.max(note62, note79)) ? 1 : 0
+conf_smt_b   = smt_bullish ? 1 : 0
+conf_smt_s   = smt_bearish ? 1 : 0
+
+confLong  = conf_sess + conf_bias + conf_sweep_b + conf_bos_b + conf_disp_b + conf_fvg_b + conf_ote + conf_smt_b
+confShort = conf_sess + conf_bias + conf_sweep_s + conf_bos_s + conf_disp_s + conf_fvg_s + conf_ote + conf_smt_s
+
+priorityLong  = (retestBull or (setupDir == 1 and inPosition)) and (not use_confluence or confLong >= min_conf_score)
+priorityShort = (retestBear or (setupDir == -1 and inPosition)) and (not use_confluence or confShort >= min_conf_score)
+
+if priorityLong
+    label.new(bar_index, low, "ICT PRIORITY LONG\nConf=" + str.tostring(confLong), style=label.style_label_up, textcolor=color.lime, color=color.new(color.black, 0), size=size.small)
+if priorityShort
+    label.new(bar_index, high, "ICT PRIORITY SHORT\nConf=" + str.tostring(confShort), style=label.style_label_down, textcolor=color.red, color=color.new(color.black, 0), size=size.small)
+
+alertcondition(priorityLong,  "ICT Priority Long",  "ICT Priority Long (confluence)")
+alertcondition(priorityShort, "ICT Priority Short", "ICT Priority Short (confluence)")
+
+// ---------------------- Extended Plan Label ----------------------
+if inPosition and showPlanLabel
+    rrNow = math.abs(activeEntry - activeTP) / math.max(math.abs(activeEntry - activeStop), tickSize)
+    sizeTxt = use_pos_sizing and not na(activeSize) ? "\nSize: " + str.tostring(activeSize) : ""
+    txt2 = (setupDir == 1 ? "ICT BULLISH TRADE" : "ICT BEARISH TRADE") + "\n" +
+           "Entry: " + str.tostring(activeEntry, format.mintick) + "\n" +
+           "Stop:  " + str.tostring(activeStop,  format.mintick) + "\n" +
+           "Target:" + str.tostring(activeTP,    format.mintick) + "\n" +
+           "R:R   :" + str.tostring(rrNow, format.mintick) + sizeTxt + "\nConf: " + (setupDir == 1 ? str.tostring(confLong) : str.tostring(confShort))
+    if not na(planLabel)
+        label.delete(planLabel)
+    planLabel := label.new(bar_index, activeEntry, txt2, style=label.style_label_left, textcolor=color.white, color=color.new(color.black, 0), size=size.small)
+
+
+// ---------------------- Opening Range (Daily/Weekly) ----------------------
+var g_OR = "Opening Range"
+show_daily_or           = input.bool(true,  "Show Daily Opening Range", group=g_OR)
+daily_or_minutes        = input.int(30,     "Daily OR minutes", minval=1, maxval=240, group=g_OR)
+show_weekly_or          = input.bool(false, "Show Weekly Opening Range (Mon)", group=g_OR)
+weekly_or_minutes       = input.int(60,     "Weekly OR minutes (first session)", minval=1, maxval=240, group=g_OR)
+or_line_color           = input.color(color.new(color.yellow, 0), "OR line color", group=g_OR)
+or_fill_color           = input.color(color.new(color.yellow, 90), "OR fill color", group=g_OR)
+
+calcOR(tfOpen, tfTime, minutes) =>
+    // captures high/low from session start to start+minutes
+    inWin = (time - tfTime) <= minutes * 60 * 1000 and (time - tfTime) >= 0
+    sessionStarted = ta.change(tfTime) != 0
+    var float orHigh = na
+    var float orLow  = na
+    if sessionStarted
+        orHigh := high
+        orLow  := low
+    if inWin
+        orHigh := math.max(orHigh, high)
+        orLow  := math.min(orLow,  low)
+    [orHigh, orLow, inWin]
+
+[dayOpen, dayTime] = request.security(syminfo.tickerid, "D", [open, time], barmerge.gaps_off, barmerge.lookahead_off)
+[weekOpen, weekTime] = request.security(syminfo.tickerid, "W", [open, time], barmerge.gaps_off, barmerge.lookahead_off)
+
+var line dORhi = na, dORlo = na
+var line wORhi = na, wORlo = na
+
+if show_daily_or
+    [dHi, dLo, dWin] = calcOR(dayOpen, dayTime, daily_or_minutes)
+    if dWin
+        if na(dORhi)
+            dORhi := line.new(bar_index-1, dHi, bar_index, dHi, extend=extend.right, color=or_line_color)
+            dORlo := line.new(bar_index-1, dLo, bar_index, dLo, extend=extend.right, color=or_line_color)
+        else
+            line.set_y1(dORhi, dHi), line.set_y2(dORhi, dHi), line.set_x2(dORhi, bar_index)
+            line.set_y1(dORlo, dLo), line.set_y2(dORlo, dLo), line.set_x2(dORlo, bar_index)
+
+if show_weekly_or
+    [wHi, wLo, wWin] = calcOR(weekOpen, weekTime, weekly_or_minutes)
+    if wWin
+        if na(wORhi)
+            wORhi := line.new(bar_index-1, wHi, bar_index, wHi, extend=extend.right, color=color.new(or_line_color, 30))
+            wORlo := line.new(bar_index-1, wLo, bar_index, wLo, extend=extend.right, color=color.new(or_line_color, 30))
+        else
+            line.set_y1(wORhi, wHi), line.set_y2(wORhi, wHi), line.set_x2(wORhi, bar_index)
+            line.set_y1(wORlo, wLo), line.set_y2(wORlo, wLo), line.set_x2(wORlo, bar_index)
+
+// ---------------------- Premium/Discount Grid (Fib) ----------------------
+var g_PDGRID = "Premium/Discount Grid"
+show_pd_grid           = input.bool(true, "Show Fib 0/50/62/70.5/79/100 on active range", group=g_PDGRID)
+pdgrid_color           = input.color(color.new(color.gray, 50), "Grid color", group=g_PDGRID)
+pdgrid_mid_color       = input.color(color.new(color.orange, 0), "Mid (50%) color", group=g_PDGRID)
+
+var line grid0 = na, grid50 = na, grid62 = na, grid705 = na, grid79 = na, grid100 = na
+
+drawGrid(rLow, rHigh) =>
+    if na(grid0)
+        grid0   := line.new(bar_index-1, rLow,  bar_index, rLow,  extend=extend.right, color=pdgrid_color)
+        grid50  := line.new(bar_index-1, (rLow+rHigh)/2, bar_index, (rLow+rHigh)/2, extend=extend.right, color=pdgrid_mid_color)
+        grid62  := line.new(bar_index-1, rLow + 0.62*(rHigh-rLow), bar_index, rLow + 0.62*(rHigh-rLow), extend=extend.right, color=pdgrid_color)
+        grid705 := line.new(bar_index-1, rLow + 0.705*(rHigh-rLow), bar_index, rLow + 0.705*(rHigh-rLow), extend=extend.right, color=pdgrid_color)
+        grid79  := line.new(bar_index-1, rLow + 0.79*(rHigh-rLow), bar_index, rLow + 0.79*(rHigh-rLow), extend=extend.right, color=pdgrid_color)
+        grid100 := line.new(bar_index-1, rHigh, bar_index, rHigh, extend=extend.right, color=pdgrid_color)
+    else
+        line.set_y1(grid0, rLow),  line.set_y2(grid0, rLow),  line.set_x2(grid0,  bar_index)
+        line.set_y1(grid50,(rLow+rHigh)/2), line.set_y2(grid50,(rLow+rHigh)/2), line.set_x2(grid50, bar_index)
+        line.set_y1(grid62, rLow + 0.62*(rHigh-rLow)),  line.set_y2(grid62, rLow + 0.62*(rHigh-rLow)),  line.set_x2(grid62,  bar_index)
+        line.set_y1(grid705,rLow + 0.705*(rHigh-rLow)), line.set_y2(grid705,rLow + 0.705*(rHigh-rLow)), line.set_x2(grid705, bar_index)
+        line.set_y1(grid79, rLow + 0.79*(rHigh-rLow)),  line.set_y2(grid79, rLow + 0.79*(rHigh-rLow)),  line.set_x2(grid79,  bar_index)
+        line.set_y1(grid100,rHigh), line.set_y2(grid100,rHigh), line.set_x2(grid100, bar_index)
+
+if show_pd_grid
+    // use latest consolidated range from Donchian preview
+    rLow = donLowPrev
+    rHigh= donHighPrev
+    if rHigh > rLow
+        drawGrid(rLow, rHigh)
+
