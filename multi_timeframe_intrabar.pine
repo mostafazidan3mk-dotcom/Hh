@@ -145,11 +145,11 @@ process_tf(tf) =>
         basicBear = ((use_wick_touch and bearishRejectWick) or (use_body_touch and bearishRejectBody) or closedBelow) and not closedAbove
 
         if use_strong_rule
-            // Holding logic (consecutive closes) for stronger confirmation
-            holdAboveHighBars = ta.sum(close > rangeHigh ? 1 : 0, hold_bars) == hold_bars
-            holdBelowLowBars  = ta.sum(close < rangeLow  ? 1 : 0, hold_bars) == hold_bars
-            holdAboveLowBars  = ta.sum(close >= rangeLow ? 1 : 0, hold_bars) == hold_bars
-            holdBelowHighBars = ta.sum(close <= rangeHigh? 1 : 0, hold_bars) == hold_bars
+            // Holding logic (consecutive closes) for stronger confirmation (no ta.sum)
+            holdAboveHighBars = (na(ta.barssince(close <= rangeHigh)) ? false : ta.barssince(close <= rangeHigh) >= hold_bars)
+            holdBelowLowBars  = (na(ta.barssince(close >= rangeLow))  ? false : ta.barssince(close >= rangeLow)  >= hold_bars)
+            holdAboveLowBars  = (na(ta.barssince(close <  rangeLow))  ? false : ta.barssince(close <  rangeLow)  >= hold_bars)
+            holdBelowHighBars = (na(ta.barssince(close >  rangeHigh)) ? false : ta.barssince(close >  rangeHigh) >= hold_bars)
 
             // Break & close beyond the range with hold
             strongBreakBull = closedAbove and holdAboveHighBars
