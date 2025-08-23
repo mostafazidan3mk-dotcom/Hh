@@ -67,6 +67,11 @@ hold_bars         = input.int(2, "Hold Bars", minval=1, maxval=10, group=g_RULE)
 require_retest    = input.bool(false, "Require Retest of Level", group=g_RULE)
 retest_lookback   = input.int(5, "Retest Lookback Bars", minval=1, maxval=50, group=g_RULE)
 
+// Confluence/confirmation options
+var g_CONF = "Confluence"
+confirm_on_htf_close = input.bool(true, "Confirm on HTF Close (wait for next bar)", group=g_CONF, tooltip="Signal fires on the first bar of the next HTF candle based on what happened during the previous one.")
+require_htf_sweep   = input.bool(false, "Require HTF Sweep Confluence", group=g_CONF, tooltip="Previous HTF bar must sweep the prior high for shorts or the prior low for longs.")
+
 var g_LABEL = "Label Options"
 bullishLabelStyle = input.string("Label Up", "Bullish Label Style", options=[  "None", "Label Up", "Label Down", "Label Left", "Label Right", "Label Center",   "Triangle Up", "Triangle Down", "Triangle Left", "Triangle Right",   "Flag", "Circle", "Square", "Diamond", "Cross", "X-Cross", "Arrow Up", "Arrow Down" ], group=g_LABEL)
 bearishLabelStyle = input.string("Label Down", "Bearish Label Style", options=[ "None", "Label Up", "Label Down", "Label Left", "Label Right", "Label Center", "Triangle Up", "Triangle Down", "Triangle Left", "Triangle Right", "Flag", "Circle", "Square", "Diamond",  "Cross", "X-Cross", "Arrow Up", "Arrow Down"  ], group=g_LABEL)
@@ -101,14 +106,31 @@ process_tf(tf) =>
     var bool  inConsolidation = true
     var bool  bullishTouch = false
     var bool  bearishTouch = false
+    // Accumulators within each HTF candle and one-shot emitters
+    var bool  accumBullInBar = false
+    var bool  accumBearInBar = false
+    var bool  emitBullNextBar = false
+    var bool  emitBearNextBar = false
 
     [tfOpen, tfHigh, tfLow, tfClose, tfTime] = request.security(syminfo.tickerid, tf, [open, high, low, close, time], barmerge.gaps_off, barmerge.lookahead_on)
+    // Stable HTF values (no repaint) for previous-bar checks
+    [htfO, htfH, htfL, htfC] = request.security(syminfo.tickerid, tf, [open, high, low, close], barmerge.gaps_off, barmerge.lookahead_off)
+    // Previous HTF bar swept prior bar?
+    sweptHighPrev = htfH[1] > htfH[2] and math.max(htfO[1], htfC[1]) <= htfH[2]
+    sweptLowPrev  = htfL[1] < htfL[2] and math.min(htfO[1], htfC[1]) >= htfL[2]
     newBar = ta.change(tfTime) != 0
 
     tfChildUp   = math.max(tfOpen, tfClose)
     tfChildDown = math.min(tfOpen, tfClose)
 
     if newBar
+        // On HTF boundary: finalize previous-HTF-bar accumulators into one-shot emitters
+        if confirm_on_htf_close
+            emitBullNextBar := accumBullInBar
+            emitBearNextBar := accumBearInBar
+        accumBullInBar := false
+        accumBearInBar := false
+
         upControl   = tfChildUp > rangeHigh  and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
         downControl = tfChildDown < rangeLow and bar_index - rangeStart > minbars and bar_index - rangeStart <= maxbars
         if (upControl or downControl)
@@ -171,11 +193,30 @@ process_tf(tf) =>
             strongBull = (strongBreakBull and (not require_retest or retestBreakBull)) or (strongReentryBull and (not require_retest or retestReentryBull))
             strongBear = (strongBreakBear and (not require_retest or retestBreakBear)) or (strongReentryBear and (not require_retest or retestReentryBear))
 
-            bullishTouch := strongBull
-            bearishTouch := strongBear
+            if confirm_on_htf_close
+                accumBullInBar := accumBullInBar or strongBull
+                accumBearInBar := accumBearInBar or strongBear
+                bullishTouch := false
+                bearishTouch := false
+            else
+                bullishTouch := strongBull
+                bearishTouch := strongBear
         else
-            bullishTouch := basicBull
-            bearishTouch := basicBear
+            if confirm_on_htf_close
+                accumBullInBar := accumBullInBar or basicBull
+                accumBearInBar := accumBearInBar or basicBear
+                bullishTouch := false
+                bearishTouch := false
+            else
+                bullishTouch := basicBull
+                bearishTouch := basicBear
+
+    // Emit confirmed signals on the first LTF bar of the new HTF candle
+    if confirm_on_htf_close and newBar
+        bullishTouch := emitBullNextBar and (not require_htf_sweep or sweptLowPrev)
+        bearishTouch := emitBearNextBar and (not require_htf_sweep or sweptHighPrev)
+        emitBullNextBar := false
+        emitBearNextBar := false
 
     [rangeHigh, rangeLow, rangeMid, rangeStart, inConsolidation, newBar, bullishTouch, bearishTouch]
 
