@@ -1,0 +1,1536 @@
+//@version=6
+indicator("Sentient Fractals", "Fractals", overlay=true, max_bars_back=5000, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+
+group_general = "General Settings"
+autoDetectAsset        = input.bool(true, "Auto-Detect Asset Class", group=group_general, tooltip="When checked, the script will try to automatically determine the asset class (Forex, Gold, Crypto) from the chart's symbol. Uncheck to use the manual dropdown below.")
+assetClass             = input.string("Forex: 17:00", "Asset Class", options=["Forex: 17:00", "Gold&Futures: 18:00", "Crypto: 20:00"], group=group_general, tooltip="Select the asset class to determine session times.")
+labelContentInput      = input.string("No info", "Label Content", options=["Fractal Label", "Fractal Time Info", "No info"], group=group_general)
+fractalLabelSize = input.string(size.small, "Fractal Label Size", options=[size.tiny, size.small, size.normal, size.large, size.huge], group=group_general)
+preventOverlapInput    = input.bool(false, "Prevent Label Overlap", group=group_general)
+lookbackInput          = input.int(2000, "Lookback Period (Candles)", minval=10, group=group_general, tooltip="Max bars to look back to calculate High/Low. Yearly/Monthly fractals use a fixed internal limit (4990 bars) to prevent errors.")
+tzInput                = input.string("America/New_York", "Timezone", group=group_general)
+borderWidthInput       = input.int(1, "Border Width", group=group_general, minval=1, maxval=5)
+lineWidth50pr          = input.int(1, "50% Line Width", group=group_general, minval=1)
+fractalRenderMode        = input.string("Boxes", "Fractal Render Mode", options=["Boxes","Lines"], group=group_general, tooltip="Choose how fractals are drawn: filled boxes or outline lines (start & end verticals plus a top line).")
+isBoxesMode            = fractalRenderMode == "Boxes"
+
+group_candle_openings = "Candle Openings"
+lookbackCandleOpenings = input.int(200, "Lookback by bars", group=group_candle_openings, tooltip="How many bars back to draw the opening lines.")
+showCandleOpenTime = input.bool(false, "Info", group=group_candle_openings, tooltip="Show time info for candle opening lines.")
+show5mOpen   = input.bool(false, "5m", group=group_candle_openings, inline="co_line1")
+show15mOpen  = input.bool(false, "15m", group=group_candle_openings, inline="co_line1")
+show30mOpen  = input.bool(false, "30m", group=group_candle_openings, inline="co_line1")
+show1hOpen   = input.bool(false, "1h", group=group_candle_openings, inline="co_line1")
+show4hOpen   = input.bool(false, "4h", group=group_candle_openings, inline="co_line2")
+showDailyOpen  = input.bool(false, "D", group=group_candle_openings, inline="co_line2")
+showWeeklyOpen = input.bool(false, "W", group=group_candle_openings, inline="co_line2")
+showMonthlyOpen = input.bool(false, "M", group=group_candle_openings, inline="co_line3")
+show3MonthOpen = input.bool(false, "3M", group=group_candle_openings, inline="co_line3")
+showYearlyOpen = input.bool(false, "Y", group=group_candle_openings, inline="co_line3")
+co_label_pos = input.string("Bottom", "Position", options=["Top", "Center", "Bottom"], group=group_candle_openings)
+co_label_size = input.string(size.small, "Size", options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=group_candle_openings)
+co_label_color_src = input.string("Custom", "Color Source", options=["Line Color", "Custom"], group=group_candle_openings)
+co_label_custom_color = input.color(color.rgb(3, 5, 13), "Custom Color", group=group_candle_openings)
+co_label_show_year = input.bool(true, "Show Year", group=group_candle_openings, inline="co_l_3")
+co_label_show_month = input.bool(true, "Show Month", group=group_candle_openings, inline="co_l_3")
+co_label_show_day = input.bool(true, "Show Day", group=group_candle_openings, inline="co_l_3")
+co_label_show_time = input.bool(true, "Show Time", group=group_candle_openings, inline="co_l_3")
+
+group_5min = "⏱️ 5-Minute (5m) Fractal Settings"
+startDayOffset5m   = input.int(0, "OR Day Offset", group=group_5min, inline="m5_anchor_or")
+startHourOffset5m  = input.int(0, "OR Hour Offset", group=group_5min, inline="m5_anchor_or")
+startMinuteOffset5m= input.int(0, "OR Min Offset", group=group_5min, inline="m5_anchor_or")
+endDayOffset5m     = input.int(0, "OF Day Offset", group=group_5min, inline="m5_anchor_of")
+endHourOffset5m    = input.int(0, "OF Hour Offset", group=group_5min, inline="m5_anchor_of")
+endMinuteOffset5m  = input.int(0, "OF Min Offset", group=group_5min, inline="m5_anchor_of")
+show5mOpenFloat = input.bool(false, "5m OF", group=group_5min, inline="m5_of")
+color5mOpenFloat = input.color(color.new(color.purple, 10), "", group=group_5min, inline="m5_of")
+bgColor5mOpenFloat = input.color(color.new(color.purple, 92), "", group=group_5min, inline="m5_of")
+show50PR5m = input.bool(true, "50% PR", group=group_5min, inline="m5_of")
+showStdvOF5m = input.bool(true, "STDVs", group=group_5min, inline="m5_of")
+showFuture5m_OF = input.bool(false, "Future", group=group_5min, inline="m5_of")
+show5mOpenRange = input.bool(false, "5m OR", group=group_5min, inline="m5_or")
+color5mOpenRange = input.color(color.new(color.purple, 20), "", group=group_5min, inline="m5_or")
+bgColor5mOpenRange = input.color(color.new(color.purple, 94), "", group=group_5min, inline="m5_or")
+show50PR5mOR = input.bool(true, "50% PR", group=group_5min, inline="m5_or")
+showStdvOR5m = input.bool(false, "STDVs", group=group_5min, inline="m5_or")
+showFuture5m_OR = input.bool(false, "Future", group=group_5min, inline="m5_or")
+show5mNest = input.bool(false, "5m Nest", group=group_5min, inline="m5_nest")
+color5mNest = input.color(color.new(color.gray, 70), "Border", group=group_5min, inline="m5_nest")
+bgColor5mNest = input.color(color.new(color.gray, 94), "BG", group=group_5min, inline="m5_nest")
+showFuture5m_Nest = input.bool(false, "Future", group=group_5min, inline="m5_nest")
+show_future_vdiv_5m = input.bool(false, "Future", group=group_5min, inline="m5_div")
+show_vdiv_5m = input.bool(false, "Show Divider", group=group_5min, inline="m5_div")
+color_vdiv_5m = input.color(color.new(color.purple, 50), "", group=group_5min, inline="m5_div")
+style_vdiv_5m = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_5min, inline="m5_div")
+width_vdiv_5m = input.int(1, "", group=group_5min, inline="m5_div", minval=1)
+show_stdv_ffd_5m = input.bool(false, "STDVs", group=group_5min, inline="m5_ffd")
+show_ffd_5m = input.bool(false, "FFD Border", group=group_5min, inline="m5_ffd")
+color_ffd_5m = input.color(color.new(color.purple, 80), "", group=group_5min, inline="m5_ffd")
+bgColor_ffd_5m = input.color(color.new(color.purple, 95), "BG", group=group_5min, inline="m5_ffd")
+orDurationPct5m = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_5min, inline="m5_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPct5m = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_5min, inline="m5_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookback5m = input.bool(true, "Limit History", group=group_5min, inline="m5_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCount5m = input.int(2, "", group=group_5min, inline="m5_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibility5m = input.bool(false, "highest TF Visibility", group=group_5min, inline="m5_tf_vis")
+maxTfVisibility5m = input.string("1m", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_5min, inline="m5_tf_vis")
+
+group_15min = "⏱️ 15-Minute (15m) Fractal Settings"
+startDayOffset15m   = input.int(0, "OR Day Offset", group=group_15min, inline="m15_anchor_or")
+startHourOffset15m  = input.int(0, "OR Hour Offset", group=group_15min, inline="m15_anchor_or")
+startMinuteOffset15m= input.int(0, "OR Min Offset", group=group_15min, inline="m15_anchor_or")
+endDayOffset15m     = input.int(0, "OF Day Offset", group=group_15min, inline="m15_anchor_of")
+endHourOffset15m    = input.int(0, "OF Hour Offset", group=group_15min, inline="m15_anchor_of")
+endMinuteOffset15m  = input.int(0, "OF Min Offset", group=group_15min, inline="m15_anchor_of")
+show15mOpenFloat = input.bool(false, "15m OF", group=group_15min, inline="m15_of")
+color15mOpenFloat = input.color(color.new(color.orange, 10), "", group=group_15min, inline="m15_of")
+bgColor15mOpenFloat = input.color(color.new(color.orange, 92), "", group=group_15min, inline="m15_of")
+show50PR15m = input.bool(true, "50% PR", group=group_15min, inline="m15_of")
+showStdvOF15m = input.bool(true, "STDVs", group=group_15min, inline="m15_of")
+showFuture15m_OF = input.bool(false, "Future", group=group_15min, inline="m15_of")
+show15mOpenRange = input.bool(false, "15m OR", group=group_15min, inline="m15_or")
+color15mOpenRange = input.color(color.new(color.orange, 20), "", group=group_15min, inline="m15_or")
+bgColor15mOpenRange = input.color(color.new(color.orange, 94), "", group=group_15min, inline="m15_or")
+show50PR15mOR = input.bool(true, "50% PR", group=group_15min, inline="m15_or")
+showStdvOR15m = input.bool(false, "STDVs", group=group_15min, inline="m15_or")
+showFuture15m_OR = input.bool(false, "Future", group=group_15min, inline="m15_or")
+show15mNest = input.bool(false, "15m Nest", group=group_15min, inline="m15_nest")
+color15mNest = input.color(color.new(color.gray, 70), "Border", group=group_15min, inline="m15_nest")
+bgColor15mNest = input.color(color.new(color.gray, 94), "BG", group=group_15min, inline="m15_nest")
+showFuture15m_Nest = input.bool(false, "Future", group=group_15min, inline="m15_nest")
+show_future_vdiv_15m = input.bool(false, "Future", group=group_15min, inline="m15_div")
+show_vdiv_15m = input.bool(false, "Show Divider", group=group_15min, inline="m15_div")
+color_vdiv_15m = input.color(color.new(color.teal, 50), "", group=group_15min, inline="m15_div")
+style_vdiv_15m = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_15min, inline="m15_div")
+width_vdiv_15m = input.int(1, "", group=group_15min, inline="m15_div", minval=1)
+show_stdv_ffd_15m = input.bool(false, "STDVs", group=group_15min, inline="m15_ffd")
+show_ffd_15m = input.bool(false, "FFD Border", group=group_15min, inline="m15_ffd")
+color_ffd_15m = input.color(color.new(color.orange, 80), "", group=group_15min, inline="m15_ffd")
+bgColor_ffd_15m = input.color(color.new(color.orange, 95), "BG", group=group_15min, inline="m15_ffd")
+orDurationPct15m = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_15min, inline="m15_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPct15m = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_15min, inline="m15_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookback15m = input.bool(true, "Limit History", group=group_15min, inline="m15_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCount15m = input.int(3, "", group=group_15min, inline="m15_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibility15m = input.bool(false, "highest TF Visibility", group=group_15min, inline="m15_tf_vis")
+maxTfVisibility15m = input.string("1m", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_15min, inline="m15_tf_vis")
+
+group_1hour = "🕐 1-Hour (1h) Fractal Settings"
+startDayOffset1h   = input.int(0, "OR Day Offset", group=group_1hour, inline="h1_anchor_or")
+startHourOffset1h  = input.int(0, "OR Hour Offset", group=group_1hour, inline="h1_anchor_or")
+startMinuteOffset1h= input.int(0, "OR Min Offset", group=group_1hour, inline="h1_anchor_or")
+endDayOffset1h     = input.int(0, "OF Day Offset", group=group_1hour, inline="h1_anchor_of")
+endHourOffset1h    = input.int(0, "OF Hour Offset", group=group_1hour, inline="h1_anchor_of")
+endMinuteOffset1h  = input.int(0, "OF Min Offset", group=group_1hour, inline="h1_anchor_of")
+show1hOpenFloat = input.bool(false, "1h OF", group=group_1hour, inline="h1_of")
+color1hOpenFloat = input.color(color.new(color.blue, 10), "", group=group_1hour, inline="h1_of")
+bgColor1hOpenFloat = input.color(color.new(color.blue, 92), "", group=group_1hour, inline="h1_of")
+show50PR1h = input.bool(true, "50% PR", group=group_1hour, inline="h1_of")
+showStdvOF1h = input.bool(true, "STDVs", group=group_1hour, inline="h1_of")
+showFuture1h_OF = input.bool(false, "Future", group=group_1hour, inline="h1_of")
+show1hOpenRange = input.bool(false, "1h OR", group=group_1hour, inline="h1_or")
+color1hOpenRange = input.color(color.new(color.blue, 20), "", group=group_1hour, inline="h1_or")
+bgColor1hOpenRange = input.color(color.new(color.blue, 94), "", group=group_1hour, inline="h1_or")
+show50PR1hOR = input.bool(true, "50% PR", group=group_1hour, inline="h1_or")
+showStdvOR1h = input.bool(false, "STDVs", group=group_1hour, inline="h1_or")
+showFuture1h_OR = input.bool(false, "Future", group=group_1hour, inline="h1_or")
+show1hNest = input.bool(false, "1h Nest", group=group_1hour, inline="h1_nest")
+color1hNest = input.color(color.new(color.gray, 70), "Border", group=group_1hour, inline="h1_nest")
+bgColor1hNest = input.color(color.new(color.gray, 94), "BG", group=group_1hour, inline="h1_nest")
+showFuture1h_Nest = input.bool(false, "Future", group=group_1hour, inline="h1_nest")
+show_future_vdiv_1h = input.bool(false, "Future", group=group_1hour, inline="h1_div")
+show_vdiv_1h = input.bool(false, "Show Divider", group=group_1hour, inline="h1_div")
+color_vdiv_1h = input.color(color.new(color.blue, 50), "", group=group_1hour, inline="h1_div")
+style_vdiv_1h = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_1hour, inline="h1_div")
+width_vdiv_1h = input.int(1, "", group=group_1hour, inline="h1_div", minval=1)
+show_stdv_ffd_1h = input.bool(false, "STDVs", group=group_1hour, inline="h1_ffd")
+show_ffd_1h = input.bool(false, "FFD Border", group=group_1hour, inline="h1_ffd")
+color_ffd_1h = input.color(color.new(color.blue, 80), "", group=group_1hour, inline="h1_ffd")
+bgColor_ffd_1h = input.color(color.new(color.blue, 95), "BG", group=group_1hour, inline="h1_ffd")
+orDurationPct1h = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_1hour, inline="h1_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPct1h = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_1hour, inline="h1_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookback1h = input.bool(true, "Limit History", group=group_1hour, inline="h1_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCount1h = input.int(4, "", group=group_1hour, inline="h1_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibility1h = input.bool(false, "highest TF Visibility", group=group_1hour, inline="h1_tf_vis")
+maxTfVisibility1h = input.string("1m", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_1hour, inline="h1_tf_vis")
+
+group_4hour = "🕐 4-Hour (4h) Fractal Settings"
+startDayOffset4h   = input.int(0, "OR Day Offset", group=group_4hour, inline="h4_anchor_or")
+startHourOffset4h  = input.int(0, "OR Hour Offset", group=group_4hour, inline="h4_anchor_or")
+startMinuteOffset4h= input.int(0, "OR Min Offset", group=group_4hour, inline="h4_anchor_or")
+endDayOffset4h     = input.int(0, "OF Day Offset", group=group_4hour, inline="h4_anchor_of")
+endHourOffset4h    = input.int(0, "OF Hour Offset", group=group_4hour, inline="h4_anchor_of")
+endMinuteOffset4h  = input.int(0, "OF Min Offset", group=group_4hour, inline="h4_anchor_of")
+show4hOpenFloat = input.bool(false, "4h OF", group=group_4hour, inline="h4_of")
+color4hOpenFloat = input.color(color.new(color.maroon, 10), "", group=group_4hour, inline="h4_of")
+bgColor4hOpenFloat = input.color(color.new(color.maroon, 92), "", group=group_4hour, inline="h4_of")
+show50PR4h = input.bool(true, "50% PR", group=group_4hour, inline="h4_of")
+showStdvOF4h = input.bool(true, "STDVs", group=group_4hour, inline="h4_of")
+showFuture4h_OF = input.bool(false, "Future", group=group_4hour, inline="h4_of")
+show4hOpenRange = input.bool(false, "4h OR", group=group_4hour, inline="h4_or")
+color4hOpenRange = input.color(color.new(color.maroon, 20), "", group=group_4hour, inline="h4_or")
+bgColor4hOpenRange = input.color(color.new(color.maroon, 94), "", group=group_4hour, inline="h4_or")
+show50PR4hOR = input.bool(true, "50% PR", group=group_4hour, inline="h4_or")
+showStdvOR4h = input.bool(false, "STDVs", group=group_4hour, inline="h4_or")
+showFuture4h_OR = input.bool(false, "Future", group=group_4hour, inline="h4_or")
+show4hNest = input.bool(false, "4h Nest", group=group_4hour, inline="h4_nest")
+color4hNest = input.color(color.new(color.gray, 70), "Border", group=group_4hour, inline="h4_nest")
+bgColor4hNest = input.color(color.new(color.gray, 94), "BG", group=group_4hour, inline="h4_nest")
+showFuture4h_Nest = input.bool(false, "Future", group=group_4hour, inline="h4_nest")
+show_future_vdiv_4h = input.bool(false, "Future", group=group_4hour, inline="h4_div")
+show_vdiv_4h = input.bool(false, "Show Divider", group=group_4hour, inline="h4_div")
+color_vdiv_4h = input.color(color.new(color.orange, 50), "", group=group_4hour, inline="h4_div")
+style_vdiv_4h = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_4hour, inline="h4_div")
+width_vdiv_4h = input.int(1, "", group=group_4hour, inline="h4_div", minval=1)
+show_stdv_ffd_4h = input.bool(false, "STDVs", group=group_4hour, inline="h4_ffd")
+show_ffd_4h = input.bool(false, "FFD Border", group=group_4hour, inline="h4_ffd")
+color_ffd_4h = input.color(color.new(color.maroon, 80), "", group=group_4hour, inline="h4_ffd")
+bgColor_ffd_4h = input.color(color.new(color.maroon, 95), "BG", group=group_4hour, inline="h4_ffd")
+orDurationPct4h = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_4hour, inline="h4_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPct4h = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_4hour, inline="h4_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookback4h = input.bool(true, "Limit History", group=group_4hour, inline="h4_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCount4h = input.int(4, "", group=group_4hour, inline="h4_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibility4h = input.bool(false, "highest TF Visibility", group=group_4hour, inline="h4_tf_vis")
+maxTfVisibility4h = input.string("1m", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_4hour, inline="h4_tf_vis")
+
+group_daily = "🌅 Daily (D) Fractal Settings"
+startDayOffsetD   = input.int(0, "OR Day Offset", group=group_daily, inline="d_anchor_or")
+startHourOffsetD  = input.int(0, "OR Hour Offset", group=group_daily, inline="d_anchor_or")
+startMinuteOffsetD= input.int(0, "OR Min Offset", group=group_daily, inline="d_anchor_or")
+endDayOffsetD     = input.int(0, "OF Day Offset", group=group_daily, inline="d_anchor_of")
+endHourOffsetD    = input.int(0, "OF Hour Offset", group=group_daily, inline="d_anchor_of")
+endMinuteOffsetD  = input.int(0, "OF Min Offset", group=group_daily, inline="d_anchor_of")
+showDOpenFloat = input.bool(false, "D OF", group=group_daily, inline="d1_of")
+colorDOpenFloat = input.color(color.new(#0d8a0f, 10), "", group=group_daily, inline="d1_of")
+bgColorDOpenFloat = input.color(color.new(color.yellow, 92), "", group=group_daily, inline="d1_of")
+show50PRD = input.bool(true, "50% PR", group=group_daily, inline="d1_of")
+showStdvOFD = input.bool(true, "STDVs", group=group_daily, inline="d1_of")
+showFutureD_OF = input.bool(false, "Future", group=group_daily, inline="d1_of")
+showDOpenRange = input.bool(false, "D OR", group=group_daily, inline="d1_or")
+colorDOpenRange = input.color(color.new(#0d8a0f, 20), "", group=group_daily, inline="d1_or")
+bgColorDOpenRange = input.color(color.new(color.yellow, 94), "", group=group_daily, inline="d1_or")
+show50PRDOR = input.bool(true, "50% PR", group=group_daily, inline="d1_or")
+showStdvORD = input.bool(false, "STDVs", group=group_daily, inline="d1_or")
+showFutureD_OR = input.bool(false, "Future", group=group_daily, inline="d1_or")
+showDNest = input.bool(false, "D Nest", group=group_daily, inline="d1_nest")
+colorDNest = input.color(color.new(color.gray, 70), "Border", group=group_daily, inline="d1_nest")
+bgColorDNest = input.color(color.new(color.gray, 94), "BG", group=group_daily, inline="d1_nest")
+showFutureD_Nest = input.bool(false, "Future", group=group_daily, inline="d1_nest")
+show_future_vdiv_D = input.bool(false, "Future", group=group_daily, inline="d1_div")
+show_vdiv_D = input.bool(false, "Show Divider", group=group_daily, inline="d1_div")
+color_vdiv_D = input.color(color.new(#0dc751, 50), "", group=group_daily, inline="d1_div")
+style_vdiv_D = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_daily, inline="d1_div")
+width_vdiv_D = input.int(1, "", group=group_daily, inline="d1_div", minval=1)
+show_stdv_ffd_D = input.bool(false, "STDVs", group=group_daily, inline="d1_ffd")
+show_ffd_D = input.bool(false, "FFD Border", group=group_daily, inline="d1_ffd")
+color_ffd_D = input.color(color.new(#0d8a0f, 80), "", group=group_daily, inline="d1_ffd")
+bgColor_ffd_D = input.color(color.new(#0d8a0f, 95), "BG", group=group_daily, inline="d1_ffd")
+orDurationPctD = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_daily, inline="d1_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPctD = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_daily, inline="d1_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookbackD = input.bool(true, "Limit History", group=group_daily, inline="d1_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCountD = input.int(6, "", group=group_daily, inline="d1_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibilityD = input.bool(false, "highest TF Visibility", group=group_daily, inline="d1_tf_vis")
+maxTfVisibilityD = input.string("15m", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_daily, inline="d1_tf_vis")
+
+group_weekly = "📅 Weekly (W) Fractal Settings"
+startDayOffsetW   = input.int(0, "OR Day Offset", group=group_weekly, inline="w_anchor_or")
+startHourOffsetW  = input.int(-23, "OR Hour Offset", group=group_weekly, inline="w_anchor_or")
+startMinuteOffsetW= input.int(-59, "OR Min Offset", group=group_weekly, inline="w_anchor_or")
+endDayOffsetW     = input.int(0, "OF Day Offset", group=group_weekly, inline="w_anchor_of")
+endHourOffsetW    = input.int(-23, "OF Hour Offset", group=group_weekly, inline="w_anchor_of")
+endMinuteOffsetW  = input.int(-59, "OF Min Offset", group=group_weekly, inline="w_anchor_of")
+showWOpenFloat = input.bool(false, "W OF", group=group_weekly, inline="w1_of")
+colorWOpenFloat = input.color(color.new(#b70de8, 10), "", group=group_weekly, inline="w1_of")
+bgColorWOpenFloat = input.color(color.new(#b70de8, 92), "", group=group_weekly, inline="w1_of")
+show50PRW = input.bool(true, "50% PR", group=group_weekly, inline="w1_of")
+showStdvOFW = input.bool(true, "STDVs", group=group_weekly, inline="w1_of")
+showFutureW_OF = input.bool(false, "Future", group=group_weekly, inline="w1_of")
+showWOpenRange = input.bool(false, "W OR", group=group_weekly, inline="w1_or")
+colorWOpenRange = input.color(color.new(#b70de8, 20), "", group=group_weekly, inline="w1_or")
+bgColorWOpenRange = input.color(color.new(#b70de8, 94), "", group=group_weekly, inline="w1_or")
+show50PRWOR = input.bool(true, "50% PR", group=group_weekly, inline="w1_or")
+showStdvORW = input.bool(false, "STDVs", group=group_weekly, inline="w1_or")
+showFutureW_OR = input.bool(false, "Future", group=group_weekly, inline="w1_or")
+showWNest = input.bool(false, "W Nest", group=group_weekly, inline="w1_nest")
+colorWNest = input.color(color.new(color.gray, 70), "Border", group=group_weekly, inline="w1_nest")
+bgColorWNest = input.color(color.new(color.gray, 94), "BG", group=group_weekly, inline="w1_nest")
+showFutureW_Nest = input.bool(false, "Future", group=group_weekly, inline="w1_nest")
+show_future_vdiv_W = input.bool(false, "Future", group=group_weekly, inline="w1_div")
+show_vdiv_W = input.bool(false, "Show Divider", group=group_weekly, inline="w1_div")
+color_vdiv_W = input.color(color.new(#e80dd1, 50), "", group=group_weekly, inline="w1_div")
+style_vdiv_W = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_weekly, inline="w1_div")
+width_vdiv_W = input.int(1, "", group=group_weekly, inline="w1_div", minval=1)
+show_stdv_ffd_W = input.bool(false, "STDVs", group=group_weekly, inline="w1_ffd")
+show_ffd_W = input.bool(false, "FFD Border", group=group_weekly, inline="w1_ffd")
+color_ffd_W = input.color(color.new(#b70de8, 80), "", group=group_weekly, inline="w1_ffd")
+bgColor_ffd_W = input.color(color.new(#b70de8, 95), "BG", group=group_weekly, inline="w1_ffd")
+orDurationPctW = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_weekly, inline="w1_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPctW = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_weekly, inline="w1_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookbackW = input.bool(true, "Limit History", group=group_weekly, inline="w1_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCountW = input.int(7, "", group=group_weekly, inline="w1_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibilityW = input.bool(false, "highest TF Visibility", group=group_weekly, inline="w1_tf_vis")
+maxTfVisibilityW = input.string("15m", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_weekly, inline="w1_tf_vis")
+
+group_monthly = "📆 Monthly (M) Fractal Settings"
+startDayOffsetM   = input.int(0, "OR Day Offset", group=group_monthly, inline="m_anchor_or")
+startHourOffsetM  = input.int(0, "OR Hour Offset", group=group_monthly, inline="m_anchor_or")
+startMinuteOffsetM= input.int(0, "OR Min Offset", group=group_monthly, inline="m_anchor_or")
+endDayOffsetM     = input.int(0, "OF Day Offset", group=group_monthly, inline="m_anchor_of")
+endHourOffsetM    = input.int(0, "OF Hour Offset", group=group_monthly, inline="m_anchor_of")
+endMinuteOffsetM  = input.int(0, "OF Min Offset", group=group_monthly, inline="m_anchor_of")
+showMOpenFloat = input.bool(false, "M OF", group=group_monthly, inline="m1_of")
+colorMOpenFloat = input.color(color.new(#ff5722, 10), "", group=group_monthly, inline="m1_of")
+bgColorMOpenFloat = input.color(color.new(#ff5722, 92), "", group=group_monthly, inline="m1_of")
+show50PRM = input.bool(true, "50% PR", group=group_monthly, inline="m1_of")
+showStdvOFM = input.bool(true, "STDVs", group=group_monthly, inline="m1_of")
+showFutureM_OF = input.bool(false, "Future", group=group_monthly, inline="m1_of")
+showMOpenRange = input.bool(false, "M OR", group=group_monthly, inline="m1_or")
+colorMOpenRange = input.color(color.new(#ff5722, 20), "", group=group_monthly, inline="m1_or")
+bgColorMOpenRange = input.color(color.new(#ff5722, 94), "", group=group_monthly, inline="m1_or")
+show50PRMOR = input.bool(true, "50% PR", group=group_monthly, inline="m1_or")
+showStdvORM = input.bool(false, "STDVs", group=group_monthly, inline="m1_or")
+showFutureM_OR = input.bool(false, "Future", group=group_monthly, inline="m1_or")
+showMNest = input.bool(false, "M Nest", group=group_monthly, inline="m1_nest")
+colorMNest = input.color(color.new(color.gray, 70), "Border", group=group_monthly, inline="m1_nest")
+bgColorMNest = input.color(color.new(color.gray, 94), "BG", group=group_monthly, inline="m1_nest")
+showFutureM_Nest = input.bool(false, "Future", group=group_monthly, inline="m1_nest")
+show_future_vdiv_M = input.bool(false, "Future", group=group_monthly, inline="m1_div")
+show_vdiv_M = input.bool(false, "Show Divider", group=group_monthly, inline="m1_div")
+color_vdiv_M = input.color(color.new(#ff5722, 50), "", group=group_monthly, inline="m1_div")
+style_vdiv_M = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_monthly, inline="m1_div")
+width_vdiv_M = input.int(1, "", group=group_monthly, inline="m1_div", minval=1)
+show_stdv_ffd_M = input.bool(false, "STDVs", group=group_monthly, inline="m1_ffd")
+show_ffd_M = input.bool(false, "FFD Border", group=group_monthly, inline="m1_ffd")
+color_ffd_M = input.color(color.new(#ff5722, 80), "", group=group_monthly, inline="m1_ffd")
+bgColor_ffd_M = input.color(color.new(#ff5722, 95), "BG", group=group_monthly, inline="m1_ffd")
+orDurationPctM = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_monthly, inline="m1_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPctM = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_monthly, inline="m1_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookbackM = input.bool(true, "Limit History", group=group_monthly, inline="m1_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCountM = input.int(4, "", group=group_monthly, inline="m1_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibilityM = input.bool(false, "highest TF Visibility", group=group_monthly, inline="m1_tf_vis")
+maxTfVisibilityM = input.string("4H", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_monthly, inline="m1_tf_vis")
+
+group_3month = "📊 3-Month (3M) Fractal Settings"
+startDayOffset3M   = input.int(0, "OR Day Offset", group=group_3month, inline="3m_anchor_or")
+startHourOffset3M  = input.int(0, "OR Hour Offset", group=group_3month, inline="3m_anchor_or")
+startMinuteOffset3M= input.int(0, "OR Min Offset", group=group_3month, inline="3m_anchor_or")
+endDayOffset3M     = input.int(0, "OF Day Offset", group=group_3month, inline="3m_anchor_of")
+endHourOffset3M    = input.int(0, "OF Hour Offset", group=group_3month, inline="3m_anchor_of")
+endMinuteOffset3M  = input.int(0, "OF Min Offset", group=group_3month, inline="3m_anchor_of")
+show3MOpenFloat = input.bool(false, "3M OF", group=group_3month, inline="3m1_of")
+color3MOpenFloat = input.color(color.new(#070801, 10), "", group=group_3month, inline="3m1_of")
+bgColor3MOpenFloat = input.color(color.new(#cddc39, 92), "", group=group_3month, inline="3m1_of")
+show50PR3M = input.bool(true, "50% PR", group=group_3month, inline="3m1_of")
+showStdvOF3M = input.bool(true, "STDVs", group=group_3month, inline="3m1_of")
+showFuture3M_OF = input.bool(false, "Future", group=group_3month, inline="3m1_of")
+show3MOpenRange = input.bool(false, "3M OR", group=group_3month, inline="3m1_or")
+color3MOpenRange = input.color(color.new(#090903, 20), "", group=group_3month, inline="3m1_or")
+bgColor3MOpenRange = input.color(color.new(#cddc39, 94), "", group=group_3month, inline="3m1_or")
+show50PR3MOR = input.bool(true, "50% PR", group=group_3month, inline="3m1_or")
+showStdvOR3M = input.bool(false, "STDVs", group=group_3month, inline="3m1_or")
+showFuture3M_OR = input.bool(false, "Future", group=group_3month, inline="3m1_or")
+show3MNest = input.bool(false, "3M Nest", group=group_3month, inline="3m1_nest")
+color3MNest = input.color(color.new(color.gray, 70), "Border", group=group_3month, inline="3m1_nest")
+bgColor3MNest = input.color(color.new(color.gray, 94), "BG", group=group_3month, inline="3m1_nest")
+showFuture3M_Nest = input.bool(false, "Future", group=group_3month, inline="3m1_nest")
+show_future_vdiv_3M = input.bool(false, "Future", group=group_3month, inline="3m1_div")
+show_vdiv_3M = input.bool(false, "Show Divider", group=group_3month, inline="3m1_div")
+color_vdiv_3M = input.color(color.new(#cddc39, 50), "", group=group_3month, inline="3m1_div")
+style_vdiv_3M = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_3month, inline="3m1_div")
+width_vdiv_3M = input.int(1, "", group=group_3month, inline="3m1_div", minval=1)
+show_stdv_ffd_3M = input.bool(false, "STDVs", group=group_3month, inline="3m1_ffd")
+show_ffd_3M = input.bool(false, "FFD Border", group=group_3month, inline="3m1_ffd")
+color_ffd_3M = input.color(color.new(#cddc39, 80), "", group=group_3month, inline="3m1_ffd")
+bgColor_ffd_3M = input.color(color.new(#cddc39, 95), "BG", group=group_3month, inline="3m1_ffd")
+orDurationPct3M = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_3month, inline="3m1_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPct3M = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_3month, inline="3m1_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookback3M = input.bool(true, "Limit History", group=group_3month, inline="3m1_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCount3M = input.int(3, "", group=group_3month, inline="3m1_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibility3M = input.bool(false, "highest TF Visibility", group=group_3month, inline="3m1_tf_vis")
+maxTfVisibility3M = input.string("D", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_3month, inline="3m1_tf_vis")
+
+group_yearly = "📅 Yearly (Y) Fractal Settings"
+startDayOffsetY   = input.int(0, "OR Day Offset", group=group_yearly, inline="y_anchor_or")
+startHourOffsetY  = input.int(0, "OR Hour Offset", group=group_yearly, inline="y_anchor_or")
+startMinuteOffsetY= input.int(0, "OR Min Offset", group=group_yearly, inline="y_anchor_or")
+endDayOffsetY     = input.int(0, "OF Day Offset", group=group_yearly, inline="y_anchor_of")
+endHourOffsetY    = input.int(0, "OF Hour Offset", group=group_yearly, inline="y_anchor_of")
+endMinuteOffsetY  = input.int(0, "OF Min Offset", group=group_yearly, inline="y_anchor_of")
+showYOpenFloat = input.bool(false, "Y OF", group=group_yearly, inline="y1_of")
+colorYOpenFloat = input.color(color.new(#795548, 10), "", group=group_yearly, inline="y1_of")
+bgColorYOpenFloat = input.color(color.new(#795548, 92), "", group=group_yearly, inline="y1_of")
+show50PRY = input.bool(true, "50% PR", group=group_yearly, inline="y1_of")
+showStdvOFY = input.bool(true, "STDVs", group=group_yearly, inline="y1_of")
+showFutureY_OF = input.bool(false, "Future", group=group_yearly, inline="y1_of")
+showYOpenRange = input.bool(false, "Y OR", group=group_yearly, inline="y1_or")
+colorYOpenRange = input.color(color.new(#795548, 20), "", group=group_yearly, inline="y1_or")
+bgColorYOpenRange = input.color(color.new(#795548, 94), "", group=group_yearly, inline="y1_or")
+show50PRYOR = input.bool(true, "50% PR", group=group_yearly, inline="y1_or")
+showStdvORY = input.bool(false, "STDVs", group=group_yearly, inline="y1_or")
+showFutureY_OR = input.bool(false, "Future", group=group_yearly, inline="y1_or")
+showYNest = input.bool(false, "Y Nest", group=group_yearly, inline="y1_nest")
+colorYNest = input.color(color.new(color.gray, 70), "Border", group=group_yearly, inline="y1_nest")
+bgColorYNest = input.color(color.new(color.gray, 94), "BG", group=group_yearly, inline="y1_nest")
+showFutureY_Nest = input.bool(false, "Future", group=group_yearly, inline="y1_nest")
+show_future_vdiv_Y = input.bool(false, "Future", group=group_yearly, inline="y1_div")
+show_vdiv_Y = input.bool(false, "Show Divider", group=group_yearly, inline="y1_div")
+color_vdiv_Y = input.color(color.new(#795548, 50), "", group=group_yearly, inline="y1_div")
+style_vdiv_Y = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_yearly, inline="y1_div")
+width_vdiv_Y = input.int(1, "", group=group_yearly, inline="y1_div", minval=1)
+show_stdv_ffd_Y = input.bool(false, "STDVs", group=group_yearly, inline="y1_ffd")
+show_ffd_Y = input.bool(false, "FFD Border", group=group_yearly, inline="y1_ffd")
+color_ffd_Y = input.color(color.new(#795548, 80), "", group=group_yearly, inline="y1_ffd")
+bgColor_ffd_Y = input.color(color.new(#795548, 95), "BG", group=group_yearly, inline="y1_ffd")
+orDurationPctY = input.float(16.67, "OR Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_yearly, inline="y1_timing", tooltip="Duration of the Opening Range as a percentage of the total fractal time. The sum of OR and OF percentages cannot exceed 100%.")
+ofDurationPctY = input.float(16.67, "OF Duration (%)", minval=0.01, maxval=49.99, step=0.1, group=group_yearly, inline="y1_timing", tooltip="Duration of the Opening Float as a percentage of the total fractal time.")
+useLookbackY = input.bool(true, "Limit History", group=group_yearly, inline="y1_lookback", tooltip="Enable to limit the number of past fractals shown.")
+lookbackCountY = input.int(4, "", group=group_yearly, inline="y1_lookback", minval=1, tooltip="Number of fractals to show.")
+enableTfVisibilityY = input.bool(false, "highest TF Visibility", group=group_yearly, inline="y1_tf_vis")
+maxTfVisibilityY = input.string("D", "", options=["1m","5m","15m","30m","1H","4H","D","1W"], group=group_yearly, inline="y1_tf_vis")
+
+group_stdv = "Standard Deviation Settings"
+stdv_type = input.string("-6 to +6", "Type", options=["-6 to +6", "-3 to +3"], group=group_stdv)
+stdv_label_pos = input.string("Center", "Show Labels", options=["None", "Left", "Center", "Right"], group=group_stdv)
+stdvLabelSize = input.string(size.small, "STDV Label Size", options=[size.tiny, size.small, size.normal, size.large, size.huge], group=group_stdv)
+stdv_line_width = input.int(2, "Line Width", minval=1, maxval=5, group=group_stdv)
+
+group_stdv_mid = "Midpoint STDV Level (0.0)"
+show_mid_0_0 = input.bool(true, "Show 0.0", group=group_stdv_mid, inline="m0.0")
+color_mid_0_0 = input.color(color.new(color.gray, 50), "", group=group_stdv_mid, inline="m0.0")
+style_mid_0_0 = input.string("Dashed", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_mid, inline="m0.0")
+extend_mid_0_0 = input.bool(false, "Extend", group=group_stdv_mid, inline="m0.0")
+
+group_stdv_pos = "Positive STDV Levels"
+pos_level_1 = input.float(0.5, "Level 1", group=group_stdv_pos, inline="p1", minval=0)
+show_pos_1 = input.bool(true, "Show", group=group_stdv_pos, inline="p1")
+color_pos_1 = input.color(color.new(color.green, 60), "", group=group_stdv_pos, inline="p1")
+style_pos_1 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p1")
+extend_pos_1 = input.bool(false, "Extend", group=group_stdv_pos, inline="p1")
+pos_level_2 = input.float(1.0, "Level 2", group=group_stdv_pos, inline="p2", minval=0)
+show_pos_2 = input.bool(true, "Show", group=group_stdv_pos, inline="p2")
+color_pos_2 = input.color(color.new(#2635d8, 50), "", group=group_stdv_pos, inline="p2")
+style_pos_2 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p2")
+extend_pos_2 = input.bool(false, "Extend", group=group_stdv_pos, inline="p2")
+pos_level_3 = input.float(1.5, "Level 3", group=group_stdv_pos, inline="p3", minval=0)
+show_pos_3 = input.bool(true, "Show", group=group_stdv_pos, inline="p3")
+color_pos_3 = input.color(color.new(#d30db9, 44), "", group=group_stdv_pos, inline="p3")
+style_pos_3 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p3")
+extend_pos_3 = input.bool(false, "Extend", group=group_stdv_pos, inline="p3")
+pos_level_4 = input.float(2.0, "Level 4", group=group_stdv_pos, inline="p4", minval=0)
+show_pos_4 = input.bool(true, "Show", group=group_stdv_pos, inline="p4")
+color_pos_4 = input.color(color.new(#2635d8, 50), "", group=group_stdv_pos, inline="p4")
+style_pos_4 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p4")
+extend_pos_4 = input.bool(false, "Extend", group=group_stdv_pos, inline="p4")
+pos_level_5 = input.float(2.5, "Level 5", group=group_stdv_pos, inline="p5", minval=0)
+show_pos_5 = input.bool(true, "Show", group=group_stdv_pos, inline="p5")
+color_pos_5 = input.color(color.new(#d30db9, 44), "", group=group_stdv_pos, inline="p5")
+style_pos_5 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p5")
+extend_pos_5 = input.bool(false, "Extend", group=group_stdv_pos, inline="p5")
+pos_level_6 = input.float(3.0, "Level 6", group=group_stdv_pos, inline="p6", minval=0)
+show_pos_6 = input.bool(true, "Show", group=group_stdv_pos, inline="p6")
+color_pos_6 = input.color(color.new(#2635d8, 50), "", group=group_stdv_pos, inline="p6")
+style_pos_6 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p6")
+extend_pos_6 = input.bool(false, "Extend", group=group_stdv_pos, inline="p6")
+pos_level_7 = input.float(3.5, "Level 7", group=group_stdv_pos, inline="p7", minval=0)
+show_pos_7 = input.bool(true, "Show", group=group_stdv_pos, inline="p7")
+color_pos_7 = input.color(color.new(#d30db9, 44), "", group=group_stdv_pos, inline="p7")
+style_pos_7 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p7")
+extend_pos_7 = input.bool(false, "Extend", group=group_stdv_pos, inline="p7")
+pos_level_8 = input.float(4.0, "Level 8", group=group_stdv_pos, inline="p8", minval=0)
+show_pos_8 = input.bool(true, "Show", group=group_stdv_pos, inline="p8")
+color_pos_8 = input.color(color.new(color.black, 50), "", group=group_stdv_pos, inline="p8")
+style_pos_8 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p8")
+extend_pos_8 = input.bool(false, "Extend", group=group_stdv_pos, inline="p8")
+pos_level_9 = input.float(4.5, "Level 9", group=group_stdv_pos, inline="p9", minval=0)
+show_pos_9 = input.bool(true, "Show", group=group_stdv_pos, inline="p9")
+color_pos_9 = input.color(color.new(#870510, 15), "", group=group_stdv_pos, inline="p9")
+style_pos_9 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p9")
+extend_pos_9 = input.bool(false, "Extend", group=group_stdv_pos, inline="p9")
+pos_level_10 = input.float(5.0, "Level 10", group=group_stdv_pos, inline="p10", minval=0)
+show_pos_10 = input.bool(true, "Show", group=group_stdv_pos, inline="p10")
+color_pos_10 = input.color(color.new(color.black, 50), "", group=group_stdv_pos, inline="p10")
+style_pos_10 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p10")
+extend_pos_10 = input.bool(false, "Extend", group=group_stdv_pos, inline="p10")
+pos_level_11 = input.float(5.5, "Level 11", group=group_stdv_pos, inline="p11", minval=0)
+show_pos_11 = input.bool(true, "Show", group=group_stdv_pos, inline="p11")
+color_pos_11 = input.color(color.new(#870510, 15), "", group=group_stdv_pos, inline="p11")
+style_pos_11 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p11")
+extend_pos_11 = input.bool(false, "Extend", group=group_stdv_pos, inline="p11")
+pos_level_12 = input.float(6.0, "Level 12", group=group_stdv_pos, inline="p12", minval=0)
+show_pos_12 = input.bool(true, "Show", group=group_stdv_pos, inline="p12")
+color_pos_12 = input.color(color.new(color.black, 50), "", group=group_stdv_pos, inline="p12")
+style_pos_12 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_pos, inline="p12")
+extend_pos_12 = input.bool(false, "Extend", group=group_stdv_pos, inline="p12")
+
+group_stdv_neg = "Negative STDV Levels"
+neg_level_1 = input.float(0.5, "Level 1", group=group_stdv_neg, inline="n1", minval=0)
+show_neg_1 = input.bool(true, "Show", group=group_stdv_neg, inline="n1")
+color_neg_1 = input.color(color.new(color.red, 60), "", group=group_stdv_neg, inline="n1")
+style_neg_1 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n1")
+extend_neg_1 = input.bool(false, "Extend", group=group_stdv_neg, inline="n1")
+neg_level_2 = input.float(1.0, "Level 2", group=group_stdv_neg, inline="n2", minval=0)
+show_neg_2 = input.bool(true, "Show", group=group_stdv_neg, inline="n2")
+color_neg_2 = input.color(color.new(#2635d8, 50), "", group=group_stdv_neg, inline="n2")
+style_neg_2 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n2")
+extend_neg_2 = input.bool(false, "Extend", group=group_stdv_neg, inline="n2")
+neg_level_3 = input.float(1.5, "Level 3", group=group_stdv_neg, inline="n3", minval=0)
+show_neg_3 = input.bool(true, "Show", group=group_stdv_neg, inline="n3")
+color_neg_3 = input.color(color.new(#d30db9, 44), "", group=group_stdv_neg, inline="n3")
+style_neg_3 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n3")
+extend_neg_3 = input.bool(false, "Extend", group=group_stdv_neg, inline="n3")
+neg_level_4 = input.float(2.0, "Level 4", group=group_stdv_neg, inline="n4", minval=0)
+show_neg_4 = input.bool(true, "Show", group=group_stdv_neg, inline="n4")
+color_neg_4 = input.color(color.new(#2635d8, 50), "", group=group_stdv_neg, inline="n4")
+style_neg_4 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n4")
+extend_neg_4 = input.bool(false, "Extend", group=group_stdv_neg, inline="n4")
+neg_level_5 = input.float(2.5, "Level 5", group=group_stdv_neg, inline="n5", minval=0)
+show_neg_5 = input.bool(true, "Show", group=group_stdv_neg, inline="n5")
+color_neg_5 = input.color(color.new(#d30db9, 44), "", group=group_stdv_neg, inline="n5")
+style_neg_5 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n5")
+extend_neg_5 = input.bool(false, "Extend", group=group_stdv_neg, inline="n5")
+neg_level_6 = input.float(3.0, "Level 6", group=group_stdv_neg, inline="n6", minval=0)
+show_neg_6 = input.bool(true, "Show", group=group_stdv_neg, inline="n6")
+color_neg_6 = input.color(color.new(#2635d8, 50), "", group=group_stdv_neg, inline="n6")
+style_neg_6 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n6")
+extend_neg_6 = input.bool(false, "Extend", group=group_stdv_neg, inline="n6")
+neg_level_7 = input.float(3.5, "Level 7", group=group_stdv_neg, inline="n7", minval=0)
+show_neg_7 = input.bool(true, "Show", group=group_stdv_neg, inline="n7")
+color_neg_7 = input.color(color.new(#d30db9, 44), "", group=group_stdv_neg, inline="n7")
+style_neg_7 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n7")
+extend_neg_7 = input.bool(false, "Extend", group=group_stdv_neg, inline="n7")
+neg_level_8 = input.float(4.0, "Level 8", group=group_stdv_neg, inline="n8", minval=0)
+show_neg_8 = input.bool(true, "Show", group=group_stdv_neg, inline="n8")
+color_neg_8 = input.color(color.new(color.black, 50), "", group=group_stdv_neg, inline="n8")
+style_neg_8 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n8")
+extend_neg_8 = input.bool(false, "Extend", group=group_stdv_neg, inline="n8")
+neg_level_9 = input.float(4.5, "Level 9", group=group_stdv_neg, inline="n9", minval=0)
+show_neg_9 = input.bool(true, "Show", group=group_stdv_neg, inline="n9")
+color_neg_9 = input.color(color.new(#870510, 15), "", group=group_stdv_neg, inline="n9")
+style_neg_9 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n9")
+extend_neg_9 = input.bool(false, "Extend", group=group_stdv_neg, inline="n9")
+neg_level_10 = input.float(5.0, "Level 10", group=group_stdv_neg, inline="n10", minval=0)
+show_neg_10 = input.bool(true, "Show", group=group_stdv_neg, inline="n10")
+color_neg_10 = input.color(color.new(color.black, 50), "", group=group_stdv_neg, inline="n10")
+style_neg_10 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n10")
+extend_neg_10 = input.bool(false, "Extend", group=group_stdv_neg, inline="n10")
+neg_level_11 = input.float(5.5, "Level 11", group=group_stdv_neg, inline="n11", minval=0)
+show_neg_11 = input.bool(true, "Show", group=group_stdv_neg, inline="n11")
+color_neg_11 = input.color(color.new(#870510, 15), "", group=group_stdv_neg, inline="n11")
+style_neg_11 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n11")
+extend_neg_11 = input.bool(false, "Extend", group=group_stdv_neg, inline="n11")
+neg_level_12 = input.float(6.0, "Level 12", group=group_stdv_neg, inline="n12", minval=0)
+show_neg_12 = input.bool(true, "Show", group=group_stdv_neg, inline="n12")
+color_neg_12 = input.color(color.new(color.black, 50), "", group=group_stdv_neg, inline="n12")
+style_neg_12 = input.string("Solid", "", options=["Solid", "Dashed", "Dotted"], group=group_stdv_neg, inline="n12")
+extend_neg_12 = input.bool(false, "Extend", group=group_stdv_neg, inline="n12")
+
+group_swing = "Swing High/Low Settings"
+showSwings = input.bool(false, "Show Swing Points", group=group_swing)
+swingSizeR = input.int(1, 'Bars Right-Left', inline='brl', group=group_swing)
+swingSizeL = input.int(1, '-', inline='brl', group=group_swing)
+
+string COMPONENT_OR = "OR"
+string COMPONENT_NEST = "Nest"
+string COMPONENT_OF = "OF"
+string COMPONENT_FFD = "FFD"
+
+PERF_MAX_LOOKBACK = 500
+
+MS_IN_HOUR = 3600000, MS_IN_MIN  = 60000, MS_IN_SEC  = 1000, MS_IN_DAY  = 24 * MS_IN_HOUR, MS_IN_WEEK = 7  * MS_IN_DAY
+
+type Session
+    int id
+    box box_obj
+    label label_obj
+    line line_left
+    line line_right
+    line line_top
+    float session_high
+    float session_low
+    line pr50_line_obj
+    array<line> stdv_lines
+    array<label> stdv_labels
+
+type LabelInfo
+    int id
+    label label_obj
+    int x1
+    int x2
+    float y
+
+f_get_timeframe_seconds(tf_string) =>
+    switch tf_string
+        "1m"  => 60
+        "5m"  => 300
+        "15m" => 900
+        "30m" => 1800
+        "1H"  => 3600
+        "4H"  => 14400
+        "D"  => 86400
+        "1W"  => 604800
+        => na
+
+f_should_show_fractal(enableFilter, maxTf) =>
+    not enableFilter or timeframe.in_seconds(timeframe.period) <= f_get_timeframe_seconds(maxTf)
+
+f_format_2(n) => n < 10 ? "0" + str.tostring(n) : str.tostring(n)
+f_get_line_style(style) => style == "Solid" ? line.style_solid : style == "Dashed" ? line.style_dashed : line.style_dotted
+
+f_auto_detect_asset() =>
+    asset = if syminfo.type == "forex"
+        "Forex"
+    else if syminfo.type == "crypto"
+        "Crypto"
+    else if syminfo.type == "futures" or str.contains(str.upper(syminfo.ticker), "XAU")
+        "Gold&Futures"
+    else
+        "Forex"
+    asset
+
+f_find_daily_yearly_anchor(daily_anchor_h, daily_anchor_m, y, t) =>
+    year_anchor = timestamp(tzInput, y, 1, 1, daily_anchor_h, daily_anchor_m, 0)
+    year_anchor > t ? timestamp(tzInput, y - 1, 1, 1, daily_anchor_h, daily_anchor_m, 0) : year_anchor
+
+f_find_daily_quarterly_anchor(daily_anchor_h, daily_anchor_m, y, m, t) =>
+    q_start_month = m <= 3 ? 1 : m <= 6 ? 4 : m <= 9 ? 7 : 10
+    quarter_anchor = timestamp(tzInput, y, q_start_month, 1, daily_anchor_h, daily_anchor_m, 0)
+    if quarter_anchor > t
+        prev_q_start_y = q_start_month <= 3 ? y - 1 : y
+        prev_q_start_m = q_start_month <= 3 ? q_start_month + 9 : q_start_month - 3
+        timestamp(tzInput, prev_q_start_y, prev_q_start_m, 1, daily_anchor_h, daily_anchor_m, 0)
+    else
+        quarter_anchor
+
+f_find_daily_monthly_anchor(daily_anchor_h, daily_anchor_m, y, m, t) =>
+    month_anchor = timestamp(tzInput, y, m, 1, daily_anchor_h, daily_anchor_m, 0)
+    if month_anchor > t
+        prev_m = m == 1 ? 12 : m - 1
+        prev_y = m == 1 ? y - 1 : y
+        timestamp(tzInput, prev_y, prev_m, 1, daily_anchor_h, daily_anchor_m, 0)
+    else
+        month_anchor
+
+f_find_daily_weekly_anchor(daily_anchor_h, daily_anchor_m, dow, t) =>
+    days_to_subtract = (dow - dayofweek.monday + 7) % 7
+    current_day_start_t = timestamp(tzInput, year(t, tzInput), month(t, tzInput), dayofmonth(t, tzInput), 0, 0, 0)
+    anchor_day_start_t = current_day_start_t - days_to_subtract * MS_IN_DAY
+    session_anchor_t = anchor_day_start_t + daily_anchor_h * MS_IN_HOUR + daily_anchor_m * MS_IN_MIN
+    session_anchor_t > t ? session_anchor_t - MS_IN_WEEK : session_anchor_t
+
+f_find_yearly_anchor(cycle_anchor_h, cycle_anchor_m, y, t) =>
+    year_anchor = timestamp(tzInput, y, 1, 1, cycle_anchor_h, cycle_anchor_m, 0)
+    year_anchor > t ? timestamp(tzInput, y - 1, 1, 1, cycle_anchor_h, cycle_anchor_m, 0) : year_anchor
+
+f_find_quarterly_anchor(cycle_anchor_h, cycle_anchor_m, y, m, t) =>
+    q_start_month = m <= 3 ? 1 : m <= 6 ? 4 : m <= 9 ? 7 : 10
+    quarter_anchor = timestamp(tzInput, y, q_start_month, 1, cycle_anchor_h, cycle_anchor_m, 0)
+    if quarter_anchor > t
+        prev_q_start_y = q_start_month <= 3 ? y - 1 : y
+        prev_q_start_m = q_start_month <= 3 ? q_start_month + 9 : q_start_month - 3
+        timestamp(tzInput, prev_q_start_y, prev_q_start_m, 1, cycle_anchor_h, cycle_anchor_m, 0)
+    else
+        quarter_anchor
+
+f_find_monthly_anchor(cycle_anchor_h, cycle_anchor_m, y, m, t) =>
+    month_anchor = timestamp(tzInput, y, m, 1, cycle_anchor_h, cycle_anchor_m, 0)
+    if month_anchor > t
+        prev_m = m == 1 ? 12 : m - 1
+        prev_y = m == 1 ? y - 1 : y
+        timestamp(tzInput, prev_y, prev_m, 1, cycle_anchor_h, cycle_anchor_m, 0)
+    else
+        month_anchor
+
+f_find_weekly_anchor(anchor_dow, cycle_anchor_h, cycle_anchor_m, dow, t) =>
+    days_to_subtract = (dow - anchor_dow + 7) % 7
+    current_day_start_t = timestamp(tzInput, year(t, tzInput), month(t, tzInput), dayofmonth(t, tzInput), 0, 0, 0)
+    anchor_day_start_t = current_day_start_t - days_to_subtract * MS_IN_DAY
+    session_anchor_t = anchor_day_start_t + cycle_anchor_h * MS_IN_HOUR + cycle_anchor_m * MS_IN_MIN
+    session_anchor_t > t ? session_anchor_t - MS_IN_WEEK : session_anchor_t
+
+f_find_last_cycle_anchor(cycle_ms, anchor_h, anchor_m, y, m, d, t) =>
+    day_anchor = timestamp(tzInput, y, m, d, anchor_h, anchor_m, 0)
+    base_anchor = t >= day_anchor ? day_anchor : day_anchor - MS_IN_DAY
+    ms_since_base = t - base_anchor
+    num_cycles = math.floor(ms_since_base / cycle_ms)
+    base_anchor + num_cycles * cycle_ms
+
+f_find_next_cycle_anchor(cycle_ms, anchor_h, anchor_m, y, m, d, t) => f_find_last_cycle_anchor(cycle_ms, anchor_h, anchor_m, y, m, d, t) + cycle_ms
+
+f_get_cyclical_fractal(tf_str, offset_ms, duration_ms) =>
+    anchor     = time(tf_str, syminfo.session, tzInput)
+    start_time = anchor + offset_ms
+    end_time   = start_time + duration_ms
+    [start_time, end_time]
+
+f_get_future_cyclical_fractal(tf_str, offset_ms, duration_ms) =>
+    current_anchor = time(tf_str, syminfo.session, tzInput)
+    tf_ms = timeframe.in_seconds(tf_str) * 1000
+    next_anchor = current_anchor + tf_ms
+    start_time = next_anchor + offset_ms
+    end_time   = start_time + duration_ms
+    [start_time, end_time]
+
+f_manage_swing_high_lows(show, sizeL, sizeR) =>
+    isPivotHigh = false
+    isPivotLow = false
+    if show
+        pivHi = ta.pivothigh(high, sizeL, sizeR)
+        pivLo = ta.pivotlow(low, sizeL, sizeR)
+        isPivotHigh := not na(pivHi)
+        isPivotLow := not na(pivLo)
+    [isPivotHigh, isPivotLow]
+
+var activeLabels = array.new<LabelInfo>()
+var ALL_STDV_LEVELS = array.new_float()
+var stdv_show_config = array.new_bool()
+var stdv_color_config = array.new_color()
+var stdv_style_config = array.new_string()
+var stdv_extend_config = array.new_bool()
+
+if barstate.isfirst
+    array.push(ALL_STDV_LEVELS, pos_level_1), array.push(stdv_show_config, show_pos_1), array.push(stdv_color_config, color_pos_1), array.push(stdv_style_config, style_pos_1), array.push(stdv_extend_config, extend_pos_1)
+    array.push(ALL_STDV_LEVELS, pos_level_2), array.push(stdv_show_config, show_pos_2), array.push(stdv_color_config, color_pos_2), array.push(stdv_style_config, style_pos_2), array.push(stdv_extend_config, extend_pos_2)
+    array.push(ALL_STDV_LEVELS, pos_level_3), array.push(stdv_show_config, show_pos_3), array.push(stdv_color_config, color_pos_3), array.push(stdv_style_config, style_pos_3), array.push(stdv_extend_config, extend_pos_3)
+    array.push(ALL_STDV_LEVELS, pos_level_4), array.push(stdv_show_config, show_pos_4), array.push(stdv_color_config, color_pos_4), array.push(stdv_style_config, style_pos_4), array.push(stdv_extend_config, extend_pos_4)
+    array.push(ALL_STDV_LEVELS, pos_level_5), array.push(stdv_show_config, show_pos_5), array.push(stdv_color_config, color_pos_5), array.push(stdv_style_config, style_pos_5), array.push(stdv_extend_config, extend_pos_5)
+    array.push(ALL_STDV_LEVELS, pos_level_6), array.push(stdv_show_config, show_pos_6), array.push(stdv_color_config, color_pos_6), array.push(stdv_style_config, style_pos_6), array.push(stdv_extend_config, extend_pos_6)
+    array.push(ALL_STDV_LEVELS, pos_level_7), array.push(stdv_show_config, show_pos_7), array.push(stdv_color_config, color_pos_7), array.push(stdv_style_config, style_pos_7), array.push(stdv_extend_config, extend_pos_7)
+    array.push(ALL_STDV_LEVELS, pos_level_8), array.push(stdv_show_config, show_pos_8), array.push(stdv_color_config, color_pos_8), array.push(stdv_style_config, style_pos_8), array.push(stdv_extend_config, extend_pos_8)
+    array.push(ALL_STDV_LEVELS, pos_level_9), array.push(stdv_show_config, show_pos_9), array.push(stdv_color_config, color_pos_9), array.push(stdv_style_config, style_pos_9), array.push(stdv_extend_config, extend_pos_9)
+    array.push(ALL_STDV_LEVELS, pos_level_10), array.push(stdv_show_config, show_pos_10), array.push(stdv_color_config, color_pos_10), array.push(stdv_style_config, style_pos_10), array.push(stdv_extend_config, extend_pos_10)
+    array.push(ALL_STDV_LEVELS, pos_level_11), array.push(stdv_show_config, show_pos_11), array.push(stdv_color_config, color_pos_11), array.push(stdv_style_config, style_pos_11), array.push(stdv_extend_config, extend_pos_11)
+    array.push(ALL_STDV_LEVELS, pos_level_12), array.push(stdv_show_config, show_pos_12), array.push(stdv_color_config, color_pos_12), array.push(stdv_style_config, style_pos_12), array.push(stdv_extend_config, extend_pos_12)
+    array.push(ALL_STDV_LEVELS, 0.0), array.push(stdv_show_config, show_mid_0_0), array.push(stdv_color_config, color_mid_0_0), array.push(stdv_style_config, style_mid_0_0), array.push(stdv_extend_config, extend_mid_0_0)
+    array.push(ALL_STDV_LEVELS, -neg_level_1), array.push(stdv_show_config, show_neg_1), array.push(stdv_color_config, color_neg_1), array.push(stdv_style_config, style_neg_1), array.push(stdv_extend_config, extend_neg_1)
+    array.push(ALL_STDV_LEVELS, -neg_level_2), array.push(stdv_show_config, show_neg_2), array.push(stdv_color_config, color_neg_2), array.push(stdv_style_config, style_neg_2), array.push(stdv_extend_config, extend_neg_2)
+    array.push(ALL_STDV_LEVELS, -neg_level_3), array.push(stdv_show_config, show_neg_3), array.push(stdv_color_config, color_neg_3), array.push(stdv_style_config, style_neg_3), array.push(stdv_extend_config, extend_neg_3)
+    array.push(ALL_STDV_LEVELS, -neg_level_4), array.push(stdv_show_config, show_neg_4), array.push(stdv_color_config, color_neg_4), array.push(stdv_style_config, style_neg_4), array.push(stdv_extend_config, extend_neg_4)
+    array.push(ALL_STDV_LEVELS, -neg_level_5), array.push(stdv_show_config, show_neg_5), array.push(stdv_color_config, color_neg_5), array.push(stdv_style_config, style_neg_5), array.push(stdv_extend_config, extend_neg_5)
+    array.push(ALL_STDV_LEVELS, -neg_level_6), array.push(stdv_show_config, show_neg_6), array.push(stdv_color_config, color_neg_6), array.push(stdv_style_config, style_neg_6), array.push(stdv_extend_config, extend_neg_6)
+    array.push(ALL_STDV_LEVELS, -neg_level_7), array.push(stdv_show_config, show_neg_7), array.push(stdv_color_config, color_neg_7), array.push(stdv_style_config, style_neg_7), array.push(stdv_extend_config, extend_neg_7)
+    array.push(ALL_STDV_LEVELS, -neg_level_8), array.push(stdv_show_config, show_neg_8), array.push(stdv_color_config, color_neg_8), array.push(stdv_style_config, style_neg_8), array.push(stdv_extend_config, extend_neg_8)
+    array.push(ALL_STDV_LEVELS, -neg_level_9), array.push(stdv_show_config, show_neg_9), array.push(stdv_color_config, color_neg_9), array.push(stdv_style_config, style_neg_9), array.push(stdv_extend_config, extend_neg_9)
+    array.push(ALL_STDV_LEVELS, -neg_level_10), array.push(stdv_show_config, show_neg_10), array.push(stdv_color_config, color_neg_10), array.push(stdv_style_config, style_neg_10), array.push(stdv_extend_config, extend_neg_10)
+    array.push(ALL_STDV_LEVELS, -neg_level_11), array.push(stdv_show_config, show_neg_11), array.push(stdv_color_config, color_neg_11), array.push(stdv_style_config, style_neg_11), array.push(stdv_extend_config, extend_neg_11)
+    array.push(ALL_STDV_LEVELS, -neg_level_12), array.push(stdv_show_config, show_neg_12), array.push(stdv_color_config, color_neg_12), array.push(stdv_style_config, style_neg_12), array.push(stdv_extend_config, extend_neg_12)
+
+f_create_outline_lines(start_bar, end_bar, sh, sl, col, lineStyle) =>
+    [line.new(start_bar, sl, start_bar, sh, color=col, width=borderWidthInput, style=lineStyle), line.new(end_bar, sl, end_bar, sh, color=col, width=borderWidthInput, style=lineStyle), line.new(start_bar, sh, end_bar, sh, color=col, width=borderWidthInput, style=lineStyle)]
+
+f_update_outline_lines(ref_left, ref_right, sh, sl, col, lineStyle) =>
+    lx = line.get_x1(ref_left)
+    rx = line.get_x1(ref_right)
+    line.set_xy1(ref_left, lx, sl)
+    line.set_xy2(ref_left, lx, sh)
+    line.set_color(ref_left, col)
+    line.set_width(ref_left, borderWidthInput)
+    line.set_style(ref_left, lineStyle)
+    line.set_xy1(ref_right, rx, sl)
+    line.set_xy2(ref_right, rx, sh)
+    line.set_color(ref_right, col)
+    line.set_width(ref_right, borderWidthInput)
+    line.set_style(ref_right, lineStyle)
+
+f_manage_single_stdv_line(line_ref, x1, y1, x2, y2, color, style, width, should_draw, should_extend) =>
+    line_id = line_ref
+    if should_draw
+        if na(line_id)
+            line_id := line.new(x1, y1, x2, y2, color=color, style=style, width=width, extend=should_extend ? extend.right : extend.none)
+        else
+            line.set_xy1(line_id, x1, y1)
+            line.set_xy2(line_id, x2, y2)
+            line.set_color(line_id, color)
+            line.set_style(line_id, style)
+            line.set_width(line_id, width)
+            line.set_extend(line_id, should_extend ? extend.right : extend.none)
+    else if not na(line_id)
+        line.delete(line_id)
+        line_id := na
+    line_id
+
+f_manage_single_stdv_label(label_ref, x, y, labelText, textcolor, size, should_draw) =>
+    label_id = label_ref
+    if should_draw
+        if na(label_id)
+            label_id := label.new(x, y, labelText, xloc=xloc.bar_index, yloc=yloc.price, style=label.style_none, textcolor=textcolor, color=na, size=size)
+        else
+            label.set_xy(label_id, x, y)
+            label.set_text(label_id, labelText)
+            label.set_textcolor(label_id, textcolor)
+            label.set_size(label_id, size)
+    else if not na(label_id)
+        label.delete(label_id)
+        label_id := na
+    label_id
+
+f_manage_stdv_lines(session_obj, show_overall, box_high, box_low, box_left, box_right) =>
+    if stdv_type == "-6 to +6"
+        mid_price = show_overall and not na(box_high) and not na(box_low) ? (box_high + box_low) / 2 : na
+        one_stdv  = show_overall and not na(box_high) and not na(box_low) ? box_high - mid_price : na
+
+        for i = 0 to array.size(ALL_STDV_LEVELS) - 1
+            is_visible_level = array.get(stdv_show_config, i)
+            level_val = array.get(ALL_STDV_LEVELS, i)
+            level_color = array.get(stdv_color_config, i)
+            level_style = f_get_line_style(array.get(stdv_style_config, i))
+            should_extend = array.get(stdv_extend_config, i)
+            price_level = not na(mid_price) ? mid_price + one_stdv * level_val : na
+            
+            current_line_ref = array.get(session_obj.stdv_lines, i)
+            should_draw_this_line = show_overall and not na(box_high) and not na(box_low) and is_visible_level and not na(price_level)
+            updated_line_ref = f_manage_single_stdv_line(current_line_ref, box_left, price_level, box_right, price_level, level_color, level_style, stdv_line_width, should_draw_this_line, should_extend)
+            array.set(session_obj.stdv_lines, i, updated_line_ref)
+            
+            current_label_ref = array.get(session_obj.stdv_labels, i)
+            should_draw_label = should_draw_this_line and stdv_label_pos != "None"
+            label_x = switch stdv_label_pos
+                "Left"   => box_left
+                "Center" => int((box_left + box_right) / 2)
+                "Right"  => box_right
+            stdv_label_text = str.tostring(level_val)
+            updated_label_ref = f_manage_single_stdv_label(current_label_ref, label_x, price_level, stdv_label_text, level_color, stdvLabelSize, should_draw_label)
+            array.set(session_obj.stdv_labels, i, updated_label_ref)
+    else // For "-3 to +3"
+        range_height = show_overall and not na(box_high) and not na(box_low) ? box_high - box_low : na
+        if show_overall and not na(range_height) and range_height > 0
+            label_x = switch stdv_label_pos
+                "Left"   => box_left
+                "Center" => int((box_left + box_right) / 2)
+                "Right"  => box_right
+
+            // Draw 0 levels
+            updated_line_ref_high = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, 17), box_left, box_high, box_right, box_high, color_pos_8, f_get_line_style("Solid"), stdv_line_width, true, false)
+            array.set(session_obj.stdv_lines, 17, updated_line_ref_high)
+            updated_label_ref_high = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, 17), label_x, box_high, "0", color_pos_8, stdvLabelSize, stdv_label_pos != "None")
+            array.set(session_obj.stdv_labels, 17, updated_label_ref_high)
+
+            updated_line_ref_low = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, 18), box_left, box_low, box_right, box_low, color_neg_8, f_get_line_style("Solid"), stdv_line_width, true, false)
+            array.set(session_obj.stdv_lines, 18, updated_line_ref_low)
+            updated_label_ref_low = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, 18), label_x, box_low, "0", color_neg_8, stdvLabelSize, stdv_label_pos != "None")
+            array.set(session_obj.stdv_labels, 18, updated_label_ref_low)
+
+            // Part A: external levels
+            ext_levels = array.from(0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
+            ext_level_colors = array.from(color_pos_1, color_pos_2, color_pos_3, color_pos_4, color_pos_5, color_pos_6)
+            
+            for i = 0 to array.size(ext_levels) - 1
+                level_val = array.get(ext_levels, i)
+                level_color = array.get(ext_level_colors, i)
+
+                // Positive levels
+                price_level_pos = box_high + level_val * range_height
+                updated_line_ref_pos = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, i), box_left, price_level_pos, box_right, price_level_pos, level_color, f_get_line_style("Solid"), stdv_line_width, true, false)
+                array.set(session_obj.stdv_lines, i, updated_line_ref_pos)
+                
+                updated_label_ref_pos = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, i), label_x, price_level_pos, "+" + str.tostring(level_val), level_color, stdvLabelSize, stdv_label_pos != "None")
+                array.set(session_obj.stdv_labels, i, updated_label_ref_pos)
+
+                // Negative levels
+                price_level_neg = box_low - level_val * range_height
+                updated_line_ref_neg = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, i + 6), box_left, price_level_neg, box_right, price_level_neg, level_color, f_get_line_style("Solid"), stdv_line_width, true, false)
+                array.set(session_obj.stdv_lines, i + 6, updated_line_ref_neg)
+
+                updated_label_ref_neg = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, i + 6), label_x, price_level_neg, "-" + str.tostring(level_val), level_color, stdvLabelSize, stdv_label_pos != "None")
+                array.set(session_obj.stdv_labels, i + 6, updated_label_ref_neg)
+
+            // Part B: internal levels
+            int_levels = array.from(0.21, 0.38, 0.5, 0.62, 0.79)
+            int_level_colors = array.from(color_mid_0_0, color_mid_0_0, color.new(#31bf0e, 21), color_mid_0_0, color_mid_0_0)
+            for i = 0 to array.size(int_levels) - 1
+                level_val = array.get(int_levels, i)
+                level_color = array.get(int_level_colors, i)
+                price_level = box_low + level_val * range_height
+                updated_line_ref = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, i + 12), box_left, price_level, box_right, price_level, level_color, f_get_line_style("Solid"), stdv_line_width, true, false)
+                array.set(session_obj.stdv_lines, i + 12, updated_line_ref)
+
+                updated_label_ref = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, i + 12), label_x, price_level, str.tostring(level_val), level_color, stdvLabelSize, stdv_label_pos != "None")
+                array.set(session_obj.stdv_labels, i + 12, updated_label_ref)
+            
+            // Clean up unused lines/labels from the old mode
+            for i = 19 to 24
+                updated_line_ref = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, i), 0, 0, 0, 0, color.black, f_get_line_style("Solid"), 0, false, false)
+                array.set(session_obj.stdv_lines, i, updated_line_ref)
+                updated_label_ref = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, i), 0, 0, "", color.black, size.tiny, false)
+                array.set(session_obj.stdv_labels, i, updated_label_ref)
+        else
+            // Not visible, delete all lines
+            for i = 0 to 24
+                updated_line_ref = f_manage_single_stdv_line(array.get(session_obj.stdv_lines, i), 0, 0, 0, 0, color.black, f_get_line_style("Solid"), 0, false, false)
+                array.set(session_obj.stdv_lines, i, updated_line_ref)
+                updated_label_ref = f_manage_single_stdv_label(array.get(session_obj.stdv_labels, i), 0, 0, "", color.black, size.tiny, false)
+                array.set(session_obj.stdv_labels, i, updated_label_ref)
+
+f_delete_session(session_obj) =>
+    if isBoxesMode and not na(session_obj.box_obj)
+        box.delete(session_obj.box_obj)
+    else
+        if not na(session_obj.line_left)
+            line.delete(session_obj.line_left)
+        if not na(session_obj.line_right)
+            line.delete(session_obj.line_right)
+        if not na(session_obj.line_top)
+            line.delete(session_obj.line_top)
+    if not na(session_obj.label_obj)
+        label.delete(session_obj.label_obj)
+    if not na(session_obj.pr50_line_obj)
+        line.delete(session_obj.pr50_line_obj)
+    f_manage_stdv_lines(session_obj, false, 0, 0, 0, 0)
+    for j = array.size(activeLabels) - 1 to 0
+        if array.get(activeLabels, j).id == session_obj.id
+            array.remove(activeLabels, j)
+            break
+
+manage_fractal_component(string component_type, array<Session> session_array, bool show, bool is_visible, string labelText, color borderColor, color bgColor, int sessionStart, int sessionEnd, bool showSeconds, bool show50PR, bool showStdv, int fractalKey, int maxLookback, bool useLookback, int lookbackCount) =>
+    if useLookback and array.size(session_array) > lookbackCount
+        s_to_del = array.shift(session_array)
+        f_delete_session(s_to_del)
+
+    tf_ms = timeframe.in_seconds(timeframe.period) * 1000
+    bs = not na(sessionStart) and time >= sessionStart ? int(math.round((time - sessionStart) / tf_ms)) : 0
+    bars_since_start = math.max(0, bs)
+    bars_to_lookback = math.min(bars_since_start, maxLookback)
+    window_len = int(math.max(1, math.min(bars_to_lookback + 1, maxLookback + 1)))
+    safe_window_len = math.min(window_len, bar_index + 1)
+    initial_high = ta.highest(high, safe_window_len)
+    initial_low = ta.lowest(low, safe_window_len)
+
+    if not na(sessionStart) and not na(sessionEnd)
+
+        final_border_color = show and is_visible ? borderColor : na
+        final_bg_color = show and is_visible ? bgColor : na
+        final_text_color = show and is_visible ? borderColor : na
+
+        textToShow = labelText + " " + component_type
+        if labelContentInput == "Fractal Time Info"
+            sH = f_format_2(hour(sessionStart, tzInput)), sM = f_format_2(minute(sessionStart, tzInput))
+            eH = f_format_2(hour(sessionEnd,   tzInput)), eM = f_format_2(minute(sessionEnd,   tzInput))
+            if showSeconds
+                sS = f_format_2(second(sessionStart, tzInput)), eS = f_format_2(second(sessionEnd,   tzInput))
+                textToShow := sH + ":" + sM + ":" + sS + " - " + eH + ":" + eM + ":" + eS + " (" + component_type + ")"
+            else
+                textToShow := sH + ":" + sM + " - " + eH + ":" + eM + " (" + component_type + ")"
+        else if labelContentInput == "No info"
+            textToShow := ""
+        
+        final_label_text = is_visible ? textToShow : ""
+
+        inSession = time >= sessionStart and time < sessionEnd
+        sid = sessionStart + fractalKey
+
+        found = Session.new()
+        isFound = false
+        for s in session_array
+            if s.id == sid
+                found := s
+                isFound := true
+                break
+    
+        if inSession and not isFound and show
+            start_bar = bar_index - bars_to_lookback
+            bars_to_end = tf_ms > 0 ? int(math.floor((sessionEnd - time) / tf_ms)) : 0
+            end_bar = bar_index + math.min(bars_to_end, 499)
+            sh = initial_high, sl = initial_low
+            if not na(sh) and not na(sl)
+                box b = na
+                line ln_left = na, line ln_right = na, line ln_top = na
+                if isBoxesMode
+                    b := box.new(start_bar, sh, end_bar, sl, border_color=final_border_color, border_width=borderWidthInput, bgcolor=final_bg_color)
+                else
+                    [l, r, t] = f_create_outline_lines(start_bar, end_bar, sh, sl, final_border_color, line.style_solid)
+                    ln_left := l, ln_right := r, ln_top := t
+                mid_x = int(math.round((start_bar + end_bar) / 2))
+                label la = label.new(mid_x, sh, final_label_text, yloc=yloc.price, style=label.style_label_down, textcolor=final_text_color, color=na, size=fractalLabelSize)
+                array.push(activeLabels, LabelInfo.new(sid, la, start_bar, end_bar, sh))
+                line pr50Line = na
+                if show50PR
+                    pr50 = (sh + sl) / 2
+                    pr50Line := line.new(start_bar, pr50, end_bar, pr50, color=final_border_color, style=line.style_solid, width=lineWidth50pr)
+
+                newSession = Session.new(sid, b, la, ln_left, ln_right, ln_top, sh, sl, pr50Line, array.new<line>(25, na), array.new<label>(25, na))
+                f_manage_stdv_lines(newSession, showStdv and is_visible, sh, sl, start_bar, end_bar)
+                array.push(session_array, newSession)
+
+        else if isFound and inSession
+            box_left = isBoxesMode ? box.get_left(found.box_obj) : (na(found.line_left) ? (bar_index - bars_to_lookback) : int(line.get_x1(found.line_left)))
+            bars_to_end = tf_ms > 0 ? int(math.floor((sessionEnd - time) / tf_ms)) : 0
+            box_right = bar_index + math.min(bars_to_end, 499)
+            sh = math.max(found.session_high, high), sl = math.min(found.session_low, low)
+            if not na(sh) and not na(sl)
+                found.session_high := sh, found.session_low := sl
+                if isBoxesMode
+                    box.set_top(found.box_obj, sh), box.set_bottom(found.box_obj, sl), box.set_right(found.box_obj, box_right), box.set_bgcolor(found.box_obj, final_bg_color), box.set_border_color(found.box_obj, final_border_color)
+                else
+                    if na(found.line_right)
+                        [l, r, t] = f_create_outline_lines(box_left, box_right, sh, sl, final_border_color, line.style_solid)
+                        found.line_left := l, found.line_right := r, found.line_top := t
+                    else
+                        line.set_x1(found.line_right, box_right), line.set_x2(found.line_right, box_right)
+                        f_update_outline_lines(found.line_left, found.line_right, sh, sl, final_border_color, line.style_solid)
+                        lx = int(line.get_x1(found.line_left))
+                        line.set_xy1(found.line_top, lx, sh), line.set_xy2(found.line_top, box_right, sh)
+                        line.set_color(found.line_top, final_border_color), line.set_width(found.line_top, borderWidthInput)
+                mid_x = int(math.round((box_left + box_right) / 2))
+                label.set_text(found.label_obj, final_label_text), label.set_x(found.label_obj, mid_x), label.set_textcolor(found.label_obj, final_text_color), label.set_size(found.label_obj, fractalLabelSize)
+                target_y = sh
+                if preventOverlapInput and is_visible
+                    y_offset = ta.tr * 1.5
+                    is_safe = false
+                    while not is_safe
+                        is_safe := true
+                        for item in activeLabels
+                            if item.id != sid and item.x2 >= box_left and item.x1 <= box_right and math.abs(target_y - item.y) < y_offset
+                                target_y := item.y + y_offset, is_safe := false
+                                break
+                label.set_y(found.label_obj, target_y)
+                for item in activeLabels
+                    if item.id == sid
+                        item.x2 := box_right, item.y  := target_y
+                        break
+                if show50PR
+                    pr50 = (sh + sl) / 2
+                    if na(found.pr50_line_obj)
+                        found.pr50_line_obj := line.new(box_left, pr50, box_right, pr50, color=final_border_color, style=line.style_solid, width=lineWidth50pr)
+                    else
+                        line.set_xy1(found.pr50_line_obj, box_left,  pr50), line.set_xy2(found.pr50_line_obj, box_right, pr50), line.set_color(found.pr50_line_obj, final_border_color)
+                else if not na(found.pr50_line_obj)
+                    line.delete(found.pr50_line_obj)
+                    found.pr50_line_obj := na
+                f_manage_stdv_lines(found, showStdv and is_visible, sh, sl, box_left, box_right)
+        else if isFound and not inSession
+            if not is_visible
+                if isBoxesMode
+                    box.set_border_color(found.box_obj, na), box.set_bgcolor(found.box_obj, na)
+                else
+                    line.set_color(found.line_left, na), line.set_color(found.line_right, na), line.set_color(found.line_top, na)
+                label.set_text(found.label_obj, "")
+                if not na(found.pr50_line_obj)
+                    line.set_color(found.pr50_line_obj, na)
+                f_manage_stdv_lines(found, false, 0,0,0,0)
+
+manage_future_fractal_component(string component_type, bool show, string labelText, color borderColor, color bgColor, int sessionStart, int sessionEnd, bool showSeconds, int fractalKey) =>
+    var futureSessions = array.new<Session>()
+    
+    if not na(sessionStart) and not na(sessionEnd) and show
+        textToShow = labelText + " " + component_type + " (Next)"
+        if labelContentInput == "Fractal Time Info"
+            sH = f_format_2(hour(sessionStart, tzInput)), sM = f_format_2(minute(sessionStart, tzInput))
+            eH = f_format_2(hour(sessionEnd,   tzInput)), eM = f_format_2(minute(sessionEnd,   tzInput))
+            if showSeconds
+                sS = f_format_2(second(sessionStart, tzInput)), eS = f_format_2(second(sessionEnd,   tzInput))
+                textToShow := sH + ":" + sM + ":" + sS + " - " + eH + ":" + eM + ":" + eS + " (Next)"
+            else
+                textToShow := sH + ":" + sM + " - " + eH + ":" + eM + " (Next)"
+        else if labelContentInput == "No info"
+            textToShow := ""
+
+        sid = sessionStart + fractalKey + 2000
+
+        chart_tf_ms = timeframe.in_seconds(timeframe.period) * 1000
+        time_to_start = sessionStart - time
+        time_to_end = sessionEnd - time
+        bars_to_start = chart_tf_ms > 0 and time_to_start > 0 ? int(math.floor(time_to_start / chart_tf_ms)) : 0
+        bars_to_end = chart_tf_ms > 0 and time_to_end > 0 ? int(math.floor(time_to_end / chart_tf_ms)) : 1
+        start_bar = bar_index + bars_to_start
+        end_bar = bar_index + math.min(bars_to_end, 499)
+        sh = high, sl = low
+
+        isFound = false
+        for s in futureSessions
+            if s.id == sid
+                isFound := true
+                break
+
+        if not isFound
+            futureBorderColor = color.new(borderColor, 70)
+            futureBgColor = color.new(bgColor, 90)
+            box b = na, line ln_left = na, line ln_right = na, line ln_top = na
+            if isBoxesMode
+                b := box.new(start_bar, sh, end_bar, sl, border_color=futureBorderColor, border_width=borderWidthInput, bgcolor=futureBgColor)
+            else
+                [l, r, t] = f_create_outline_lines(start_bar, end_bar, sh, sl, futureBorderColor, line.style_dashed)
+                ln_left := l, ln_right := r, ln_top := t
+            mid_x = int(math.round((start_bar + end_bar) / 2))
+            label la = label.new(mid_x, sh, textToShow, yloc=yloc.price, style=label.style_label_down, textcolor=futureBorderColor, color=na, size=fractalLabelSize)
+            array.push(futureSessions, Session.new(sid, b, la, ln_left, ln_right, ln_top, sh, sl, na, array.new<line>(25, na), array.new<label>(25, na)))
+
+    if array.size(futureSessions) > 0
+        for i = array.size(futureSessions) - 1 to 0
+            s = array.get(futureSessions, i)
+            left_bar = isBoxesMode ? box.get_left(s.box_obj) : (na(s.line_left) ? na : int(line.get_x1(s.line_left)))
+            if not na(left_bar) and left_bar < bar_index - 10
+                f_delete_session(s)
+                array.remove(futureSessions, i)
+
+f_manage_vdivs(show, start_time, color, style, width, array<line> line_array, useLookback, lookbackCount) =>
+    is_new_session_bar = not na(start_time) and time >= start_time and time[1] < start_time
+
+    if show and is_new_session_bar
+        array.push(line_array, line.new(x1=bar_index, y1=low, x2=bar_index, y2=high, extend=extend.both, color=color, style=f_get_line_style(style), width=width))
+
+    if useLookback
+        while array.size(line_array) > lookbackCount
+            line.delete(array.shift(line_array))
+
+    if array.size(line_array) > 0
+        for i = array.size(line_array) - 1 to 0
+            l = array.get(line_array, i)
+            if not show
+                line.delete(array.remove(line_array, i))
+            else
+                line.set_color(l, color)
+                line.set_style(l, f_get_line_style(style))
+                line.set_width(l, width)
+
+f_manage_future_vdiv(show, future_start_time, color, style, width, array<line> future_line_array) =>
+    line_id = array.size(future_line_array) > 0 ? array.get(future_line_array, 0) : na
+
+    if show and not na(future_start_time)
+        chart_tf_ms = timeframe.in_seconds(timeframe.period) * 1000
+        time_to_start = future_start_time - time
+        bars_to_start = chart_tf_ms > 0 and time_to_start > 0 ? int(math.floor(time_to_start / chart_tf_ms)) : 0
+        start_bar = bar_index + bars_to_start
+
+        if na(line_id)
+            l = line.new(start_bar, low, start_bar, high, extend=extend.both, color=color, style=f_get_line_style(style), width=width)
+            array.push(future_line_array, l)
+        else
+            if line.get_x1(line_id) != start_bar
+                line.set_x1(line_id, start_bar)
+                line.set_x2(line_id, start_bar)
+            
+            line.set_color(line_id, color)
+            line.set_style(line_id, f_get_line_style(style))
+            line.set_width(line_id, width)
+
+        if not na(line_id) and line.get_x1(line_id) < bar_index
+            line.delete(array.remove(future_line_array, 0))
+
+    else if not na(line_id)
+        line.delete(array.remove(future_line_array, 0))
+
+f_manage_candle_open_vdivs(string tf, bool show, bool show_label, color vcolor, int lookback, array<line> past_lines, array<line> future_lines, array<label> past_labels, array<label> future_labels, string label_pos, string label_size, string label_color_src, color custom_label_color, bool show_year, bool show_month, bool show_day, bool show_time) =>
+    label_style = label_pos == "Top" ? label.style_label_up : label_pos == "Bottom" ? label.style_label_down : label.style_none
+    final_label_color = label_color_src == "Custom" ? custom_label_color : vcolor
+
+    format_str = ""
+    if show_year
+        format_str := format_str + "yyyy"
+    if show_month
+        format_str := format_str + (format_str == "" ? "" : " ") + "MMM"
+    if show_day
+        format_str := format_str + (format_str == "" ? "" : " ") + "E"
+    if show_time
+        format_str := format_str + (format_str == "" ? "" : " ") + "HH:mm"
+
+    visible_high = ta.highest(high, lookback)
+    visible_low  = ta.lowest(low, lookback)
+    price_range = na(visible_high) or na(visible_low) ? ta.tr : visible_high - visible_low
+
+    float label_y_pos = switch label_pos
+        "Top"    => visible_high + price_range * 0.05
+        "Bottom" => visible_low - price_range * 0.05
+        => (visible_high + visible_low) / 2
+
+    is_new_tf_bar = na(time(tf)[1]) or time(tf) != time(tf)[1]
+    if show and is_new_tf_bar
+        array.push(past_lines, line.new(bar_index, low, bar_index, high, color=vcolor, style=line.style_solid, width=1, extend=extend.both))
+        if show_label and format_str != ""
+            time_text = str.format("{0,time," + format_str + "}", time(tf))
+            array.push(past_labels, label.new(bar_index, label_y_pos, time_text, yloc=yloc.price, style=label_style, textalign=text.align_center, color=color.new(vcolor, 100), textcolor=final_label_color, size=label_size))
+
+    if array.size(past_lines) > 0
+        for i = array.size(past_lines) - 1 to 0
+            l = array.get(past_lines, i)
+            if not show or (bar_index - line.get_x1(l) > lookback)
+                line.delete(array.remove(past_lines, i))
+            else
+                line.set_color(l, vcolor)
+
+    if array.size(past_labels) > 0
+        for i = array.size(past_labels) - 1 to 0
+            la = array.get(past_labels, i)
+            if not show or not show_label or (bar_index - label.get_x(la) > lookback) or format_str == ""
+                label.delete(array.remove(past_labels, i))
+            else
+                label.set_y(la, label_y_pos)
+                label.set_textcolor(la, final_label_color)
+                label.set_color(la, color.new(vcolor, 100))
+                label.set_style(la, label_style)
+                label.set_size(la, label_size)
+
+    if array.size(future_lines) > 0
+        for i = array.size(future_lines) - 1 to 0
+            l = array.get(future_lines, i)
+            if not na(l) and line.get_x1(l) < bar_index
+                line.delete(array.remove(future_lines, i))
+    if array.size(future_labels) > 0
+        for i = array.size(future_labels) - 1 to 0
+            la = array.get(future_labels, i)
+            if not na(la) and label.get_x(la) < bar_index
+                label.delete(array.remove(future_labels, i))
+
+    if show and is_new_tf_bar
+        tf_ms = timeframe.in_seconds(tf) * 1000
+        chart_tf_ms = timeframe.in_seconds(timeframe.period) * 1000
+        if tf_ms > 0 and chart_tf_ms > 0
+            for l in future_lines
+                if not na(l)
+                    line.delete(l)
+            array.clear(future_lines)
+            if show_label
+                for la in future_labels
+                    if not na(la)
+                        label.delete(la)
+                array.clear(future_labels)
+
+            for j = 1 to 2
+                future_start_time = time(tf) + j * tf_ms
+                time_to_start = future_start_time - time
+                bars_to_start = int(math.round(time_to_start / chart_tf_ms))
+                start_bar = bar_index + bars_to_start
+                array.push(future_lines, line.new(start_bar, low, start_bar, high, color=vcolor, style=line.style_dashed, width=1, extend=extend.both))
+                if show_label and format_str != ""
+                    time_text = str.format("{0,time," + format_str + "}", future_start_time)
+                    array.push(future_labels, label.new(start_bar, label_y_pos, time_text, yloc=yloc.price, style=label_style, textalign=text.align_center, color=color.new(vcolor, 100), textcolor=final_label_color, size=label_size))
+
+f_get_session_times_for_asset(assetName, y, m, d, dow, t) =>
+    cycle_anchor_h = assetName == "Forex" ? 17 : assetName == "Gold&Futures" ? 18 : 20
+    cycle_anchor_m = 0
+    anchor_dow = assetName == "Crypto" ? dayofweek.sunday : dayofweek.monday
+    
+    y1Start  = f_find_yearly_anchor(cycle_anchor_h, cycle_anchor_m, y, t)
+    m3Start  = f_find_quarterly_anchor(cycle_anchor_h, cycle_anchor_m, y, m, t)
+    m1Start  = f_find_monthly_anchor(cycle_anchor_h, cycle_anchor_m, y, m, t)
+    w1Start  = f_find_weekly_anchor(anchor_dow, cycle_anchor_h, cycle_anchor_m, dow, t)
+
+    d1Start  = f_find_last_cycle_anchor(24 * MS_IN_HOUR, cycle_anchor_h, cycle_anchor_m, y, m, d, t)
+    h4Start  = f_find_last_cycle_anchor(4 * MS_IN_HOUR, cycle_anchor_h, cycle_anchor_m, y, m, d, t)
+    [h1Start, _] = f_get_cyclical_fractal('60', 0, 0)
+    [m15Start, _] = f_get_cyclical_fractal('15', 0, 0)
+    [m5Start, _] = f_get_cyclical_fractal('5', 0, 0)
+    
+    [m5Start, m15Start, h1Start, h4Start, d1Start, w1Start, m1Start, m3Start, y1Start]
+
+
+f_get_future_session_times_for_asset(assetName, y, m, d, dow, t) =>
+    [m5Now, m15Now, h1Now, h4Now, d1Now, w1Now, m1Now, m3Now, y1Now] = f_get_session_times_for_asset(assetName, y, m, d, dow, t)
+
+    y_of_y1 = year(y1Now, tzInput)
+    y1_dur = timestamp(tzInput, y_of_y1 + 1, month(y1Now, tzInput), dayofmonth(y1Now, tzInput), hour(y1Now, tzInput), minute(y1Now, tzInput), 0) - y1Now
+    y1Start = y1Now + y1_dur
+    
+    y_of_m3 = year(m3Now, tzInput)
+    m_of_m3 = month(m3Now, tzInput)
+    next_m3_y = m_of_m3 >= 10 ? y_of_m3 + 1 : y_of_m3
+    next_m3_m = m_of_m3 >= 10 ? (m_of_m3 + 3) % 12 : m_of_m3 + 3
+    m3_dur = timestamp(tzInput, next_m3_y, next_m3_m, dayofmonth(m3Now, tzInput), hour(m3Now, tzInput), minute(m3Now, tzInput), 0) - m3Now
+    m3Start = m3Now + m3_dur
+
+    y_of_m1 = year(m1Now, tzInput)
+    m_of_m1 = month(m1Now, tzInput)
+    next_m1_y = m_of_m1 == 12 ? y_of_m1 + 1 : y_of_m1
+    next_m1_m = m_of_m1 == 12 ? 1 : m_of_m1 + 1
+    m1_dur = timestamp(tzInput, next_m1_y, next_m1_m, dayofmonth(m1Now, tzInput), hour(m1Now, tzInput), minute(m1Now, tzInput), 0) - m1Now
+    m1Start = m1Now + m1_dur
+
+    w1Start = w1Now + MS_IN_WEEK
+    d1Start = d1Now + MS_IN_DAY
+    h4Start = h4Now + 4 * MS_IN_HOUR
+    h1Start = h1Now + MS_IN_HOUR
+    m15Start = m15Now + 15 * MS_IN_MIN
+    m5Start = m5Now + 5 * MS_IN_MIN
+    
+    [m5Start, m15Start, h1Start, h4Start, d1Start, w1Start, m1Start, m3Start, y1Start]
+
+var m5_or_sessions = array.new<Session>(), var m5_nest_sessions = array.new<Session>(), var m5_of_sessions = array.new<Session>(), var m5_ffd_sessions = array.new<Session>(), var m5_vdivs = array.new<line>(), var m5_future_vdivs = array.new<line>()
+var m15_or_sessions = array.new<Session>(), var m15_nest_sessions = array.new<Session>(), var m15_of_sessions = array.new<Session>(), var m15_ffd_sessions = array.new<Session>(), var m15_vdivs = array.new<line>(), var m15_future_vdivs = array.new<line>()
+var h1_or_sessions = array.new<Session>(), var h1_nest_sessions = array.new<Session>(), var h1_of_sessions = array.new<Session>(), var h1_ffd_sessions = array.new<Session>(), var h1_vdivs = array.new<line>(), var h1_future_vdivs = array.new<line>()
+var h4_or_sessions = array.new<Session>(), var h4_nest_sessions = array.new<Session>(), var h4_of_sessions = array.new<Session>(), var h4_ffd_sessions = array.new<Session>(), var h4_vdivs = array.new<line>(), var h4_future_vdivs = array.new<line>()
+var d1_or_sessions = array.new<Session>(), var d1_nest_sessions = array.new<Session>(), var d1_of_sessions = array.new<Session>(), var d1_ffd_sessions = array.new<Session>(), var d1_vdivs = array.new<line>(), var d1_future_vdivs = array.new<line>()
+var w1_or_sessions = array.new<Session>(), var w1_nest_sessions = array.new<Session>(), var w1_of_sessions = array.new<Session>(), var w1_ffd_sessions = array.new<Session>(), var w1_vdivs = array.new<line>(), var w1_future_vdivs = array.new<line>()
+var m1_or_sessions = array.new<Session>(), var m1_nest_sessions = array.new<Session>(), var m1_of_sessions = array.new<Session>(), var m1_ffd_sessions = array.new<Session>(), var m1_vdivs = array.new<line>(), var m1_future_vdivs = array.new<line>()
+var m3_or_sessions = array.new<Session>(), var m3_nest_sessions = array.new<Session>(), var m3_of_sessions = array.new<Session>(), var m3_ffd_sessions = array.new<Session>(), var m3_vdivs = array.new<line>(), var m3_future_vdivs = array.new<line>()
+var y_or_sessions = array.new<Session>(), var y_nest_sessions = array.new<Session>(), var y_of_sessions = array.new<Session>(), var y_ffd_sessions = array.new<Session>(), var y_vdivs = array.new<line>(), var y_future_vdivs = array.new<line>()
+
+y = year(time, tzInput), mo = month(time, tzInput), d = dayofmonth(time, tzInput), dow = dayofweek(time, tzInput)
+string effectiveAssetClass = autoDetectAsset ? f_auto_detect_asset() : array.get(str.split(assetClass, ":"), 0)
+
+[baseM5Start, baseM15Start, baseH1Start, baseH4Start, baseD1Start, baseW1Start, baseM1Start, baseM3Start, baseY1Start] = f_get_session_times_for_asset(effectiveAssetClass, y, mo, d, dow, time)
+[futureBaseM5Start, futureBaseM15Start, futureBaseH1Start, futureBaseH4Start, futureBaseD1Start, futureBaseW1Start, futureBaseM1Start, futureBaseM3Start, futureBaseY1Start] = f_get_future_session_times_for_asset(effectiveAssetClass, y, mo, d, dow, time)
+
+start_off_ms_5m = startDayOffset5m * MS_IN_DAY + startHourOffset5m * MS_IN_HOUR + startMinuteOffset5m * MS_IN_MIN
+end_off_ms_5m = endDayOffset5m * MS_IN_DAY + endHourOffset5m * MS_IN_HOUR + endMinuteOffset5m * MS_IN_MIN
+start_off_ms_15m = startDayOffset15m * MS_IN_DAY + startHourOffset15m * MS_IN_HOUR + startMinuteOffset15m * MS_IN_MIN
+end_off_ms_15m = endDayOffset15m * MS_IN_DAY + endHourOffset15m * MS_IN_HOUR + endMinuteOffset15m * MS_IN_MIN
+start_off_ms_1h = startDayOffset1h * MS_IN_DAY + startHourOffset1h * MS_IN_HOUR + startMinuteOffset1h * MS_IN_MIN
+end_off_ms_1h = endDayOffset1h * MS_IN_DAY + endHourOffset1h * MS_IN_HOUR + endMinuteOffset1h * MS_IN_MIN
+start_off_ms_4h = startDayOffset4h * MS_IN_DAY + startHourOffset4h * MS_IN_HOUR + startMinuteOffset4h * MS_IN_MIN
+end_off_ms_4h = endDayOffset4h * MS_IN_DAY + endHourOffset4h * MS_IN_HOUR + endMinuteOffset4h * MS_IN_MIN
+start_off_ms_D = startDayOffsetD * MS_IN_DAY + startHourOffsetD * MS_IN_HOUR + startMinuteOffsetD * MS_IN_MIN
+end_off_ms_D = endDayOffsetD * MS_IN_DAY + endHourOffsetD * MS_IN_HOUR + endMinuteOffsetD * MS_IN_MIN
+start_off_ms_W = startDayOffsetW * MS_IN_DAY + startHourOffsetW * MS_IN_HOUR + startMinuteOffsetW * MS_IN_MIN
+end_off_ms_W = endDayOffsetW * MS_IN_DAY + endHourOffsetW * MS_IN_HOUR + endMinuteOffsetW * MS_IN_MIN
+start_off_ms_M = startDayOffsetM * MS_IN_DAY + startHourOffsetM * MS_IN_HOUR + startMinuteOffsetM * MS_IN_MIN
+end_off_ms_M = endDayOffsetM * MS_IN_DAY + endHourOffsetM * MS_IN_HOUR + endMinuteOffsetM * MS_IN_MIN
+start_off_ms_3M = startDayOffset3M * MS_IN_DAY + startHourOffset3M * MS_IN_HOUR + startMinuteOffset3M * MS_IN_MIN
+end_off_ms_3M = endDayOffset3M * MS_IN_DAY + endHourOffset3M * MS_IN_HOUR + endMinuteOffset3M * MS_IN_MIN
+start_off_ms_Y = startDayOffsetY * MS_IN_DAY + startHourOffsetY * MS_IN_HOUR + startMinuteOffsetY * MS_IN_MIN
+end_off_ms_Y = endDayOffsetY * MS_IN_DAY + endHourOffsetY * MS_IN_HOUR + endMinuteOffsetY * MS_IN_MIN
+
+m5Start = baseM5Start + start_off_ms_5m
+m15Start = baseM15Start + start_off_ms_15m
+h1Start = baseH1Start + start_off_ms_1h
+h4Start = baseH4Start + start_off_ms_4h
+d1Start = baseD1Start + start_off_ms_D
+w1Start = baseW1Start + start_off_ms_W
+m1Start = baseM1Start + start_off_ms_M
+m3Start = baseM3Start + start_off_ms_3M
+y1Start = baseY1Start + start_off_ms_Y
+
+futureM5Start = futureBaseM5Start + start_off_ms_5m
+futureM15Start = futureBaseM15Start + start_off_ms_15m
+futureH1Start = futureBaseH1Start + start_off_ms_1h
+futureH4Start = futureBaseH4Start + start_off_ms_4h
+futureD1Start = futureBaseD1Start + start_off_ms_D
+futureW1Start = futureBaseW1Start + start_off_ms_W
+futureM1Start = futureBaseM1Start + start_off_ms_M
+futureM3Start = futureBaseM3Start + start_off_ms_3M
+futureY1Start = futureBaseY1Start + start_off_ms_Y
+
+is_visible_5m = f_should_show_fractal(enableTfVisibility5m, maxTfVisibility5m)
+m5_end_time = (na(baseM5Start) ? na : baseM5Start + 5 * MS_IN_MIN) + end_off_ms_5m
+m5_total_duration = na(m5Start) or na(m5_end_time) ? na : m5_end_time - m5Start
+m5_or_end   = na(m5_total_duration) ? na : m5Start + math.round(m5_total_duration * (orDurationPct5m / 100.0))
+m5_nest_end = na(m5_total_duration) ? na : m5_end_time - math.round(m5_total_duration * (ofDurationPct5m / 100.0))
+manage_fractal_component(COMPONENT_FFD, m5_ffd_sessions, show_ffd_5m, is_visible_5m, "5m", color_ffd_5m, bgColor_ffd_5m, m5Start, m5_end_time, true, false, show_stdv_ffd_5m, 1004, lookbackInput, useLookback5m, lookbackCount5m)
+manage_fractal_component(COMPONENT_OR, m5_or_sessions, show5mOpenRange, is_visible_5m, "5m", color5mOpenRange, bgColor5mOpenRange, m5Start, m5_or_end, true, show50PR5mOR, showStdvOR5m, 1001, lookbackInput, useLookback5m, lookbackCount5m)
+manage_fractal_component(COMPONENT_NEST, m5_nest_sessions, show5mNest, is_visible_5m, "5m", color5mNest, bgColor5mNest, m5_or_end, m5_nest_end, true, false, false, 1002, lookbackInput, useLookback5m, lookbackCount5m)
+manage_fractal_component(COMPONENT_OF, m5_of_sessions, show5mOpenFloat, is_visible_5m, "5m", color5mOpenFloat, bgColor5mOpenFloat, m5_nest_end, m5_end_time, true, show50PR5m, showStdvOF5m, 1003, lookbackInput, useLookback5m, lookbackCount5m)
+f_manage_vdivs(show_vdiv_5m, m5Start, color_vdiv_5m, style_vdiv_5m, width_vdiv_5m, m5_vdivs, useLookback5m, lookbackCount5m)
+f_manage_future_vdiv(show_future_vdiv_5m, futureM5Start, color_vdiv_5m, style_vdiv_5m, width_vdiv_5m, m5_future_vdivs)
+
+is_visible_15m = f_should_show_fractal(enableTfVisibility15m, maxTfVisibility15m)
+m15_end_time = (na(baseM15Start) ? na : baseM15Start + 15 * MS_IN_MIN) + end_off_ms_15m
+m15_total_duration = na(m15Start) or na(m15_end_time) ? na : m15_end_time - m15Start
+m15_or_end   = na(m15_total_duration) ? na : m15Start + math.round(m15_total_duration * (orDurationPct15m / 100.0))
+m15_nest_end = na(m15_total_duration) ? na : m15_end_time - math.round(m15_total_duration * (ofDurationPct15m / 100.0))
+manage_fractal_component(COMPONENT_FFD, m15_ffd_sessions, show_ffd_15m, is_visible_15m, "15m", color_ffd_15m, bgColor_ffd_15m, m15Start, m15_end_time, true, false, show_stdv_ffd_15m, 904, lookbackInput, useLookback15m, lookbackCount15m)
+manage_fractal_component(COMPONENT_OR, m15_or_sessions, show15mOpenRange, is_visible_15m, "15m", color15mOpenRange, bgColor15mOpenRange, m15Start, m15_or_end, true, show50PR15mOR, showStdvOR15m, 901, lookbackInput, useLookback15m, lookbackCount15m)
+manage_fractal_component(COMPONENT_NEST, m15_nest_sessions, show15mNest, is_visible_15m, "15m", color15mNest, bgColor15mNest, m15_or_end, m15_nest_end, true, false, false, 902, lookbackInput, useLookback15m, lookbackCount15m)
+manage_fractal_component(COMPONENT_OF, m15_of_sessions, show15mOpenFloat, is_visible_15m, "15m", color15mOpenFloat, bgColor15mOpenFloat, m15_nest_end, m15_end_time, true, show50PR15m, showStdvOF15m, 903, lookbackInput, useLookback15m, lookbackCount15m)
+f_manage_vdivs(show_vdiv_15m, m15Start, color_vdiv_15m, style_vdiv_15m, width_vdiv_15m, m15_vdivs, useLookback15m, lookbackCount15m)
+f_manage_future_vdiv(show_future_vdiv_15m, futureM15Start, color_vdiv_15m, style_vdiv_15m, width_vdiv_15m, m15_future_vdivs)
+
+is_visible_1h = f_should_show_fractal(enableTfVisibility1h, maxTfVisibility1h)
+h1_end_time = (na(baseH1Start) ? na : baseH1Start + MS_IN_HOUR) + end_off_ms_1h
+h1_total_duration = na(h1Start) or na(h1_end_time) ? na : h1_end_time - h1Start
+h1_or_end   = na(h1_total_duration) ? na : h1Start + math.round(h1_total_duration * (orDurationPct1h / 100.0))
+h1_nest_end = na(h1_total_duration) ? na : h1_end_time - math.round(h1_total_duration * (ofDurationPct1h / 100.0))
+manage_fractal_component(COMPONENT_FFD, h1_ffd_sessions, show_ffd_1h, is_visible_1h, "1h", color_ffd_1h, bgColor_ffd_1h, h1Start, h1_end_time, false, false, show_stdv_ffd_1h, 704, lookbackInput, useLookback1h, lookbackCount1h)
+manage_fractal_component(COMPONENT_OR, h1_or_sessions, show1hOpenRange, is_visible_1h, "1h", color1hOpenRange, bgColor1hOpenRange, h1Start, h1_or_end, false, show50PR1hOR, showStdvOR1h, 701, lookbackInput, useLookback1h, lookbackCount1h)
+manage_fractal_component(COMPONENT_NEST, h1_nest_sessions, show1hNest, is_visible_1h, "1h", color1hNest, bgColor1hNest, h1_or_end, h1_nest_end, false, false, false, 702, lookbackInput, useLookback1h, lookbackCount1h)
+manage_fractal_component(COMPONENT_OF, h1_of_sessions, show1hOpenFloat, is_visible_1h, "1h", color1hOpenFloat, bgColor1hOpenFloat, h1_nest_end, h1_end_time, false, show50PR1h, showStdvOF1h, 703, lookbackInput, useLookback1h, lookbackCount1h)
+f_manage_vdivs(show_vdiv_1h, h1Start, color_vdiv_1h, style_vdiv_1h, width_vdiv_1h, h1_vdivs, useLookback1h, lookbackCount1h)
+f_manage_future_vdiv(show_future_vdiv_1h, futureH1Start, color_vdiv_1h, style_vdiv_1h, width_vdiv_1h, h1_future_vdivs)
+
+is_visible_4h = f_should_show_fractal(enableTfVisibility4h, maxTfVisibility4h)
+h4_end_time = (na(baseH4Start) ? na : baseH4Start + 4 * MS_IN_HOUR) + end_off_ms_4h
+h4_total_duration = na(h4Start) or na(h4_end_time) ? na : h4_end_time - h4Start
+h4_or_end   = na(h4_total_duration) ? na : h4Start + math.round(h4_total_duration * (orDurationPct4h / 100.0))
+h4_nest_end = na(h4_total_duration) ? na : h4_end_time - math.round(h4_total_duration * (ofDurationPct4h / 100.0))
+manage_fractal_component(COMPONENT_FFD, h4_ffd_sessions, show_ffd_4h, is_visible_4h, "4h", color_ffd_4h, bgColor_ffd_4h, h4Start, h4_end_time, false, false, show_stdv_ffd_4h, 604, lookbackInput, useLookback4h, lookbackCount4h)
+manage_fractal_component(COMPONENT_OR, h4_or_sessions, show4hOpenRange, is_visible_4h, "4h", color4hOpenRange, bgColor4hOpenRange, h4Start, h4_or_end, false, show50PR4hOR, showStdvOR4h, 601, lookbackInput, useLookback4h, lookbackCount4h)
+manage_fractal_component(COMPONENT_NEST, h4_nest_sessions, show4hNest, is_visible_4h, "4h", color4hNest, bgColor4hNest, h4_or_end, h4_nest_end, false, false, false, 602, lookbackInput, useLookback4h, lookbackCount4h)
+manage_fractal_component(COMPONENT_OF, h4_of_sessions, show4hOpenFloat, is_visible_4h, "4h", color4hOpenFloat, bgColor4hOpenFloat, h4_nest_end, h4_end_time, false, show50PR4h, showStdvOF4h, 603, lookbackInput, useLookback4h, lookbackCount4h)
+f_manage_vdivs(show_vdiv_4h, h4Start, color_vdiv_4h, style_vdiv_4h, width_vdiv_4h, h4_vdivs, useLookback4h, lookbackCount4h)
+f_manage_future_vdiv(show_future_vdiv_4h, futureH4Start, color_vdiv_4h, style_vdiv_4h, width_vdiv_4h, h4_future_vdivs)
+
+is_visible_d = f_should_show_fractal(enableTfVisibilityD, maxTfVisibilityD)
+d1_end_time = (na(baseD1Start) ? na : baseD1Start + MS_IN_DAY) + end_off_ms_D
+d1_total_duration = na(d1Start) or na(d1_end_time) ? na : d1_end_time - d1Start
+d1_or_end   = na(d1_total_duration) ? na : d1Start + math.round(d1_total_duration * (orDurationPctD / 100.0))
+d1_nest_end = na(d1_total_duration) ? na : d1_end_time - math.round(d1_total_duration * (ofDurationPctD / 100.0))
+manage_fractal_component(COMPONENT_FFD, d1_ffd_sessions, show_ffd_D, is_visible_d, "D", color_ffd_D, bgColor_ffd_D, d1Start, d1_end_time, false, false, show_stdv_ffd_D, 504, lookbackInput, useLookbackD, lookbackCountD)
+manage_fractal_component(COMPONENT_OR, d1_or_sessions, showDOpenRange, is_visible_d, "D", colorDOpenRange, bgColorDOpenRange, d1Start, d1_or_end, false, show50PRDOR, showStdvORD, 501, lookbackInput, useLookbackD, lookbackCountD)
+manage_fractal_component(COMPONENT_NEST, d1_nest_sessions, showDNest, is_visible_d, "D", colorDNest, bgColorDNest, d1_or_end, d1_nest_end, false, false, false, 502, lookbackInput, useLookbackD, lookbackCountD)
+manage_fractal_component(COMPONENT_OF, d1_of_sessions, showDOpenFloat, is_visible_d, "D", colorDOpenFloat, bgColorDOpenFloat, d1_nest_end, d1_end_time, false, show50PRD, showStdvOFD, 503, lookbackInput, useLookbackD, lookbackCountD)
+f_manage_vdivs(show_vdiv_D, d1Start, color_vdiv_D, style_vdiv_D, width_vdiv_D, d1_vdivs, useLookbackD, lookbackCountD)
+f_manage_future_vdiv(show_future_vdiv_D, futureD1Start, color_vdiv_D, style_vdiv_D, width_vdiv_D, d1_future_vdivs)
+
+is_visible_w = f_should_show_fractal(enableTfVisibilityW, maxTfVisibilityW)
+max_lb_w = 4990
+w1_end_time = (na(baseW1Start) ? na : baseW1Start + MS_IN_WEEK) + end_off_ms_W
+w1_total_duration = na(w1Start) or na(w1_end_time) ? na : w1_end_time - w1Start
+w1_or_end   = na(w1_total_duration) ? na : w1Start + math.round(w1_total_duration * (orDurationPctW / 100.0))
+w1_nest_end = na(w1_total_duration) ? na : w1_end_time - math.round(w1_total_duration * (ofDurationPctW / 100.0))
+manage_fractal_component(COMPONENT_FFD, w1_ffd_sessions, show_ffd_W, is_visible_w, "W", color_ffd_W, bgColor_ffd_W, w1Start, w1_end_time, false, false, show_stdv_ffd_W, 404, max_lb_w, useLookbackW, lookbackCountW)
+manage_fractal_component(COMPONENT_OR, w1_or_sessions, showWOpenRange, is_visible_w, "W", colorWOpenRange, bgColorWOpenRange, w1Start, w1_or_end, false, show50PRWOR, showStdvORW, 401, max_lb_w, useLookbackW, lookbackCountW)
+manage_fractal_component(COMPONENT_NEST, w1_nest_sessions, showWNest, is_visible_w, "W", colorWNest, bgColorWNest, w1_or_end, w1_nest_end, false, false, false, 402, max_lb_w, useLookbackW, lookbackCountW)
+manage_fractal_component(COMPONENT_OF, w1_of_sessions, showWOpenFloat, is_visible_w, "W", colorWOpenFloat, bgColorWOpenFloat, w1_nest_end, w1_end_time, false, show50PRW, showStdvOFW, 403, max_lb_w, useLookbackW, lookbackCountW)
+f_manage_vdivs(show_vdiv_W, w1Start, color_vdiv_W, style_vdiv_W, width_vdiv_W, w1_vdivs, useLookbackW, lookbackCountW)
+f_manage_future_vdiv(show_future_vdiv_W, futureW1Start, color_vdiv_W, style_vdiv_W, width_vdiv_W, w1_future_vdivs)
+
+is_visible_m = f_should_show_fractal(enableTfVisibilityM, maxTfVisibilityM)
+max_lb_m = 4990
+int base_m1_end_time = na
+if not na(baseM1Start)
+    y_of_m1 = year(baseM1Start, tzInput)
+    m_of_m1 = month(baseM1Start, tzInput)
+    next_m = m_of_m1 == 12 ? 1 : m_of_m1 + 1
+    next_y = m_of_m1 == 12 ? y_of_m1 + 1 : y_of_m1
+    base_m1_end_time := timestamp(tzInput, next_y, next_m, 1, hour(baseM1Start, tzInput), minute(baseM1Start, tzInput), 0)
+m1_end_time = base_m1_end_time + end_off_ms_M
+m1_total_duration = na(m1Start) or na(m1_end_time) ? na : m1_end_time - m1Start
+m1_or_end   = na(m1_total_duration) ? na : m1Start + math.round(m1_total_duration * (orDurationPctM / 100.0))
+m1_nest_end = na(m1_total_duration) ? na : m1_end_time - math.round(m1_total_duration * (ofDurationPctM / 100.0))
+manage_fractal_component(COMPONENT_FFD, m1_ffd_sessions, show_ffd_M, is_visible_m, "M", color_ffd_M, bgColor_ffd_M, m1Start, m1_end_time, false, false, show_stdv_ffd_M, 304, max_lb_m, useLookbackM, lookbackCountM)
+manage_fractal_component(COMPONENT_OR, m1_or_sessions, showMOpenRange, is_visible_m, "M", colorMOpenRange, bgColorMOpenRange, m1Start, m1_or_end, false, show50PRMOR, showStdvORM, 301, max_lb_m, useLookbackM, lookbackCountM)
+manage_fractal_component(COMPONENT_NEST, m1_nest_sessions, showMNest, is_visible_m, "M", colorMNest, bgColorMNest, m1_or_end, m1_nest_end, false, false, false, 302, max_lb_m, useLookbackM, lookbackCountM)
+manage_fractal_component(COMPONENT_OF, m1_of_sessions, showMOpenFloat, is_visible_m, "M", colorMOpenFloat, bgColorMOpenFloat, m1_nest_end, m1_end_time, false, show50PRM, showStdvOFM, 303, max_lb_m, useLookbackM, lookbackCountM)
+f_manage_vdivs(show_vdiv_M, m1Start, color_vdiv_M, style_vdiv_M, width_vdiv_M, m1_vdivs, useLookbackM, lookbackCountM)
+f_manage_future_vdiv(show_future_vdiv_M, futureM1Start, color_vdiv_M, style_vdiv_M, width_vdiv_M, m1_future_vdivs)
+
+is_visible_3m = f_should_show_fractal(enableTfVisibility3M, maxTfVisibility3M)
+max_lb_3m = 4990
+int base_m3_end_time = na
+if not na(baseM3Start)
+    y_of_q1 = year(baseM3Start, tzInput)
+    m_of_q1 = month(baseM3Start, tzInput)
+    next_q_y = m_of_q1 >= 10 ? y_of_q1 + 1 : y_of_q1
+    next_q_m = m_of_q1 >= 10 ? 1 : m_of_q1 + 3
+    base_m3_end_time := timestamp(tzInput, next_q_y, next_q_m, 1, hour(baseM3Start, tzInput), minute(baseM3Start, tzInput), 0)
+m3_end_time = base_m3_end_time + end_off_ms_3M
+m3_total_duration = na(m3Start) or na(m3_end_time) ? na : m3_end_time - m3Start
+m3_or_end   = na(m3_total_duration) ? na : m3Start + math.round(m3_total_duration * (orDurationPct3M / 100.0))
+m3_nest_end = na(m3_total_duration) ? na : m3_end_time - math.round(m3_total_duration * (ofDurationPct3M / 100.0))
+manage_fractal_component(COMPONENT_FFD, m3_ffd_sessions, show_ffd_3M, is_visible_3m, "3M", color_ffd_3M, bgColor_ffd_3M, m3Start, m3_end_time, false, false, show_stdv_ffd_3M, 204, max_lb_3m, useLookback3M, lookbackCount3M)
+manage_fractal_component(COMPONENT_OR, m3_or_sessions, show3MOpenRange, is_visible_3m, "3M", color3MOpenRange, bgColor3MOpenRange, m3Start, m3_or_end, false, show50PR3MOR, showStdvOR3M, 201, max_lb_3m, useLookback3M, lookbackCount3M)
+manage_fractal_component(COMPONENT_NEST, m3_nest_sessions, show3MNest, is_visible_3m, "3M", color3MNest, bgColor3MNest, m3_or_end, m3_nest_end, false, false, false, 202, max_lb_3m, useLookback3M, lookbackCount3M)
+manage_fractal_component(COMPONENT_OF, m3_of_sessions, show3MOpenFloat, is_visible_3m, "3M", color3MOpenFloat, bgColor3MOpenFloat, m3_nest_end, m3_end_time, false, show50PR3M, showStdvOF3M, 203, max_lb_3m, useLookback3M, lookbackCount3M)
+f_manage_vdivs(show_vdiv_3M, m3Start, color_vdiv_3M, style_vdiv_3M, width_vdiv_3M, m3_vdivs, useLookback3M, lookbackCount3M)
+f_manage_future_vdiv(show_future_vdiv_3M, futureM3Start, color_vdiv_3M, style_vdiv_3M, width_vdiv_3M, m3_future_vdivs)
+
+is_visible_y = f_should_show_fractal(enableTfVisibilityY, maxTfVisibilityY)
+max_lb_y = 4990
+base_y1_end_time = na(baseY1Start) ? na : timestamp(tzInput, year(baseY1Start, tzInput) + 1, 1, 1, hour(baseY1Start, tzInput), minute(baseY1Start, tzInput), 0)
+y1_end_time = base_y1_end_time + end_off_ms_Y
+y1_total_duration = na(y1Start) or na(y1_end_time) ? na : y1_end_time - y1Start
+y1_or_end   = na(y1_total_duration) ? na : y1Start + math.round(y1_total_duration * (orDurationPctY / 100.0))
+y1_nest_end = na(y1_total_duration) ? na : y1_end_time - math.round(y1_total_duration * (ofDurationPctY / 100.0))
+manage_fractal_component(COMPONENT_FFD, y_ffd_sessions, show_ffd_Y, is_visible_y, "Y", color_ffd_Y, bgColor_ffd_Y, y1Start, y1_end_time, false, false, show_stdv_ffd_Y, 104, max_lb_y, useLookbackY, lookbackCountY)
+manage_fractal_component(COMPONENT_OR, y_or_sessions, showYOpenRange, is_visible_y, "Y", colorYOpenRange, bgColorYOpenRange, y1Start, y1_or_end, false, show50PRYOR, showStdvORY, 101, max_lb_y, useLookbackY, lookbackCountY)
+manage_fractal_component(COMPONENT_NEST, y_nest_sessions, showYNest, is_visible_y, "Y", colorYNest, bgColorYNest, y1_or_end, y1_nest_end, false, false, false, 102, max_lb_y, useLookbackY, lookbackCountY)
+manage_fractal_component(COMPONENT_OF, y_of_sessions, showYOpenFloat, is_visible_y, "Y", colorYOpenFloat, bgColorYOpenFloat, y1_nest_end, y1_end_time, false, show50PRY, showStdvOFY, 103, max_lb_y, useLookbackY, lookbackCountY)
+f_manage_vdivs(show_vdiv_Y, y1Start, color_vdiv_Y, style_vdiv_Y, width_vdiv_Y, y_vdivs, useLookbackY, lookbackCountY)
+f_manage_future_vdiv(show_future_vdiv_Y, futureY1Start, color_vdiv_Y, style_vdiv_Y, width_vdiv_Y, y_future_vdivs)
+
+future_m5_end_time = (na(futureBaseM5Start) ? na : futureBaseM5Start + 5 * MS_IN_MIN) + end_off_ms_5m
+if not na(future_m5_end_time)
+    future_m5_or_end = futureM5Start + (future_m5_end_time - futureM5Start) / 6
+    future_m5_nest_end = future_m5_end_time - (future_m5_end_time - futureM5Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFuture5m_OR, "5m", color5mOpenRange, bgColor5mOpenRange, futureM5Start, future_m5_or_end, true, 2001)
+    manage_future_fractal_component(COMPONENT_NEST, showFuture5m_Nest, "5m", color5mNest, bgColor5mNest, future_m5_or_end, future_m5_nest_end, true, 2002)
+    manage_future_fractal_component(COMPONENT_OF, showFuture5m_OF, "5m", color5mOpenFloat, bgColor5mOpenFloat, future_m5_nest_end, future_m5_end_time, true, 2003)
+
+future_m15_end_time = (na(futureBaseM15Start) ? na : futureBaseM15Start + 15 * MS_IN_MIN) + end_off_ms_15m
+if not na(future_m15_end_time)
+    future_m15_or_end = futureM15Start + (future_m15_end_time - futureM15Start) / 6
+    future_m15_nest_end = future_m15_end_time - (future_m15_end_time - futureM15Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFuture15m_OR, "15m", color15mOpenRange, bgColor15mOpenRange, futureM15Start, future_m15_or_end, true, 1901)
+    manage_future_fractal_component(COMPONENT_NEST, showFuture15m_Nest, "15m", color15mNest, bgColor15mNest, future_m15_or_end, future_m15_nest_end, true, 1902)
+    manage_future_fractal_component(COMPONENT_OF, showFuture15m_OF, "15m", color15mOpenFloat, bgColor15mOpenFloat, future_m15_nest_end, future_m15_end_time, true, 1903)
+
+future_h1_end_time = (na(futureBaseH1Start) ? na : futureBaseH1Start + MS_IN_HOUR) + end_off_ms_1h
+if not na(future_h1_end_time)
+    future_h1_or_end = futureH1Start + (future_h1_end_time - futureH1Start) / 6
+    future_h1_nest_end = future_h1_end_time - (future_h1_end_time - futureH1Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFuture1h_OR, "1h", color1hOpenRange, bgColor1hOpenRange, futureH1Start, future_h1_or_end, false, 1701)
+    manage_future_fractal_component(COMPONENT_NEST, showFuture1h_Nest, "1h", color1hNest, bgColor1hNest, future_h1_or_end, future_h1_nest_end, false, 1702)
+    manage_future_fractal_component(COMPONENT_OF, showFuture1h_OF, "1h", color1hOpenFloat, bgColor1hOpenFloat, future_h1_nest_end, future_h1_end_time, false, 1703)
+
+future_h4_end_time = (na(futureBaseH4Start) ? na : futureBaseH4Start + 4 * MS_IN_HOUR) + end_off_ms_4h
+if not na(future_h4_end_time)
+    future_h4_or_end = futureH4Start + (future_h4_end_time - futureH4Start) / 6
+    future_h4_nest_end = future_h4_end_time - (future_h4_end_time - futureH4Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFuture4h_OR, "4h", color4hOpenRange, bgColor4hOpenRange, futureH4Start, future_h4_or_end, false, 1601)
+    manage_future_fractal_component(COMPONENT_NEST, showFuture4h_Nest, "4h", color4hNest, bgColor4hNest, future_h4_or_end, future_h4_nest_end, false, 1602)
+    manage_future_fractal_component(COMPONENT_OF, showFuture4h_OF, "4h", color4hOpenFloat, bgColor4hOpenFloat, future_h4_nest_end, future_h4_end_time, false, 1603)
+
+future_d1_end_time = (na(futureBaseD1Start) ? na : futureBaseD1Start + MS_IN_DAY) + end_off_ms_D
+if not na(future_d1_end_time)
+    future_d1_or_end = futureD1Start + (future_d1_end_time - futureD1Start) / 6
+    future_d1_nest_end = future_d1_end_time - (future_d1_end_time - futureD1Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFutureD_OR, "D", colorDOpenRange, bgColorDOpenRange, futureD1Start, future_d1_or_end, false, 1501)
+    manage_future_fractal_component(COMPONENT_NEST, showFutureD_Nest, "D", colorDNest, bgColorDNest, future_d1_or_end, future_d1_nest_end, false, 1502)
+    manage_future_fractal_component(COMPONENT_OF, showFutureD_OF, "D", colorDOpenFloat, bgColorDOpenFloat, future_d1_nest_end, future_d1_end_time, false, 1503)
+
+future_w1_end_time = (na(futureBaseW1Start) ? na : futureBaseW1Start + MS_IN_WEEK) + end_off_ms_W
+if not na(future_w1_end_time)
+    future_w1_or_end = futureW1Start + (future_w1_end_time - futureW1Start) / 6
+    future_w1_nest_end = future_w1_end_time - (future_w1_end_time - futureW1Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFutureW_OR, "W", colorWOpenRange, bgColorWOpenRange, futureW1Start, future_w1_or_end, false, 1401)
+    manage_future_fractal_component(COMPONENT_NEST, showFutureW_Nest, "W", colorWNest, bgColorWNest, future_w1_or_end, future_w1_nest_end, false, 1402)
+    manage_future_fractal_component(COMPONENT_OF, showFutureW_OF, "W", colorWOpenFloat, bgColorWOpenFloat, future_w1_nest_end, future_w1_end_time, false, 1403)
+
+int future_m1_end_time = na
+if not na(futureBaseM1Start)
+    y_of_m1 = year(futureBaseM1Start, tzInput)
+    m_of_m1 = month(futureBaseM1Start, tzInput)
+    next_m = m_of_m1 == 12 ? 1 : m_of_m1 + 1
+    next_y = m_of_m1 == 12 ? y_of_m1 + 1 : y_of_m1
+    future_m1_end_time := timestamp(tzInput, next_y, next_m, 1, hour(futureBaseM1Start, tzInput), minute(futureBaseM1Start, tzInput), 0)
+future_m1_end_time := future_m1_end_time + end_off_ms_M
+if not na(future_m1_end_time)
+    future_m1_or_end = futureM1Start + (future_m1_end_time - futureM1Start) / 6
+    future_m1_nest_end = future_m1_end_time - (future_m1_end_time - futureM1Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFutureM_OR, "M", colorMOpenRange, bgColorMOpenRange, futureM1Start, future_m1_or_end, false, 1301)
+    manage_future_fractal_component(COMPONENT_NEST, showFutureM_Nest, "M", colorMNest, bgColorMNest, future_m1_or_end, future_m1_nest_end, false, 1302)
+    manage_future_fractal_component(COMPONENT_OF, showFutureM_OF, "M", colorMOpenFloat, bgColorMOpenFloat, future_m1_nest_end, future_m1_end_time, false, 1303)
+
+int future_m3_end_time = na
+if not na(futureBaseM3Start)
+    y_of_q1 = year(futureBaseM3Start, tzInput)
+    m_of_q1 = month(futureBaseM3Start, tzInput)
+    next_q_y = m_of_q1 >= 10 ? y_of_q1 + 1 : y_of_q1
+    next_q_m = m_of_q1 >= 10 ? 1 : m_of_q1 + 3
+    future_m3_end_time := timestamp(tzInput, next_q_y, next_q_m, 1, hour(futureBaseM3Start, tzInput), minute(futureBaseM3Start, tzInput), 0)
+future_m3_end_time := future_m3_end_time + end_off_ms_3M
+if not na(future_m3_end_time)
+    future_m3_or_end = futureM3Start + (future_m3_end_time - futureM3Start) / 6
+    future_m3_nest_end = future_m3_end_time - (future_m3_end_time - futureM3Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFuture3M_OR, "3M", color3MOpenRange, bgColor3MOpenRange, futureM3Start, future_m3_or_end, false, 1201)
+    manage_future_fractal_component(COMPONENT_NEST, showFuture3M_Nest, "3M", color3MNest, bgColor3MNest, future_m3_or_end, future_m3_nest_end, false, 1202)
+    manage_future_fractal_component(COMPONENT_OF, showFuture3M_OF, "3M", color3MOpenFloat, bgColor3MOpenFloat, future_m3_nest_end, future_m3_end_time, false, 1203)
+
+future_y1_end_time = (na(futureBaseY1Start) ? na : timestamp(tzInput, year(futureBaseY1Start, tzInput) + 1, 1, 1, hour(futureBaseY1Start, tzInput), minute(futureBaseY1Start, tzInput), 0)) + end_off_ms_Y
+if not na(future_y1_end_time)
+    future_y1_or_end = futureY1Start + (future_y1_end_time - futureY1Start) / 6
+    future_y1_nest_end = future_y1_end_time - (future_y1_end_time - futureY1Start) / 6
+    manage_future_fractal_component(COMPONENT_OR, showFutureY_OR, "Y", colorYOpenRange, bgColorYOpenRange, futureY1Start, future_y1_or_end, false, 1101)
+    manage_future_fractal_component(COMPONENT_NEST, showFutureY_Nest, "Y", colorYNest, bgColorYNest, future_y1_or_end, future_y1_nest_end, false, 1102)
+    manage_future_fractal_component(COMPONENT_OF, showFutureY_OF, "Y", colorYOpenFloat, bgColorYOpenFloat, future_y1_nest_end, future_y1_end_time, false, 1103)
+
+var co_5m_past = array.new<line>(), var co_5m_future = array.new<line>(), var co_5m_past_labels = array.new<label>(), var co_5m_future_labels = array.new<label>()
+var co_15m_past = array.new<line>(), var co_15m_future = array.new<line>(), var co_15m_past_labels = array.new<label>(), var co_15m_future_labels = array.new<label>()
+var co_30m_past = array.new<line>(), var co_30m_future = array.new<line>(), var co_30m_past_labels = array.new<label>(), var co_30m_future_labels = array.new<label>()
+var co_1h_past = array.new<line>(), var co_1h_future = array.new<line>(), var co_1h_past_labels = array.new<label>(), var co_1h_future_labels = array.new<label>()
+var co_4h_past = array.new<line>(), var co_4h_future = array.new<line>(), var co_4h_past_labels = array.new<label>(), var co_4h_future_labels = array.new<label>()
+var co_d_past = array.new<line>(), var co_d_future = array.new<line>(), var co_d_past_labels = array.new<label>(), var co_d_future_labels = array.new<label>()
+var co_w_past = array.new<line>(), var co_w_future = array.new<line>(), var co_w_past_labels = array.new<label>(), var co_w_future_labels = array.new<label>()
+var co_m_past = array.new<line>(), var co_m_future = array.new<line>(), var co_m_past_labels = array.new<label>(), var co_m_future_labels = array.new<label>()
+var co_3m_past = array.new<line>(), var co_3m_future = array.new<line>(), var co_3m_past_labels = array.new<label>(), var co_3m_future_labels = array.new<label>()
+var co_y_past = array.new<line>(), var co_y_future = array.new<line>(), var co_y_past_labels = array.new<label>(), var co_y_future_labels = array.new<label>()
+
+f_manage_candle_open_vdivs("5", show5mOpen, showCandleOpenTime, color.new(color.purple, 50), lookbackCandleOpenings, co_5m_past, co_5m_future, co_5m_past_labels, co_5m_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("15", show15mOpen, showCandleOpenTime, color.new(color.orange, 50), lookbackCandleOpenings, co_15m_past, co_15m_future, co_15m_past_labels, co_15m_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("30", show30mOpen, showCandleOpenTime, color.new(color.teal, 50), lookbackCandleOpenings, co_30m_past, co_30m_future, co_30m_past_labels, co_30m_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("60", show1hOpen, showCandleOpenTime, color.new(color.blue, 50), lookbackCandleOpenings, co_1h_past, co_1h_future, co_1h_past_labels, co_1h_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("240", show4hOpen, showCandleOpenTime, color.new(color.maroon, 50), lookbackCandleOpenings, co_4h_past, co_4h_future, co_4h_past_labels, co_4h_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("D", showDailyOpen, showCandleOpenTime, color.new(#0dc751, 50), lookbackCandleOpenings, co_d_past, co_d_future, co_d_past_labels, co_d_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("W", showWeeklyOpen, showCandleOpenTime, color.new(#e80dd1, 50), lookbackCandleOpenings, co_w_past, co_w_future, co_w_past_labels, co_w_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("M", showMonthlyOpen, showCandleOpenTime, color.new(#ff5722, 50), lookbackCandleOpenings, co_m_past, co_m_future, co_m_past_labels, co_m_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("3M", show3MonthOpen, showCandleOpenTime, color.new(#cddc39, 50), lookbackCandleOpenings, co_3m_past, co_3m_future, co_3m_past_labels, co_3m_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+f_manage_candle_open_vdivs("12M", showYearlyOpen, showCandleOpenTime, color.new(#795548, 50), lookbackCandleOpenings, co_y_past, co_y_future, co_y_past_labels, co_y_future_labels, co_label_pos, co_label_size, co_label_color_src, co_label_custom_color, co_label_show_year, co_label_show_month, co_label_show_day, co_label_show_time)
+
+[isPivotHigh, isPivotLow] = f_manage_swing_high_lows(showSwings, swingSizeL, swingSizeR)
+plotshape(isPivotHigh ? high[swingSizeR] : na, style=shape.circle, location=location.absolute, color=color.rgb(124, 11, 11), size=size.tiny, offset=-swingSizeR)
+plotshape(isPivotLow ? low[swingSizeR] : na, style=shape.circle, location=location.absolute, color=color.green, size=size.tiny, offset=-swingSizeR)
